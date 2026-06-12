@@ -1,0 +1,46 @@
+<ion-grid fixed>
+    <ion-row>
+        <ion-col >
+            <ion-card >
+                <ion-card-header>
+                    <ion-card-title>Dinero Cobrado</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <ion-label color="primary">{{ totalPaid() | currency }}</ion-label>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+        <ion-col >
+            <ion-card >
+                <ion-card-header>
+                    <ion-card-title>Dinero en la Calle</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <ion-label color="primary">{{ moneyOnTheStreet() | currency }}</ion-label>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col >
+            <ion-card >
+                <ion-card-header>
+                    <ion-card-title>Cobrado Hoy</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <ion-label color="primary">{{ collectedToday() | currency }}</ion-label>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+        <ion-col >
+            <ion-card >
+                <ion-card-header>
+                    <ion-card-title>Pendiente Día</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <ion-label color="primary">{{ pendingCollectionsToday() | currency }}</ion-label>
+                </ion-card-content>
+            </ion-card>
+        </ion-col>
+    </ion-row>
+</ion-grid>

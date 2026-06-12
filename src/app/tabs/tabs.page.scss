@@ -5,7 +5,7 @@ ion-tab-bar {
   -webkit-backdrop-filter: blur(16px);
   
   /* Centrado y bordes optimizados para pantallas curvas */
-  width: calc(100% - 40px); /* Un poco más de margen para las curvas */
+  width: calc(100% - 40px); 
   max-width: 400px; 
   margin: 0 auto 25px auto; 
   padding: 0 10px;
@@ -14,7 +14,7 @@ ion-tab-bar {
   --border: 0;
   border: 1px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-  height: 80px; /* Mas alto para iconos mas grandes */
+  height: 80px; 
   
   /* Alineación de botones */
   display: flex;

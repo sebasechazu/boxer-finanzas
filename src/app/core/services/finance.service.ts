@@ -69,7 +69,7 @@ export class FinanceService implements OnDestroy {
             this._articulosSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Articulo)));
         });
 
-        const qCuotas = collection(db, 'cuotas');
+        const qCuotas = query(collection(db, 'cuotas'), where('usuarioId', '==', uid));
         this._unsubCuotas = onSnapshot(qCuotas, snap => {
             this._cuotasSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Cuota)));
         });

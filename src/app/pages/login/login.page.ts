@@ -5,6 +5,7 @@ import {
     IonCard, IonCardContent,
     IonSpinner
 } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -21,7 +22,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LoginPage implements OnInit {
     private authService = inject(AuthService);
-    private router = inject(Router);
+    private navCtrl = inject(NavController);
     
     // Convertimos isLoading a Signal para evitar problemas del ciclo de vida de Ionic/Angular
     public isLoading = signal(false);
@@ -36,7 +37,7 @@ export class LoginPage implements OnInit {
         const user = await this.authService.waitForAuth();
         if (user) {
             // Si hay usuario, vamos directo al dashboard y no mostramos el login
-            this.router.navigate(['/tabs/dashboard'], { replaceUrl: true });
+            this.navCtrl.navigateRoot('/tabs/dashboard', { animated: false });
         }
     }
 
@@ -48,7 +49,9 @@ export class LoginPage implements OnInit {
         this.isLoading.set(true);
         try {
             await this.authService.loginWithGoogle();
-        } finally {
+            // No seteamos isLoading a false aquí, para que la transición hacia
+            // el dashboard se vea fluida y no parpadee la UI.
+        } catch (error) {
             this.isLoading.set(false);
         }
     }

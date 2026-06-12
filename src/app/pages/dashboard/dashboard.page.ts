@@ -1,10 +1,8 @@
 import { Component, inject, computed, ChangeDetectionStrategy } from '@angular/core';
 import {
     IonHeader, IonToolbar, IonTitle, IonContent,
-    IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
-    IonDatetime, IonSpinner, IonGrid, IonRow, IonCol,
-    IonChip, IonIcon, IonLabel, IonBadge
-} from '@ionic/angular/standalone';
+    IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+    IonDatetime, IonChip, IonIcon, IonLabel} from '@ionic/angular/standalone';
 import { FinanceService } from '../../core/services/finance.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
@@ -12,6 +10,7 @@ import { CurrencyPipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { swapHorizontalOutline, personOutline, businessOutline } from 'ionicons/icons';
 import { CuentaAccesible } from '../../core/models/models';
+import { DashboardCardsComponent } from './dashboard-cards/dashboard-cards.component';
 
 @Component({
     selector: 'app-dashboard',
@@ -19,12 +18,11 @@ import { CuentaAccesible } from '../../core/models/models';
     standalone: true,
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
-        IonHeader, IonToolbar, IonTitle, IonContent,
-        IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
-        IonDatetime, IonSpinner, IonGrid, IonRow, IonCol,
-        IonChip, IonIcon, IonLabel,
-        CurrencyPipe
-    ],
+    IonHeader, IonToolbar, IonTitle, IonContent,
+    IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+    IonDatetime, IonChip, IonIcon, IonLabel,
+    DashboardCardsComponent
+],
 })
 export class DashboardPage {
     public financeService = inject(FinanceService);

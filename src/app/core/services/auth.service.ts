@@ -3,7 +3,7 @@ import { onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, User,
 import { Router } from '@angular/router';
 import { PerfilUsuario } from '../models/models';
 import { auth, db } from '../../firebase.config';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 @Injectable({
@@ -11,6 +11,7 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 })
 export class AuthService implements OnDestroy {
     private router = inject(Router);
+    private navCtrl = inject(NavController);
     private alertController = inject(AlertController);
     private _authStateInitialized = signal(false);
     readonly authStateInitialized = this._authStateInitialized.asReadonly();
@@ -29,7 +30,7 @@ export class AuthService implements OnDestroy {
 
                 // Si estamos en login, navegar al dashboard
                 if (this.router.url === '/login' || this.router.url === '/') {
-                    this.router.navigate(['/tabs/dashboard'], { replaceUrl: true });
+                    this.navCtrl.navigateRoot('/tabs/dashboard', { animated: false });
                 }
             }
         });
@@ -89,7 +90,7 @@ export class AuthService implements OnDestroy {
         const provider = new GoogleAuthProvider();
         try {
             await signInWithPopup(auth, provider);
-            this.router.navigate(['/tabs/dashboard']);
+            // La navegación al dashboard se maneja en onAuthStateChanged para evitar doble transición
         } catch (error: any) {
             console.error('AuthService: Error en login web:', error);
             const alert = await this.alertController.create({
@@ -98,6 +99,7 @@ export class AuthService implements OnDestroy {
                 buttons: ['OK']
             });
             await alert.present();
+            throw error;
         }
     }
 

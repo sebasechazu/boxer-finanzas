@@ -1,163 +1,43 @@
-<ion-header class="ion-no-border">
+<ion-header translucent>
   <ion-toolbar>
-    <ion-title class="text-gradient">Boxer Finanzas</ion-title>
+    <ion-title class="text-gradient">{{ nombreNegocioActivo() }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  @defer (on viewport) {
-
-    <!-- ── Selector de Cuenta Activa ──────────────────────────────── -->
-    @if (tieneMultiplesCuentas()) {
-      <div class="account-switcher">
-        <p class="account-switcher-label">Viendo cuenta de:</p>
-        <div class="account-chips">
-          @for (cuenta of accountService.cuentasAccesibles(); track cuenta.propietarioUid) {
-            <ion-chip
-              [color]="accountService.effectiveAccountUid() === cuenta.propietarioUid ? 'primary' : 'medium'"
-              [outline]="accountService.effectiveAccountUid() !== cuenta.propietarioUid"
-              (click)="switchAccount(cuenta)"
-            >
-              <ion-icon [name]="cuenta.esPropia ? 'person-outline' : 'business-outline'" slot="start"></ion-icon>
-              <ion-label>
-                @if (cuenta.esPropia) {
-                  Mi cuenta
-                } @else {
-                  {{ getNombreNegocio(cuenta.propietarioUid) }}
-                }
-              </ion-label>
-            </ion-chip>
+  @if (tieneMultiplesCuentas()) {
+  <div class="account-switcher">
+    <p>Viendo cuenta de:</p>
+    <div>
+      @for (cuenta of accountService.cuentasAccesibles(); track cuenta.propietarioUid) {
+      <ion-chip [color]="accountService.effectiveAccountUid() === cuenta.propietarioUid ? 'primary' : 'medium'"
+        [outline]="accountService.effectiveAccountUid() !== cuenta.propietarioUid" (click)="switchAccount(cuenta)">
+        <ion-icon [name]="cuenta.esPropia ? 'person-outline' : 'business-outline'" slot="start"></ion-icon>
+        <ion-label>
+          @if (cuenta.esPropia) {
+          Mi cuenta
+          } @else {
+          {{ getNombreNegocio(cuenta.propietarioUid) }}
           }
-        </div>
-      </div>
-    } @else {
-      <!-- Banner del nombre del negocio cuando solo hay una cuenta -->
-      <div class="negocio-banner">
-        <ion-icon name="business-outline" color="primary"></ion-icon>
-        <span>{{ nombreNegocioActivo() }}</span>
-      </div>
-    }
-
-    <!-- ── Tarjetas de resumen ─────────────────────────────────────── -->
-    <ion-grid fixed>
-      <ion-row>
-        <ion-col size="6">
-          <ion-card class="dashboard-card compact">
-            <ion-card-content>
-              <div class="card-label">Dinero Cobrado</div>
-              <div class="card-value">{{ financeService.totalPaid() | currency }}</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="6">
-          <ion-card class="dashboard-card compact">
-            <ion-card-content>
-              <div class="card-label">Dinero en la Calle</div>
-              <div class="card-value">{{ financeService.moneyOnTheStreet() | currency }}</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="6">
-          <ion-card class="dashboard-card compact">
-            <ion-card-content>
-              <div class="card-label">Cobrado Hoy</div>
-              <div class="card-value">{{ financeService.collectedToday() | currency }}</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="6">
-          <ion-card class="dashboard-card compact">
-            <ion-card-content>
-              <div class="card-label">Pendiente Día</div>
-              <div class="card-value">{{ financeService.pendingCollectionsToday() | currency }}</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <!-- ── Calendario ─────────────────────────────────────────────── -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-subtitle>Agenda</ion-card-subtitle>
-        <ion-card-title>Próximos Vencimientos</ion-card-title>
-      </ion-card-header>
-      <ion-datetime 
-        presentation="date" 
-        [highlightedDates]="highlightedDates()"
-      ></ion-datetime>
-    </ion-card>
-
-  } @placeholder {
-    <div class="ion-padding ion-text-center">
-      <ion-spinner name="crescent"></ion-spinner>
-      <p>Cargando datos financieros...</p>
+        </ion-label>
+      </ion-chip>
+      }
     </div>
+  </div>
   }
 
-  <style>
-    .account-switcher {
-      margin-bottom: 16px;
-    }
+  <app-dashboard-cards [totalPaid]="financeService.totalPaid()" [moneyOnTheStreet]="financeService.moneyOnTheStreet()"
+    [collectedToday]="financeService.collectedToday()"
+    [pendingCollectionsToday]="financeService.pendingCollectionsToday()">
+  </app-dashboard-cards>
 
-    .account-switcher-label {
-      font-size: 0.75rem;
-      color: var(--ion-color-medium);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin: 0 0 8px;
-      font-weight: 500;
-    }
-
-    .account-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .negocio-banner {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--ion-color-primary);
-    }
-
-    .dashboard-card {
-      margin: 0;
-      width: 100%;
-      background: var(--ion-card-background, #ffffff);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    .dashboard-card.compact ion-card-content {
-      padding: 12px;
-      text-align: center;
-    }
-
-    ion-col {
-      padding: 4px;
-    }
-
-    .card-label {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: var(--ion-color-medium);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
-    }
-
-    .card-value {
-      font-size: 1rem !important;
-      font-weight: 700 !important;
-      color: var(--ion-color-primary) !important;
-    }
-  </style>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Próximos Vencimientos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-datetime presentation="date" [highlightedDates]="highlightedDates()"></ion-datetime>
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>
