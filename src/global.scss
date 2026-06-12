@@ -1,0 +1,286 @@
+/*
+ * Boxer Finanzas - Premium Design System
+ * ----------------------------------------------------------------------------
+ */
+
+/* Google Fonts - Outfit */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+@import '@ionic/angular/css/palettes/dark.system.css';
+
+/* --- Global Improvements --- */
+:root {
+  --ion-font-family: 'Outfit', sans-serif;
+  font-size: 16px; 
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Page Background Watermark */
+ion-content {
+  --background: var(--ion-background-color) url('assets/icon/logo.png') no-repeat center / cover;
+  &::part(background) {
+    background-image: url('assets/icon/logo.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.03; /* Very subtle watermark */
+    filter: grayscale(100%);
+  }
+}
+
+/* Premium Card Design */
+ion-card {
+  border-radius: var(--premium-radius);
+  box-shadow: var(--premium-shadow);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+  margin: 16px;
+  background: var(--ion-card-background, #ffffff);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+ion-card-header {
+  padding-bottom: 8px;
+}
+
+ion-card-title {
+  font-weight: 600;
+  color: var(--ion-color-secondary);
+  font-size: 1.25rem;
+}
+
+/* Premium Buttons */
+ion-button {
+  --border-radius: 12px;
+  --box-shadow: none;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  height: 48px;
+  
+  &.button-solid {
+    --background: var(--premium-gradient);
+    --background-hover: var(--ion-color-primary-shade);
+  }
+
+  &.new-op-button {
+    --border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    margin-top: -30px;
+    --box-shadow: 0 8px 16px rgba(var(--ion-color-primary-rgb), 0.3);
+  }
+}
+
+/* Polished Tab Bar (Floating Design) */
+ion-tabs {
+  background: transparent !important;
+}
+
+ion-tab-bar {
+  /* Absolute positioning to prevent "double bar" ghosting */
+  position: absolute !important;
+  bottom: 0 !important;
+  bottom: env(safe-area-inset-bottom) !important;
+  left: 8px !important;
+  right: 8px !important;
+  width: auto !important;
+  margin-bottom: 8px !important;
+  
+  /* Design - Reduced transparency for better legibility on mobile */
+  --background: rgba(255, 255, 255, 0.96) !important;
+  --border: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  height: 56px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  
+  /* Reset layout */
+  margin: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+  z-index: 1000;
+
+  &::part(background) {
+    background: transparent !important;
+  }
+}
+
+ion-tab-button {
+  --background: transparent !important;
+  --background-focused: transparent !important;
+  --color-selected: var(--ion-color-primary) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  ion-tab-bar {
+    --background: rgba(35, 35, 35, 0.96) !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  }
+  
+  ion-card-title {
+    color: #ffffff;
+  }
+}
+
+ion-tab-button {
+  --color-selected: var(--ion-color-primary);
+  
+  ion-icon {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+  }
+
+  &.tab-selected ion-icon {
+    transform: translateY(-2px);
+  }
+}
+
+/* Header Styles */
+ion-header {
+  ion-toolbar {
+    --background: transparent;
+    --border-width: 0;
+    padding-top: 10px;
+  }
+  
+  ion-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+  }
+}
+
+/* Utilities */
+ion-fab {
+  margin-bottom: 120px;
+}
+
+.firebase-emulator-warning {
+  display: none !important;
+}
+
+.text-gradient {
+  background: var(--premium-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+
+/* Custom Large Buttons for Lists */
+.large-list-btn {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  height: 56px !important;
+  width: 56px !important;
+  margin: 0 4px;
+  
+  ion-icon {
+    font-size: 28px !important;
+  }
+}
+
+.large-list-icon {
+  font-size: 32px !important;
+  margin-right: 12px;
+}
+
+/* ── Avatar en la tab bar ────────────────────────────────────────────── */
+ion-tab-button.profile-tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .tab-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+    margin: auto;
+
+    .avatar-wrapper {
+      box-sizing: border-box !important;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+  }
+
+  &.tab-selected {
+    .tab-avatar {
+      transform: translateY(-2px);
+    }
+    .avatar-wrapper {
+      border-color: var(--ion-color-primary);
+    }
+  }
+}
+
+/* --- Profile Page Styles --- */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 16px 8px;
+}
+
+.profile-avatar-wrap {
+  flex-shrink: 0;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary, var(--ion-color-primary)));
+}
+
+.profile-avatar-wrap .avatar-wrapper {
+  border: 2px solid var(--ion-background-color, #fff);
+}
+
+.profile-info h2 {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+}
+
+.profile-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+.section-list {
+  margin-bottom: 8px;
+}
+
+.inv-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}

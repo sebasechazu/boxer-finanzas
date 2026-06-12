@@ -1,0 +1,7 @@
+{
+  "name": "mi-app-finanzas",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

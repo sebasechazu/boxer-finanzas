@@ -1,0 +1,107 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Artículos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openAddModal()">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid class="ion-no-padding">
+    <ion-row>
+      <ion-col size="4">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <ion-icon name="wallet-outline" color="primary"></ion-icon>
+            <div class="stat-value">$ {{ financeService.totalArticlePurchasePrice() }}</div>
+            <div class="stat-label">Total Compra</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="4">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <ion-icon name="cash-outline" color="success"></ion-icon>
+            <div class="stat-value">$ {{ financeService.totalArticleSalePrice() }}</div>
+            <div class="stat-label">Total Venta</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="4">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <ion-icon name="trending-up-outline" color="warning"></ion-icon>
+            <div class="stat-value">$ {{ financeService.totalPotentialProfit() }}</div>
+            <div class="stat-label">Dinero Ganado</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-list>
+    @for (article of financeService.userArticles(); track article.id) {
+      <ion-item>
+        <ion-icon name="cube-outline" slot="start" color="medium" class="large-list-icon"></ion-icon>
+        <ion-label>
+          <h2>{{ article.nombre }}</h2>
+          <p>
+            Compra: $ {{ article.precioCompra || 0 }} | 
+            Contado: $ {{ article.precioVentaContado }}
+          </p>
+          @if (article.precioCompra) {
+            <p color="success">
+              Ganancia: $ {{ article.precioVentaContado - article.precioCompra }}
+            </p>
+          }
+        </ion-label>
+        <div slot="end">
+          <ion-button fill="clear" class="large-list-btn" (click)="editArticle(article)">
+            <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" class="large-list-btn" color="danger" (click)="deleteArticle(article.id)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+    } @empty {
+      <div class="ion-padding ion-text-center">
+        <p>No tienes artículos registrados todavía.</p>
+      </div>
+    }
+  </ion-list>
+
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ editingArticleId ? 'Editar Artículo' : 'Nuevo Artículo' }}</ion-title>
+          <ion-button slot="end" fill="clear" (click)="closeModal()">Cerrar</ion-button>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <form [formGroup]="articleForm" (ngSubmit)="onSubmit()">
+          <ion-item lines="full">
+            <ion-label position="stacked">Nombre del Artículo</ion-label>
+            <ion-input formControlName="nombre" placeholder="Ej: Celular Samsung"></ion-input>
+          </ion-item>
+          <ion-item lines="full">
+            <ion-label position="stacked">Precio de Compra</ion-label>
+            <ion-input type="number" formControlName="precioCompra" placeholder="0.00"></ion-input>
+          </ion-item>
+          <ion-item lines="full">
+            <ion-label position="stacked">Precio Venta Contado</ion-label>
+            <ion-input type="number" formControlName="precioVentaContado" placeholder="0.00"></ion-input>
+          </ion-item>
+          
+          <ion-button expand="block" type="submit" [disabled]="articleForm.invalid || isSaving" class="ion-margin-top">
+            {{ isSaving ? 'Guardando...' : (editingArticleId ? 'Actualizar' : 'Guardar Artículo') }}
+          </ion-button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

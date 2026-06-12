@@ -1,0 +1,80 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Perfiles de usuario ─────────────────────────────────────────────────
+    // Cada usuario puede leer/escribir su propio perfil.
+    // Los colaboradores pueden leer el perfil del propietario al que asisten.
+    match /usuarios/{uid} {
+      allow read: if request.auth != null && (
+        request.auth.uid == uid || 
+        exists(/databases/$(database)/documents/colaboradores/$(uid + '_' + request.auth.uid))
+      );
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ── Invitaciones ────────────────────────────────────────────────────────
+    // Solo el propietario puede crear invitaciones desde su cuenta.
+    // El propietario y el invitado (por email) pueden leer y actualizar.
+    match /invitaciones/{invId} {
+      allow read: if request.auth != null && (
+        resource.data.propietarioUid == request.auth.uid ||
+        request.auth.token.email.lower() == resource.data.emailInvitado.lower()
+      );
+      allow create: if request.auth != null
+        && request.resource.data.propietarioUid == request.auth.uid;
+      allow update: if request.auth != null && (
+        resource.data.propietarioUid == request.auth.uid ||
+        request.auth.token.email.lower() == resource.data.emailInvitado.lower()
+      );
+    }
+
+    // ── Colaboradores ───────────────────────────────────────────────────────
+    // Solo pueden leer quienes son propietario o colaborador en ese documento.
+    // La creación la hace el colaborador al aceptar (su UID debe coincidir).
+    // El propietario puede borrar (revocar acceso).
+    match /colaboradores/{colId} {
+      allow read: if request.auth != null && (
+        resource.data.propietarioUid == request.auth.uid ||
+        resource.data.colaboradorUid == request.auth.uid
+      );
+      allow create: if request.auth != null
+        && request.resource.data.colaboradorUid == request.auth.uid;
+      allow delete: if request.auth != null && (
+        resource.data.propietarioUid == request.auth.uid ||
+        resource.data.colaboradorUid == request.auth.uid
+      );
+    }
+
+    // ── Datos financieros ───────────────────────────────────────────────────
+    // Se permite el acceso si sos el propietario (usuarioId == uid)
+    // o si sos colaborador registrado (existe doc en colaboradores/{propietarioUid}_{tuUid}).
+
+    function esOwnerOColaborador(ownerUid) {
+      return request.auth.uid == ownerUid
+        || exists(/databases/$(database)/documents/colaboradores/$(ownerUid + '_' + request.auth.uid));
+    }
+
+    match /clientes/{id} {
+      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+    }
+
+    match /articulos/{id} {
+      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+    }
+
+    match /operaciones/{id} {
+      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+    }
+
+    // Las cuotas ahora incluyen usuarioId para una validación eficiente
+    match /cuotas/{id} {
+      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+    }
+  }
+}

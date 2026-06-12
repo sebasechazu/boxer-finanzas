@@ -1,0 +1,26 @@
+<!-- Header con segment: Historial de Operaciones | Artículos -->
+<ion-header>
+  <ion-toolbar>
+    <ion-segment [value]="selectedTab()" (ionChange)="onTabChange($event)">
+      <ion-segment-button value="operaciones">
+        <ion-icon name="receipt-outline"></ion-icon>
+        <ion-label>Historial</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="articulos">
+        <ion-icon name="cube-outline"></ion-icon>
+        <ion-label>Artículos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Un único ion-content en el padre -->
+<ion-content class="ion-padding">
+  @if (selectedTab() === 'operaciones') {
+    <app-operations-list></app-operations-list>
+  }
+  @if (selectedTab() === 'articulos') {
+    <app-articles-list></app-articles-list>
+  }
+  <div style="height: 80px;"></div>
+</ion-content>
