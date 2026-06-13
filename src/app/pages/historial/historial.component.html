@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-segment [value]="selectedTab()" (ionChange)="onTabChange($event)">
       <ion-segment-button value="operaciones">
-        <ion-label>Historial</ion-label>
+        <ion-label>Operaciones</ion-label>
       </ion-segment-button>
       <ion-segment-button value="articulos">
         <ion-label>Artículos</ion-label>
@@ -11,13 +11,11 @@
   </ion-toolbar>
 </ion-header>
 
-<!-- Un único ion-content en el padre -->
 <ion-content class="ion-padding">
-  @if (selectedTab() === 'operaciones') {
-  <app-operations-list></app-operations-list>
+  @if(selectedTab() === 'operaciones') {
+    <app-operations-list></app-operations-list>
   }
-  @if (selectedTab() === 'articulos') {
-  <app-articles-list></app-articles-list>
+  @if(selectedTab() === 'articulos') {
+    <app-articles-list></app-articles-list>
   }
-  <div class="h-20"></div>
 </ion-content>

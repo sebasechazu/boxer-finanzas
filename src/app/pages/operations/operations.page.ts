@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import {
-  IonHeader, IonToolbar, IonSegment, IonSegmentButton, IonLabel, IonIcon, IonContent
+  IonHeader, IonToolbar, IonSegment, IonSegmentButton, IonLabel, IonContent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { receiptOutline, cubeOutline } from 'ionicons/icons';
@@ -13,7 +13,7 @@ import { ArticlesListComponent } from './articles-list/articles-list.component';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
-    IonHeader, IonToolbar, IonSegment, IonSegmentButton, IonLabel, IonIcon, IonContent,
+    IonHeader, IonToolbar, IonSegment, IonSegmentButton, IonLabel, IonContent,
     OperationsListComponent,
     ArticlesListComponent,
   ],
