@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { IonHeader, IonContent, IonSegment, IonSegmentButton, IonLabel, IonToolbar } from "@ionic/angular/standalone";
-import { OperationsListComponent } from "../operations/operations-list/operations-list.component";
-import { ArticlesListComponent } from "../operations/articles-list/articles-list.component";
+import { OperationsListComponent } from "./operations-list/operations-list.component";
+import { ArticlesListComponent } from "./articles-list/articles-list.component";
 
 @Component({
   selector: 'app-historial',
