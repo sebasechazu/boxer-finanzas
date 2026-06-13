@@ -2,7 +2,7 @@ import { Component, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonModal,
-  AlertController, IonButtons } from '@ionic/angular/standalone';
+  AlertController, IonButtons, IonFab, IonFabButton } from '@ionic/angular/standalone';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FinanceService } from '../../core/services/finance.service';
 import { addIcons } from 'ionicons';
@@ -13,11 +13,10 @@ import { logoWhatsapp, addOutline, personAddOutline, trashOutline, createOutline
   templateUrl: 'clients.page.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [IonButtons, 
+  imports: [IonFabButton,
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonModal,
-    ReactiveFormsModule
-  ],
+    ReactiveFormsModule, IonFab],
 })
 export class ClientsPage {
   public financeService = inject(FinanceService);

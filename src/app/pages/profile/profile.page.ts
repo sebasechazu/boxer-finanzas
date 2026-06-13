@@ -1,5 +1,5 @@
 import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote, IonListHeader, IonItemSliding, IonItemOptions, IonItemOption, AlertController, ToastController, IonThumbnail, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordion, IonCardSubtitle } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote, IonListHeader, IonItemSliding, IonItemOptions, IonItemOption, AlertController, ToastController, IonThumbnail, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordion, IonCardSubtitle, IonButtons } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
 import { Invitacion, Colaborador } from '../../core/models/models';
@@ -11,19 +11,18 @@ import {
     cafeOutline, cafe
 } from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
-import { AvatarComponent } from '../../components/avatar/avatar.component';
 
 @Component({
     selector: 'app-profile',
     templateUrl: 'profile.page.html',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [ IonCardTitle, IonCardHeader, IonCard,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
-    IonLabel, IonButton, IonIcon, IonBadge, IonNote,
-    IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
-    CommonModule,
-    IonThumbnail, IonCardContent]
+    imports: [IonButtons, IonCardTitle, IonCardHeader, IonCard,
+        IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
+        IonLabel, IonButton, IonIcon, IonBadge, IonNote,
+        IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
+        CommonModule,
+        IonThumbnail, IonCardContent]
 })
 export class ProfilePage {
     private authService = inject(AuthService);
@@ -45,7 +44,7 @@ export class ProfilePage {
             logOutOutline, mailOutline, personAddOutline, trashOutline,
             checkmarkCircleOutline, closeCircleOutline, businessOutline,
             peopleOutline, personOutline, shieldCheckmarkOutline,
-            cafeOutline, cafe
+            cafeOutline, cafe, addOutline: personAddOutline
         });
     }
 

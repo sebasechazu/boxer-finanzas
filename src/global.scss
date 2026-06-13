@@ -19,7 +19,7 @@
 
 @import '@ionic/angular/css/palettes/dark.system.css';
 
-/* --- Global Improvements --- */
+/* --- 1. Global Improvements & Resets --- */
 :root {
   --ion-font-family: 'Outfit', sans-serif;
   font-size: 16px; 
@@ -41,6 +41,8 @@ ion-content {
     filter: grayscale(100%);
   }
 }
+
+/* --- 2. Ionic Component Customizations (Base) --- */
 
 /* Premium Card Design */
 ion-card {
@@ -86,7 +88,13 @@ ion-button {
   }
 }
 
-/* Polished Tab Bar (Floating Design) */
+/* Default height / width limit for Ionic Modals in this application */
+ion-modal {
+  --height: 100%;
+  --width: 100%;
+}
+
+/* --- 3. Main Navigation Layout (Tabs) --- */
 ion-tabs {
   background: transparent !important;
 }
@@ -149,7 +157,7 @@ ion-tab-button {
   }
 }
 
-/* Utilities */
+/* --- 4. General Utility Classes --- */
 ion-fab {
   margin-bottom: 120px;
 }
@@ -166,7 +174,7 @@ ion-fab {
   font-weight: 700;
 }
 
-/* Custom Large Buttons for Lists */
+/* Custom Large Buttons and Icons for Lists */
 .large-list-btn {
   --padding-start: 12px;
   --padding-end: 12px;
@@ -184,7 +192,12 @@ ion-fab {
   margin-right: 12px;
 }
 
-/* --- COMPONENT SPECIFIC STYLES CENTRALIZED --- */
+.fullscreen-modal {
+  --height: 100%;
+  --width: 100%;
+}
+
+/* --- 5. Component-Specific Styles (Centralized) --- */
 
 /* Shared across articles, operations, etc. */
 .stat-card {
@@ -224,19 +237,12 @@ ion-fab {
   }
 }
 
-/* Articles & Operations List */
+/* Articles & Operations List spacing */
 .add-btn-row {
   margin-bottom: 12px;
 }
-ion-modal {
-  --height: 100%;
-  --width: 100%;
-}
 
-.fullscreen-modal {
-  --height: 100%;
-  --width: 100%;
-}
+/* --- 6. Page-Specific Styles --- */
 
 /* Login Page Styles */
 app-login {
@@ -303,12 +309,6 @@ app-login {
     background: rgba(210, 166, 121, 0.4);
     animation-duration: 22s;
     animation-delay: -12s;
-  }
-
-  @keyframes float-blob {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(60px, 80px) scale(1.15); }
-    66% { transform: translate(-40px, -40px) scale(0.85); }
   }
 
   /* Contenedor principal del Login */
@@ -486,4 +486,11 @@ app-login {
   .animate-beat {
     animation: pulse-beat 2.2s infinite ease-in-out;
   }
+}
+
+/* --- 7. Global Animations Keyframes --- */
+@keyframes float-blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, 80px) scale(1.15); }
+  66% { transform: translate(-40px, -40px) scale(0.85); }
 }

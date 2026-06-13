@@ -80,11 +80,14 @@
 
   <ion-card>
     <ion-card-header>
+      <ion-toolbar>
       <ion-card-title>Mis Colaboradores </ion-card-title>
-      
-      <ion-button  (click)="invitarColaborador()">
-        <ion-icon name="person-add-outline" slot="icon-only"></ion-icon>
-      </ion-button>
+      <ion-buttons slot="end">
+        <ion-button (click)="invitarColaborador()">
+          <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      </ion-toolbar>
     </ion-card-header>
     <ion-list lines="full" class="section-list">
 
