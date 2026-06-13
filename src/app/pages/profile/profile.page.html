@@ -1,33 +1,37 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-title>Mi Perfil</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content>
 
-  <div class="profile-header">
-    <app-avatar [size]="72" class="profile-avatar-wrap"></app-avatar>
-    <div class="profile-info">
-      <h2>{{ user()?.displayName || 'Usuario' }}</h2>
-      <p>{{ user()?.email }}</p>
-    </div>
-  </div>
+  <ion-header class="ion-no-border">
+    <ion-toolbar>
+      <ion-title>{{ user()?.displayName || 'Usuario' }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-  <ion-list lines="full" class="section-list">
-    <ion-list-header>
-      <ion-label>Mi Negocio</ion-label>
-    </ion-list-header>
+  <ion-item lines="none">
+    <ion-thumbnail slot="start" style="border-radius: 50%; overflow: hidden;">
+      <img [src]="user()?.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" alt="Avatar" />
+    </ion-thumbnail>
+    <ion-label>
+      <h3 color="medium">{{ user()?.email }}</h3>
+    </ion-label>
+  </ion-item>
 
-    <ion-item button (click)="editarNombreNegocio()">
-      <ion-icon name="business-outline" slot="start" color="primary"></ion-icon>
-      <ion-label>
-        <p>{{ perfil()?.nombreNegocio || 'Sin nombre' }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Mi Negocio</ion-card-title>
+    </ion-card-header>
+    <ion-list lines="full">
 
-  @if (invitacionesPendientes().length > 0) {
+      <ion-item button (click)="editarNombreNegocio()">
+        <ion-icon name="business-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <h3>{{ perfil()?.nombreNegocio || 'Sin nombre' }}</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-card>
+
+  <ion-card>
+    @if (invitacionesPendientes().length > 0) {
     <ion-list lines="full" class="section-list">
       <ion-list-header>
         <ion-label>Invitaciones Recibidas</ion-label>
@@ -35,62 +39,64 @@
       </ion-list-header>
 
       @for (inv of invitacionesPendientes(); track inv.id) {
-        <ion-item>
-          <ion-icon name="mail-outline" slot="start" color="warning"></ion-icon>
-          <ion-label>
-            <h3>{{ inv.propietarioNombreNegocio }}</h3>
-            <p>De: {{ inv.propietarioEmail }}</p>
-          </ion-label>
-          <div class="inv-actions" slot="end">
-            <ion-button fill="clear" color="success" size="small" (click)="aceptarInvitacion(inv)">
-              <ion-icon name="checkmark-circle-outline"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" color="danger" size="small" (click)="rechazarInvitacion(inv)">
-              <ion-icon name="close-circle-outline"></ion-icon>
-            </ion-button>
-          </div>
-        </ion-item>
+      <ion-item>
+        <ion-icon name="mail-outline" slot="start" color="warning"></ion-icon>
+        <ion-label>
+          <h3>{{ inv.propietarioNombreNegocio }}</h3>
+          <p>De: {{ inv.propietarioEmail }}</p>
+        </ion-label>
+        <div class="inv-actions" slot="end">
+          <ion-button fill="clear" color="success" size="small" (click)="aceptarInvitacion(inv)">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="danger" size="small" (click)="rechazarInvitacion(inv)">
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
       }
     </ion-list>
-  }
+    }
 
-  @if (cuentasAjenas().length > 0) {
+    @if (cuentasAjenas().length > 0) {
     <ion-list lines="full" class="section-list">
       <ion-list-header>
         <ion-label>Cuentas con Acceso</ion-label>
       </ion-list-header>
 
       @for (cuenta of cuentasAjenas(); track cuenta.id) {
-        <ion-item>
-          <ion-icon name="shield-checkmark-outline" slot="start" color="tertiary"></ion-icon>
-          <ion-label>
-            <h3>{{ getNombreNegocio(cuenta.propietarioUid) }}</h3>
-            <p>{{ getNombrePropietario(cuenta.propietarioUid) }}</p>
-          </ion-label>
-          <ion-note slot="end" color="tertiary">Colaborador</ion-note>
-        </ion-item>
+      <ion-item>
+        <ion-icon name="shield-checkmark-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h3>{{ getNombreNegocio(cuenta.propietarioUid) }}</h3>
+          <p>{{ getNombrePropietario(cuenta.propietarioUid) }}</p>
+        </ion-label>
+        <ion-note slot="end" color="tertiary">Colaborador</ion-note>
+      </ion-item>
       }
     </ion-list>
-  }
+    }
+  </ion-card>
 
-  <!-- ── Mis colaboradores ─────────────────────────────────────────── -->
-  <ion-list lines="full" class="section-list">
-    <ion-list-header>
-      <ion-label>Mis Colaboradores</ion-label>
-      <ion-button fill="clear" size="small" (click)="invitarColaborador()">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Mis Colaboradores </ion-card-title>
+      
+      <ion-button  (click)="invitarColaborador()">
         <ion-icon name="person-add-outline" slot="icon-only"></ion-icon>
       </ion-button>
-    </ion-list-header>
+    </ion-card-header>
+    <ion-list lines="full" class="section-list">
 
-    @if (misColaboradores().length === 0) {
+      @if (misColaboradores().length === 0) {
       <ion-item lines="none">
         <ion-label class="ion-text-center" color="medium">
           <p>Todavía no invitaste a nadie</p>
         </ion-label>
       </ion-item>
-    }
+      }
 
-    @for (col of misColaboradores(); track col.id) {
+      @for (col of misColaboradores(); track col.id) {
       <ion-item-sliding>
         <ion-item>
           <ion-icon name="person-outline" slot="start" color="success"></ion-icon>
@@ -106,47 +112,45 @@
           </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
-    }
-
-    <!-- Invitaciones enviadas (no aceptadas aún) -->
-    @for (inv of invitacionesEnviadas(); track inv.id) {
-      @if (inv.estado !== 'ACEPTADA') {
-        <ion-item>
-          <ion-icon name="mail-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>
-            <h3>{{ inv.emailInvitado }}</h3>
-            <p>Invitación {{ estadoLabel(inv.estado) | lowercase }}</p>
-          </ion-label>
-          <ion-badge slot="end" [color]="estadoColor(inv.estado)">
-            {{ estadoLabel(inv.estado) }}
-          </ion-badge>
-        </ion-item>
       }
-    }
 
-    <ion-item button detail (click)="invitarColaborador()">
-      <ion-icon name="person-add-outline" slot="start" color="primary"></ion-icon>
-      <ion-label color="primary">Invitar colaborador</ion-label>
-    </ion-item>
-  </ion-list>
+      <!-- Invitaciones enviadas (no aceptadas aún) -->
+      @for (inv of invitacionesEnviadas(); track inv.id) {
+      @if (inv.estado !== 'ACEPTADA') {
+      <ion-item>
+        <ion-icon name="mail-outline" slot="start" color="medium"></ion-icon>
+        <ion-label>
+          <h3>{{ inv.emailInvitado }}</h3>
+          <p>Invitación {{ estadoLabel(inv.estado) | lowercase }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="estadoColor(inv.estado)">
+          {{ estadoLabel(inv.estado) }}
+        </ion-badge>
+      </ion-item>
+      }
+      }
 
-  <!-- ── Cerrar sesión ─────────────────────────────────────────────── -->
-  <div class="ion-padding" style="padding-top: 24px;">
+    </ion-list>
+
+  </ion-card>
+
+  <ion-card>
     <ion-button expand="block" fill="outline" color="danger" (click)="logout()">
       <ion-icon name="log-out-outline" slot="start"></ion-icon>
       Cerrar Sesión
     </ion-button>
-  </div>
+  </ion-card>
 
-  <!-- ── Invitar un café ─────────────────────────────────────────────── -->
-  <div class="ion-padding ion-text-center" style="margin-bottom: 120px; padding-top: 0;">
-    <p style="font-size: 0.85rem; color: var(--ion-color-medium); margin-bottom: 4px;">
+  <ion-card>
+    <ion-card-header>
       Si querés seguir apoyando el desarrollo:
-    </p>
-    <ion-button fill="clear" color="warning" size="small" href="https://mpago.la/1FKmvkK" target="_blank" rel="noopener noreferrer" style="margin-top: 0;">
-      <ion-icon name="cafe-outline" slot="start"></ion-icon>
-      Invitame un café
-    </ion-button>
-  </div>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button fill="outline" color="warning" size="small" href="https://mpago.la/1FKmvkK" slot="end">
+        <ion-icon name="cafe-outline" slot="end"></ion-icon>
+        Invitame un café
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>

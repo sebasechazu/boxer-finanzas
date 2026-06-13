@@ -161,21 +161,6 @@ ion-tab-button {
   }
 }
 
-/* Header Styles */
-ion-header {
-  ion-toolbar {
-    --background: transparent;
-    --border-width: 0;
-    padding-top: 10px;
-  }
-  
-  ion-title {
-    font-weight: 700;
-    font-size: 1.5rem;
-    letter-spacing: -0.5px;
-  }
-}
-
 /* Utilities */
 ion-fab {
   margin-bottom: 120px;
@@ -243,44 +228,3 @@ ion-tab-button.profile-tab-btn {
   }
 }
 
-/* --- Profile Page Styles --- */
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 24px 16px 8px;
-}
-
-.profile-avatar-wrap {
-  flex-shrink: 0;
-  border-radius: 50%;
-  padding: 3px;
-  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary, var(--ion-color-primary)));
-}
-
-.profile-avatar-wrap .avatar-wrapper {
-  border: 2px solid var(--ion-background-color, #fff);
-}
-
-.profile-info h2 {
-  margin: 0 0 4px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--ion-color-dark);
-}
-
-.profile-info p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--ion-color-medium);
-}
-
-.section-list {
-  margin-bottom: 8px;
-}
-
-.inv-actions {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}

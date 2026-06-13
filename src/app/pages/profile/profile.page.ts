@@ -1,10 +1,5 @@
 import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import {
-    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
-    IonLabel, IonButton, IonIcon, IonBadge, IonNote,
-    IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
-    AlertController, ToastController
-} from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote, IonListHeader, IonItemSliding, IonItemOptions, IonItemOption, AlertController, ToastController, IonThumbnail, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordion, IonCardSubtitle } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
 import { Invitacion, Colaborador } from '../../core/models/models';
@@ -23,12 +18,12 @@ import { AvatarComponent } from '../../components/avatar/avatar.component';
     templateUrl: 'profile.page.html',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [
-        IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
-        IonLabel, IonButton, IonIcon, IonBadge, IonNote,
-        IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
-        CommonModule, AvatarComponent
-    ]
+    imports: [ IonCardTitle, IonCardHeader, IonCard,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
+    IonLabel, IonButton, IonIcon, IonBadge, IonNote,
+    IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
+    CommonModule,
+    IonThumbnail, IonCardContent]
 })
 export class ProfilePage {
     private authService = inject(AuthService);
