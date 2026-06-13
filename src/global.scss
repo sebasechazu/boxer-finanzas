@@ -1,8 +1,3 @@
-/*
- * Boxer Finanzas - Premium Design System
- * ----------------------------------------------------------------------------
- */
-
 /* Google Fonts - Outfit */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
@@ -62,9 +57,9 @@ ion-card {
   }
 }
 
-ion-card-header {
-  padding-bottom: 8px;
-}
+// ion-card-header {
+//   padding-bottom: 8px;
+// }
 
 ion-card-title {
   font-weight: 600;
@@ -161,6 +156,7 @@ ion-tab-button {
   }
 }
 
+
 /* Utilities */
 ion-fab {
   margin-bottom: 120px;
@@ -196,7 +192,6 @@ ion-fab {
   margin-right: 12px;
 }
 
-/* ── Avatar en la tab bar ────────────────────────────────────────────── */
 ion-tab-button.profile-tab-btn {
   display: flex;
   align-items: center;
