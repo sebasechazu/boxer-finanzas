@@ -13,7 +13,6 @@ import { Articulo } from '../../core/models/models';
 @Component({
   selector: 'app-articles',
   templateUrl: 'articles.page.html',
-  styleUrls: ['articles.page.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonButtons, CommonModule,

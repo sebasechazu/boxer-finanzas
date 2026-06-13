@@ -15,7 +15,6 @@ import { Articulo } from '../../../core/models/models';
 @Component({
   selector: 'app-articles-list',
   templateUrl: 'articles-list.component.html',
-  styleUrls: ['articles-list.component.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [

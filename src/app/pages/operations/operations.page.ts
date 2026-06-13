@@ -10,7 +10,6 @@ import { ArticlesListComponent } from './articles-list/articles-list.component';
 @Component({
   selector: 'app-operations',
   templateUrl: 'operations.page.html',
-  styleUrls: ['operations.page.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [

@@ -11,7 +11,6 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
     selector: 'app-login',
     templateUrl: 'login.page.html',
-    styleUrl: 'login.page.scss',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
