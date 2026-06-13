@@ -14,10 +14,10 @@
     @for (client of financeService.userClients(); track client.id) {
       <ion-item>
         <ion-label>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 500;">{{ client.nombre }}</h2>
-            <ion-button fill="clear" (click)="openWhatsApp(client.telefono); $event.stopPropagation()" class="large-list-btn" style="margin: 0;">
-              <ion-icon name="logo-whatsapp" color="success" slot="icon-only" style="font-size: 32px;"></ion-icon>
+          <div class="flex items-center gap-3">
+            <h2 class="m-0 text-[1.1rem] font-medium">{{ client.nombre }}</h2>
+            <ion-button fill="clear" (click)="openWhatsApp(client.telefono); $event.stopPropagation()" class="large-list-btn m-0">
+              <ion-icon name="logo-whatsapp" color="success" slot="icon-only" class="text-[32px]"></ion-icon>
             </ion-button>
           </div>
         </ion-label>

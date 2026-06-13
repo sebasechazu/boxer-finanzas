@@ -18,7 +18,6 @@ import {
 @Component({
   selector: 'app-operations-list',
   templateUrl: 'operations-list.component.html',
-  styles: ['ion-modal { --height: 100%; --width: 100%; }'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [

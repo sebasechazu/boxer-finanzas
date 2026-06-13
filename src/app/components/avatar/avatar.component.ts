@@ -14,11 +14,11 @@ import { AuthService } from '../../core/services/auth.service';
     standalone: true,
     imports: [CommonModule],
     template: `
-        <div class="avatar-wrapper" [style.width.px]="size" [style.height.px]="size">
+        <div class="avatar-wrapper rounded-full overflow-hidden shrink-0 inline-flex" [style.width.px]="size" [style.height.px]="size">
             @if (photoURL()) {
-                <img [src]="photoURL()!" [alt]="initial()" class="avatar-img" />
+                <img [src]="photoURL()!" [alt]="initial()" class="w-full h-full object-cover block" />
             } @else {
-                <div class="avatar-initials"
+                <div class="w-full h-full flex items-center justify-center font-bold text-white tracking-tighter select-none"
                      [style.background]="color()"
                      [style.fontSize.px]="size * 0.4">
                     {{ initial() }}
@@ -26,34 +26,7 @@ import { AuthService } from '../../core/services/auth.service';
             }
         </div>
     `,
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styles: [`
-        .avatar-wrapper {
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            display: inline-flex;
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .avatar-initials {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: -0.5px;
-            user-select: none;
-        }
-    `]
+    changeDetection: ChangeDetectionStrategy.Eager
 })
 export class AvatarComponent {
     private authService = inject(AuthService);

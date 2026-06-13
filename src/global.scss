@@ -184,37 +184,6 @@ ion-fab {
   margin-right: 12px;
 }
 
-ion-tab-button.profile-tab-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .tab-avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease;
-    margin: auto;
-
-    .avatar-wrapper {
-      box-sizing: border-box !important;
-      border: 2px solid transparent;
-      transition: border-color 0.2s ease;
-    }
-  }
-
-  &.tab-selected {
-    .tab-avatar {
-      transform: translateY(-2px);
-    }
-    .avatar-wrapper {
-      border-color: var(--ion-color-primary);
-    }
-  }
-}
-
 /* --- COMPONENT SPECIFIC STYLES CENTRALIZED --- */
 
 /* Shared across articles, operations, etc. */
@@ -260,6 +229,11 @@ ion-tab-button.profile-tab-btn {
   margin-bottom: 12px;
 }
 ion-modal {
+  --height: 100%;
+  --width: 100%;
+}
+
+.fullscreen-modal {
   --height: 100%;
   --width: 100%;
 }

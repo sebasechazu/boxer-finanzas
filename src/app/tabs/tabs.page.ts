@@ -6,14 +6,12 @@ import {
   pieChart, cash, person, cube, peopleOutline
 } from 'ionicons/icons';
 
-import { AvatarComponent } from '../components/avatar/avatar.component';
-
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, AvatarComponent],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
 })
 export class TabsPage {
   constructor() {
