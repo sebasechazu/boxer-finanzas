@@ -126,18 +126,3 @@ export class AuthService implements OnDestroy {
         return !!auth.currentUser || !!this.userSignal();
     }
 }
-
-// Functional Auth Guard de Angular 21
-export const authGuard = async () => {
-    const authService = inject(AuthService);
-    const router = inject(Router);
-
-    // Esperar a que Firebase se inicialice antes de decidir
-    const user = await authService.waitForAuth();
-
-    if (user) {
-        return true;
-    }
-
-    return router.parseUrl('/login');
-};

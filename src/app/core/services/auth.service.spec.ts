@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 vi.mock('../../firebase.config', () => ({
@@ -30,6 +30,7 @@ describe('AuthService', () => {
     let service: AuthService;
     let mockRouter: any;
     let mockAlertCtrl: any;
+    let mockNavCtrl: any;
 
     beforeEach(() => {
         mockRouter = {
@@ -42,11 +43,16 @@ describe('AuthService', () => {
             create: vi.fn().mockResolvedValue({ present: vi.fn() })
         };
 
+        mockNavCtrl = {
+            navigateRoot: vi.fn()
+        };
+
         TestBed.configureTestingModule({
             providers: [
                 AuthService,
                 { provide: Router, useValue: mockRouter },
-                { provide: AlertController, useValue: mockAlertCtrl }
+                { provide: AlertController, useValue: mockAlertCtrl },
+                { provide: NavController, useValue: mockNavCtrl }
             ]
         });
 

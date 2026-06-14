@@ -7,6 +7,9 @@
       <ion-segment-button value="articulos">
         <ion-label>Artículos</ion-label>
       </ion-segment-button>
+      <ion-segment-button value="prestamos">
+        <ion-label>Préstamos</ion-label>
+      </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
 </ion-header>
@@ -17,5 +20,8 @@
   }
   @if(selectedTab() === 'articulos') {
     <app-articles-list></app-articles-list>
+  }
+  @if(selectedTab() === 'prestamos') {
+    <app-loans-list></app-loans-list>
   }
 </ion-content>

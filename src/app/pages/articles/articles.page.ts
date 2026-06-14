@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonModal, IonNote,
-  AlertController, IonButtons, IonGrid, IonRow, IonCol, IonCard, IonCardContent } from '@ionic/angular/standalone';
+  AlertController, IonButtons } from '@ionic/angular/standalone';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FinanceService } from '../../core/services/finance.service';
 import { addIcons } from 'ionicons';
-import { addOutline, createOutline, trashOutline, cubeOutline, cashOutline, trendingUpOutline, walletOutline } from 'ionicons/icons';
+import { addOutline, createOutline, trashOutline, cubeOutline } from 'ionicons/icons';
 import { Articulo } from '../../core/models/models';
 
 @Component({
@@ -18,7 +18,6 @@ import { Articulo } from '../../core/models/models';
   imports: [IonButtons, CommonModule,
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonModal,
-    IonGrid, IonRow, IonCol, IonCard, IonCardContent,
     ReactiveFormsModule
   ],
 })
@@ -39,7 +38,7 @@ export class ArticlesPage {
   });
 
   constructor() {
-    addIcons({ addOutline, createOutline, trashOutline, cubeOutline, cashOutline, trendingUpOutline, walletOutline });
+    addIcons({ addOutline, createOutline, trashOutline, cubeOutline });
   }
 
   openAddModal() {

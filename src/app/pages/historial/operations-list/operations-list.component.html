@@ -11,9 +11,9 @@
           <h2>{{ getClientName(op.clienteId) }}</h2>
           <p>
             <ion-badge [color]="op.tipo === 'VENTA' ? 'primary' : 'success'">{{ op.tipo }}</ion-badge>
-            <span class="ion-margin-start">Total: <strong>$ {{ op.totalFinal | number:'1.2-2' }}</strong></span>
+            <span class="ion-margin-start">Total: <strong>$ {{ getTotalFinal(op) | number:'1.2-2' }}</strong></span>
           </p>
-          <ion-note>{{ op.cuotasCount }} cuotas | Recargo: {{ op.porcentajeRecargo }}%</ion-note>
+          <ion-note>{{ op.cuotasCount }} cuotas | Recargo: {{ getPorcentajeRecargo(op) }}%</ion-note>
         </ion-label>
       </ion-item>
 
@@ -120,6 +120,19 @@
                 <ion-select-option value="">Ninguno</ion-select-option>
                 @for (article of financeService.userArticles(); track article.id) {
                   <ion-select-option [value]="article.id">{{ article.nombre }} ($ {{article.precioVentaContado}})</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+          }
+
+          <!-- Plan de préstamo (solo préstamos) -->
+          @if (opForm.get('tipo')?.value === 'PRESTAMO') {
+            <ion-item>
+              <ion-label position="stacked">Plan de Préstamo (Opcional)</ion-label>
+              <ion-select formControlName="prestamoId" placeholder="Seleccionar Plan" (ionChange)="onLoanChange($event)">
+                <ion-select-option value="">Ninguno</ion-select-option>
+                @for (loan of financeService.userLoanPlans(); track loan.id) {
+                  <ion-select-option [value]="loan.id">{{ loan.nombre }} ($ {{loan.montoBase}} - {{loan.cuotasCount}}c - {{loan.periodicidad}})</ion-select-option>
                 }
               </ion-select>
             </ion-item>

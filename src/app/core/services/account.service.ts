@@ -14,26 +14,22 @@ import {
 })
 export class AccountService implements OnDestroy {
     private authService = inject(AuthService);
-
-    // ─── Private Signals ───────────────────────────────────────────────────────
+    
     private _misColaboradores = signal<Colaborador[]>([]);
     private _cuentasAjenas = signal<Colaborador[]>([]);
     private _invitacionesRecibidas = signal<Invitacion[]>([]);
     private _invitacionesEnviadas = signal<Invitacion[]>([]);
 
-    // ─── Unsubscribers ─────────────────────────────────────────────────────────
     private _unsubColaboradores?: () => void;
     private _unsubAjenas?: () => void;
     private _unsubInvRecibidas?: () => void;
     private _unsubInvEnviadas?: () => void;
 
-    // ─── Public Readonly Signals ───────────────────────────────────────────────
     readonly misColaboradores = this._misColaboradores.asReadonly();
     readonly cuentasAjenas = this._cuentasAjenas.asReadonly();
     readonly invitacionesPendientesRecibidas = this._invitacionesRecibidas.asReadonly();
     readonly invitacionesEnviadas = this._invitacionesEnviadas.asReadonly();
 
-    // ─── Lista de todas las cuentas accesibles por el usuario ─────────────────
     readonly cuentasAccesibles = computed<CuentaAccesible[]>(() => {
         const user = this.authService.userSignal();
         const perfil = this.authService.profileSignal();
@@ -56,7 +52,6 @@ export class AccountService implements OnDestroy {
         return [propia, ...ajenas];
     });
 
-    // ─── UID de la cuenta que se está viendo actualmente ──────────────────────
     readonly activeAccountUid = signal<string | null>(null);
 
     readonly effectiveAccountUid = computed(() => {
@@ -70,11 +65,9 @@ export class AccountService implements OnDestroy {
     });
 
     constructor() {
-        // Cuando cambia el usuario logueado, resetear y resuscribir a Firestore
         effect(() => {
             const user = this.authService.userSignal();
             
-            // Limpiar suscripciones previas
             this._unsubColaboradores?.();
             this._unsubAjenas?.();
             this._unsubInvRecibidas?.();
@@ -91,7 +84,6 @@ export class AccountService implements OnDestroy {
 
             this.activeAccountUid.set(user.uid);
 
-            // Suscribir a colecciones
             const qMisColab = query(collection(db, 'colaboradores'), where('propietarioUid', '==', user.uid));
             this._unsubColaboradores = onSnapshot(qMisColab, snap => {
                 this._misColaboradores.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Colaborador)));
@@ -115,7 +107,6 @@ export class AccountService implements OnDestroy {
             });
         });
 
-        // Cuando se cargan cuentas ajenas, enriquecer con datos del propietario
         effect(() => {
             const ajenas = this.cuentasAjenas();
             ajenas.forEach(col => this.cargarPerfilPropietario(col.propietarioUid));
@@ -134,7 +125,6 @@ export class AccountService implements OnDestroy {
         this.activeAccountUid.set(propietarioUid);
     }
 
-    // ─── Perfiles en caché ─────────────────────────────────────────────────────
     private _perfilesPropietarios = signal<Map<string, PerfilUsuario>>(new Map());
     readonly perfilesPropietarios = this._perfilesPropietarios.asReadonly();
 
@@ -151,7 +141,6 @@ export class AccountService implements OnDestroy {
         }
     }
 
-    /** Obtiene el nombre de negocio del propietario de una cuenta */
     getNombreNegocioPropietario(uid: string): string {
         return this._perfilesPropietarios().get(uid)?.nombreNegocio
             ?? this._perfilesPropietarios().get(uid)?.nombre
@@ -162,21 +151,16 @@ export class AccountService implements OnDestroy {
         return this._perfilesPropietarios().get(uid)?.nombre ?? uid;
     }
 
-    // ─── CRUD Invitaciones ─────────────────────────────────────────────────────
-
-    /** Envía una invitación a un email */
     async enviarInvitacion(emailInvitado: string): Promise<void> {
         const user = this.authService.userSignal();
         if (!user) throw new Error('No autenticado');
         const perfil = this.authService.profileSignal();
 
-        // Verificar que no existe ya una invitación PENDIENTE al mismo email
         const existing = this.invitacionesEnviadas().find(
             inv => inv.emailInvitado === emailInvitado && inv.estado === 'PENDIENTE'
         );
         if (existing) throw new Error('Ya existe una invitación pendiente para ese email');
 
-        // Verificar que no es ya colaborador
         const yaColaborador = this.misColaboradores().find(
             col => col.colaboradorEmail === emailInvitado
         );
@@ -197,7 +181,6 @@ export class AccountService implements OnDestroy {
         await addDoc(collection(db, 'invitaciones'), invitacion);
     }
 
-    /** Acepta una invitación recibida */
     async aceptarInvitacion(invitacion: Invitacion): Promise<void> {
         const user = this.authService.userSignal();
         if (!user) throw new Error('No autenticado');
@@ -212,35 +195,24 @@ export class AccountService implements OnDestroy {
             creadoEn: new Date().toISOString()
         };
 
-        // Crear el doc de colaborador con ID determinístico
         await setDoc(doc(db, 'colaboradores', colaboradorId), colaborador);
-
-        // Marcar la invitación como ACEPTADA
         await updateDoc(doc(db, 'invitaciones', invitacion.id), { estado: 'ACEPTADA' });
-
-        // Cargar el perfil del propietario
         await this.cargarPerfilPropietario(invitacion.propietarioUid);
     }
 
-    /** Rechaza una invitación recibida */
     async rechazarInvitacion(invitacion: Invitacion): Promise<void> {
         await updateDoc(doc(db, 'invitaciones', invitacion.id), { estado: 'RECHAZADA' });
     }
 
-    /** Elimina a un colaborador de mi cuenta */
     async eliminarColaborador(colaborador: Colaborador): Promise<void> {
         const { deleteDoc, doc: firestoreDoc } = await import('firebase/firestore');
         await deleteDoc(firestoreDoc(db, 'colaboradores', colaborador.id));
     }
 
-    // ─── Perfil propio ─────────────────────────────────────────────────────────
-
-    /** Actualiza el nombre del negocio en el perfil propio */
     async actualizarNombreNegocio(nombreNegocio: string): Promise<void> {
         const user = this.authService.userSignal();
         if (!user) throw new Error('No autenticado');
         await updateDoc(doc(db, 'usuarios', user.uid), { nombreNegocio });
-        // Actualizar también el signal local
         const perfilActual = this.authService.profileSignal();
         if (perfilActual) {
             this.authService.profileSignal.set({ ...perfilActual, nombreNegocio });

@@ -9,6 +9,7 @@ import {
   IonFab, IonFabButton, IonContent, AlertController
 } from '@ionic/angular/standalone';
 import { FinanceService } from '../../../core/services/finance.service';
+import { Operacion, Venta, Prestamo } from '../../../core/models/models';
 import { addIcons } from 'ionicons';
 import {
   trashOutline, cashOutline, receiptOutline, createOutline,
@@ -45,6 +46,7 @@ export class OperationsListComponent {
     porcentajeRecargo: [0, [Validators.required, Validators.min(0)]],
     clienteId: ['', Validators.required],
     articuloId: [''],
+    prestamoId: [''],
     cuotasCount: [1, [Validators.required, Validators.min(1)]],
     tieneVencimiento: [false],
     periodicidad: ['MENSUAL'],
@@ -83,6 +85,8 @@ export class OperationsListComponent {
       tipo: 'VENTA',
       montoBase: 0,
       porcentajeRecargo: 0,
+      articuloId: '',
+      prestamoId: '',
       cuotasCount: 1,
       tieneVencimiento: false,
       periodicidad: 'MENSUAL',
@@ -95,12 +99,34 @@ export class OperationsListComponent {
   private loadOperation(id: string) {
     const op = this.financeService.userOperations().find(o => o.id === id);
     if (op) {
+      let montoBase = 0;
+      let porcentajeRecargo = 0;
+      let articuloId = '';
+      let planPrestamoId = '';
+
+      if (op.tipo === 'VENTA' && op.ventaId) {
+        const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+        if (venta) {
+          montoBase = venta.montoBase;
+          porcentajeRecargo = venta.porcentajeRecargo;
+          articuloId = venta.articuloId || '';
+        }
+      } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
+        const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+        if (prestamo) {
+          montoBase = prestamo.montoBase;
+          porcentajeRecargo = prestamo.porcentajeRecargo;
+          planPrestamoId = prestamo.planId || '';
+        }
+      }
+
       this.opForm.patchValue({
         tipo: op.tipo,
-        montoBase: op.montoBase,
-        porcentajeRecargo: op.porcentajeRecargo,
+        montoBase,
+        porcentajeRecargo,
         clienteId: op.clienteId,
-        articuloId: op.articuloId || '',
+        articuloId,
+        prestamoId: planPrestamoId,
         cuotasCount: op.cuotasCount,
         tieneVencimiento: !!op.fechaPrimerVencimiento,
         periodicidad: op.periodicidad || 'MENSUAL',
@@ -121,9 +147,60 @@ export class OperationsListComponent {
     }
   }
 
+  onLoanChange(event: any) {
+    const planId = event.detail.value;
+    if (planId) {
+      const plan = this.financeService.userLoanPlans().find(p => p.id === planId);
+      if (plan) {
+        this.opForm.patchValue({
+          montoBase: plan.montoBase,
+          porcentajeRecargo: plan.porcentajeRecargo,
+          cuotasCount: plan.cuotasCount,
+          tieneVencimiento: true,
+          periodicidad: plan.periodicidad,
+          diaSemana: plan.diaSemana ?? new Date().getDay(),
+          diaVencimiento: plan.diaVencimiento ?? 5
+        });
+      }
+    }
+  }
+
   calculatePreview() {
     const { montoBase, porcentajeRecargo } = this.opForm.value;
     return this.financeService.calculateTotal(montoBase, porcentajeRecargo);
+  }
+
+  getMontoBase(op: Operacion): number {
+    if (op.tipo === 'VENTA' && op.ventaId) {
+      const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+      return venta ? venta.montoBase : 0;
+    } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
+      const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+      return prestamo ? prestamo.montoBase : 0;
+    }
+    return 0;
+  }
+
+  getPorcentajeRecargo(op: Operacion): number {
+    if (op.tipo === 'VENTA' && op.ventaId) {
+      const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+      return venta ? venta.porcentajeRecargo : 0;
+    } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
+      const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+      return prestamo ? prestamo.porcentajeRecargo : 0;
+    }
+    return 0;
+  }
+
+  getTotalFinal(op: Operacion): number {
+    if (op.tipo === 'VENTA' && op.ventaId) {
+      const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+      return venta ? venta.totalFinal : 0;
+    } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
+      const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+      return prestamo ? prestamo.totalFinal : 0;
+    }
+    return 0;
   }
 
   async onSubmitOperation() {

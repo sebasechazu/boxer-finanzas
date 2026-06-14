@@ -3,7 +3,7 @@ import { collection, addDoc, getDocs, query, where, onSnapshot, DocumentData, Qu
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from './auth.service';
 import { AccountService } from './account.service';
-import { Operacion, Cuota, Articulo, Cliente } from '../models/models';
+import { Operacion, Cuota, Articulo, Cliente, PlanPrestamo, Prestamo, Venta } from '../models/models';
 import { db } from '../../firebase.config';
 
 @Injectable({
@@ -16,12 +16,18 @@ export class FinanceService implements OnDestroy {
     private _clientesSignal = signal<Cliente[]>([]);
     private _operacionesSignal = signal<Operacion[]>([]);
     private _articulosSignal = signal<Articulo[]>([]);
+    private _planesPrestamoSignal = signal<PlanPrestamo[]>([]);
+    private _prestamosSignal = signal<Prestamo[]>([]);
+    private _ventasSignal = signal<Venta[]>([]);
     private _cuotasSignal = signal<Cuota[]>([]);
 
     // Suscripciones actuales (para desuscribir al cambiar de cuenta)
     private _unsubClientes?: () => void;
     private _unsubOperaciones?: () => void;
     private _unsubArticulos?: () => void;
+    private _unsubPlanesPrestamo?: () => void;
+    private _unsubPrestamos?: () => void;
+    private _unsubVentas?: () => void;
     private _unsubCuotas?: () => void;
 
     constructor() {
@@ -33,6 +39,9 @@ export class FinanceService implements OnDestroy {
                 this._clientesSignal.set([]);
                 this._operacionesSignal.set([]);
                 this._articulosSignal.set([]);
+                this._planesPrestamoSignal.set([]);
+                this._prestamosSignal.set([]);
+                this._ventasSignal.set([]);
                 this._cuotasSignal.set([]);
                 return;
             }
@@ -48,6 +57,9 @@ export class FinanceService implements OnDestroy {
         this._unsubClientes?.();
         this._unsubOperaciones?.();
         this._unsubArticulos?.();
+        this._unsubPlanesPrestamo?.();
+        this._unsubPrestamos?.();
+        this._unsubVentas?.();
         this._unsubCuotas?.();
     }
 
@@ -69,6 +81,21 @@ export class FinanceService implements OnDestroy {
             this._articulosSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Articulo)));
         });
 
+        const qPlanes = query(collection(db, 'planes_prestamo'), where('usuarioId', '==', uid));
+        this._unsubPlanesPrestamo = onSnapshot(qPlanes, snap => {
+            this._planesPrestamoSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as PlanPrestamo)));
+        });
+
+        const qPrestamos = query(collection(db, 'prestamos'), where('usuarioId', '==', uid));
+        this._unsubPrestamos = onSnapshot(qPrestamos, snap => {
+            this._prestamosSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Prestamo)));
+        });
+
+        const qVentas = query(collection(db, 'ventas'), where('usuarioId', '==', uid));
+        this._unsubVentas = onSnapshot(qVentas, snap => {
+            this._ventasSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Venta)));
+        });
+
         const qCuotas = query(collection(db, 'cuotas'), where('usuarioId', '==', uid));
         this._unsubCuotas = onSnapshot(qCuotas, snap => {
             this._cuotasSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Cuota)));
@@ -79,6 +106,9 @@ export class FinanceService implements OnDestroy {
     readonly userClients = this._clientesSignal.asReadonly();
     readonly userOperations = this._operacionesSignal.asReadonly();
     readonly userArticles = this._articulosSignal.asReadonly();
+    readonly userLoanPlans = this._planesPrestamoSignal.asReadonly();
+    readonly userLoans = this._prestamosSignal.asReadonly();
+    readonly userSales = this._ventasSignal.asReadonly();
     readonly userInstalments = this._cuotasSignal.asReadonly();
 
     // ─── Computed ─────────────────────────────────────────────────────────────
@@ -211,31 +241,89 @@ export class FinanceService implements OnDestroy {
         return await deleteDoc(docRef);
     }
 
+    // ─── CRUD Planes de Préstamo ────────────────────────────────────────────────
+    
+    async addLoanPlan(plan: Omit<PlanPrestamo, 'id' | 'usuarioId'>) {
+        const uid = this.activeUid;
+        const newPlan = { ...plan, usuarioId: uid };
+        return await addDoc(collection(db, 'planes_prestamo'), newPlan);
+    }
+
+    async updateLoanPlan(id: string, plan: Partial<PlanPrestamo>) {
+        const docRef = doc(db, 'planes_prestamo', id);
+        return await updateDoc(docRef, plan);
+    }
+
+    async deleteLoanPlan(id: string) {
+        const docRef = doc(db, 'planes_prestamo', id);
+        return await deleteDoc(docRef);
+    }
+
     // ─── CRUD Operaciones ─────────────────────────────────────────────────────
 
-    async addOperation(op: Omit<Operacion, 'id' | 'usuarioId' | 'totalFinal'> & { tieneVencimiento?: boolean }) {
+    async addOperation(
+        op: Omit<Operacion, 'id' | 'usuarioId' | 'ventaId' | 'prestamoId'> & {
+            tieneVencimiento?: boolean;
+            montoBase: number;
+            porcentajeRecargo: number;
+            articuloId?: string;
+            prestamoId?: string; // ID del PlanPrestamo seleccionado
+        }
+    ) {
         const uid = this.activeUid;
-
         const totalFinal = this.calculateTotal(op.montoBase, op.porcentajeRecargo);
 
-        const { tieneVencimiento, ...cleanOp } = op;
+        let ventaId: string | undefined = undefined;
+        let prestamoId: string | undefined = undefined;
+
+        if (op.tipo === 'VENTA') {
+            const ventaData = {
+                usuarioId: uid,
+                clienteId: op.clienteId,
+                articuloId: op.articuloId || '',
+                montoBase: op.montoBase,
+                porcentajeRecargo: op.porcentajeRecargo,
+                totalFinal,
+                creadoEn: new Date().toISOString()
+            };
+            const ventaRef = await addDoc(collection(db, 'ventas'), ventaData);
+            ventaId = ventaRef.id;
+        } else {
+            const prestamoData = {
+                usuarioId: uid,
+                clienteId: op.clienteId,
+                planId: op.prestamoId || '',
+                montoBase: op.montoBase,
+                porcentajeRecargo: op.porcentajeRecargo,
+                totalFinal,
+                creadoEn: new Date().toISOString()
+            };
+            const prestamoRef = await addDoc(collection(db, 'prestamos'), prestamoData);
+            prestamoId = prestamoRef.id;
+        }
 
         const newOp = {
-            ...cleanOp,
             usuarioId: uid,
-            totalFinal
+            clienteId: op.clienteId,
+            tipo: op.tipo,
+            ventaId,
+            prestamoId,
+            cuotasCount: op.cuotasCount,
+            periodicidad: op.periodicidad,
+            diaSemana: op.diaSemana,
+            diaVencimiento: op.diaVencimiento,
+            fechaPrimerVencimiento: op.fechaPrimerVencimiento
         };
+
         const opRef = await addDoc(collection(db, 'operaciones'), newOp);
 
         const montoCuota = totalFinal / op.cuotasCount;
-        
-        // Fecha base del primer vencimiento (hoy por defecto si no viene informada)
         const fechaBase = op.fechaPrimerVencimiento ? new Date(op.fechaPrimerVencimiento) : new Date();
 
         for (let i = 0; i < op.cuotasCount; i++) {
             let vencimientoISO: string | undefined = undefined;
 
-            if (tieneVencimiento) {
+            if (op.tieneVencimiento) {
                 const vencimiento = new Date(fechaBase);
 
                 if (op.periodicidad === 'SEMANAL') {
@@ -294,29 +382,74 @@ export class FinanceService implements OnDestroy {
     }
 
     async deleteOperation(id: string) {
-        // 1. Borrar la operación
+        // 1. Buscar la operación localmente para saber las referencias transaccionales
+        const op = this._operacionesSignal().find(o => o.id === id);
+        if (op) {
+            if (op.tipo === 'VENTA' && op.ventaId) {
+                await deleteDoc(doc(db, 'ventas', op.ventaId));
+            } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
+                await deleteDoc(doc(db, 'prestamos', op.prestamoId));
+            }
+        }
+
+        // 2. Borrar la operación
         await deleteDoc(doc(db, 'operaciones', id));
         
-        // 2. Borrar cuotas asociadas
+        // 3. Borrar cuotas asociadas
         const q = query(collection(db, 'cuotas'), where('operacionId', '==', id));
         const snapshot = await getDocs(q);
         const deletePromises = snapshot.docs.map(d => deleteDoc(doc(db, 'cuotas', d.id)));
         await Promise.all(deletePromises);
     }
 
-    async updateOperation(id: string, op: Partial<Operacion> & { tieneVencimiento?: boolean }) {
-        const { tieneVencimiento, ...cleanOp } = op;
-        
+    async updateOperation(
+        id: string, 
+        op: Partial<Operacion> & { 
+            tieneVencimiento?: boolean;
+            montoBase?: number;
+            porcentajeRecargo?: number;
+            articuloId?: string;
+            prestamoId?: string; // ID del PlanPrestamo seleccionado
+        }
+    ) {
+        const { tieneVencimiento, montoBase, porcentajeRecargo, articuloId, prestamoId, ...cleanOp } = op;
         const docRef = doc(db, 'operaciones', id);
-        
-        if (cleanOp.montoBase !== undefined || cleanOp.porcentajeRecargo !== undefined) {
-            const finalMontoBase = cleanOp.montoBase ?? 0;
-            const finalPorcentajeRecargo = cleanOp.porcentajeRecargo ?? 0;
-            cleanOp.totalFinal = this.calculateTotal(finalMontoBase, finalPorcentajeRecargo);
+
+        const currentOp = this._operacionesSignal().find(o => o.id === id);
+
+        if (currentOp) {
+            if (currentOp.tipo === 'VENTA' && currentOp.ventaId) {
+                const updateData: any = {};
+                if (montoBase !== undefined) updateData.montoBase = montoBase;
+                if (porcentajeRecargo !== undefined) updateData.porcentajeRecargo = porcentajeRecargo;
+                if (articuloId !== undefined) updateData.articuloId = articuloId;
+
+                if (montoBase !== undefined || porcentajeRecargo !== undefined) {
+                    const base = montoBase ?? 0;
+                    const recargo = porcentajeRecargo ?? 0;
+                    updateData.totalFinal = this.calculateTotal(base, recargo);
+                }
+                if (Object.keys(updateData).length > 0) {
+                    await updateDoc(doc(db, 'ventas', currentOp.ventaId), updateData);
+                }
+            } else if (currentOp.tipo === 'PRESTAMO' && currentOp.prestamoId) {
+                const updateData: any = {};
+                if (montoBase !== undefined) updateData.montoBase = montoBase;
+                if (porcentajeRecargo !== undefined) updateData.porcentajeRecargo = porcentajeRecargo;
+                if (prestamoId !== undefined) updateData.planId = prestamoId;
+
+                if (montoBase !== undefined || porcentajeRecargo !== undefined) {
+                    const base = montoBase ?? 0;
+                    const recargo = porcentajeRecargo ?? 0;
+                    updateData.totalFinal = this.calculateTotal(base, recargo);
+                }
+                if (Object.keys(updateData).length > 0) {
+                    await updateDoc(doc(db, 'prestamos', currentOp.prestamoId), updateData);
+                }
+            }
         }
 
         await updateDoc(docRef, cleanOp);
-        
         return docRef;
     }
 }

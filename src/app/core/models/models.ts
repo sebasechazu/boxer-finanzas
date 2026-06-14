@@ -10,9 +10,9 @@ export interface Usuario {
 export interface PerfilUsuario {
     uid: string;
     email: string;
-    nombre: string;          // displayName de Google
+    nombre: string;          
     nombreNegocio: string;
-    creadoEn: string;        // ISO string
+    creadoEn: string;       
 }
 
 export type EstadoInvitacion = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
@@ -26,17 +26,17 @@ export interface Invitacion {
     propietarioNombreNegocio: string;
     emailInvitado: string;
     estado: EstadoInvitacion;
-    creadoEn: string;        // ISO string
+    creadoEn: string;        
 }
 
 /** Relación propietario-colaborador ya aceptada (colección `colaboradores`) */
 export interface Colaborador {
-    id: string;              // formato: `{propietarioUid}_{colaboradorUid}`
+    id: string;              
     propietarioUid: string;
     colaboradorUid: string;
     colaboradorEmail: string;
     colaboradorNombre: string;
-    creadoEn: string;        // ISO string
+    creadoEn: string;        
 }
 
 /** Descriptor de una cuenta a la que el usuario tiene acceso */
@@ -52,7 +52,7 @@ export interface Cliente {
     usuarioId: string;
     nombre: string;
     telefono: string;
-    saldoPendiente: number | Signal<number>; // Se usará Signal para la reactividad en UI
+    saldoPendiente: number | Signal<number>; 
 }
 
 export interface Articulo {
@@ -63,6 +63,40 @@ export interface Articulo {
     precioVentaContado: number;
 }
 
+export interface PlanPrestamo {
+    id: string;
+    usuarioId: string;
+    nombre: string;
+    montoBase: number;
+    porcentajeRecargo: number;
+    cuotasCount: number;
+    periodicidad: TipoPeriodicidad;
+    diaSemana?: number;
+    diaVencimiento?: number;
+}
+
+export interface Prestamo {
+    id: string;
+    usuarioId: string;
+    clienteId: string;
+    planId?: string;
+    montoBase: number;
+    porcentajeRecargo: number;
+    totalFinal: number;
+    creadoEn: string;
+}
+
+export interface Venta {
+    id: string;
+    usuarioId: string;
+    clienteId: string;
+    articuloId?: string;
+    montoBase: number;
+    porcentajeRecargo: number;
+    totalFinal: number;
+    creadoEn: string;
+}
+
 export type TipoOperacion = 'PRESTAMO' | 'VENTA';
 export type TipoPeriodicidad = 'SEMANAL' | 'QUINCENAL' | 'MENSUAL';
 
@@ -70,16 +104,14 @@ export interface Operacion {
     id: string;
     usuarioId: string;
     clienteId: string;
-    articuloId?: string;
     tipo: TipoOperacion;
-    montoBase: number;
-    porcentajeRecargo: number;
-    totalFinal: number;
+    ventaId?: string;
+    prestamoId?: string;
     cuotasCount: number;
     periodicidad?: TipoPeriodicidad;
-    diaSemana?: number; // 0-6 (Domingo a Sábado)
-    diaVencimiento?: number; // 1-31 (Día del mes)
-    fechaPrimerVencimiento?: string; // ISO string
+    diaSemana?: number; //
+    diaVencimiento?: number; // 
+    fechaPrimerVencimiento?: string; 
 }
 
 export type EstadoCuota = 'PENDIENTE' | 'PAGADA' | 'VENCIDA';
@@ -89,7 +121,7 @@ export interface Cuota {
     operacionId: string;
     usuarioId: string;
     monto: number;
-    vencimiento?: string; // ISO string
-    fechaPago?: string; // ISO string
+    vencimiento?: string; 
+    fechaPago?: string; 
     estado: EstadoCuota;
 }

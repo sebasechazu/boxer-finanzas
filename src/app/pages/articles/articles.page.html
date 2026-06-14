@@ -10,37 +10,6 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-grid class="ion-no-padding">
-    <ion-row>
-      <ion-col size="4">
-        <ion-card class="stat-card">
-          <ion-card-content>
-            <ion-icon name="wallet-outline" color="primary"></ion-icon>
-            <div class="stat-value">$ {{ financeService.totalArticlePurchasePrice() }}</div>
-            <div class="stat-label">Total Compra</div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="4">
-        <ion-card class="stat-card">
-          <ion-card-content>
-            <ion-icon name="cash-outline" color="success"></ion-icon>
-            <div class="stat-value">$ {{ financeService.totalArticleSalePrice() }}</div>
-            <div class="stat-label">Total Venta</div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="4">
-        <ion-card class="stat-card">
-          <ion-card-content>
-            <ion-icon name="trending-up-outline" color="warning"></ion-icon>
-            <div class="stat-value">$ {{ financeService.totalPotentialProfit() }}</div>
-            <div class="stat-label">Dinero Ganado</div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 
   <ion-list>
     @for (article of financeService.userArticles(); track article.id) {
