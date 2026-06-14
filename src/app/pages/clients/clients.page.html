@@ -6,7 +6,7 @@
 
 <ion-content class="ion-padding">
   <ion-list>
-    @for (client of financeService.userClients(); track client.id) {
+    @for (client of clientService.userClients(); track client.id) {
       <ion-item>
         <ion-label>
           <div class="flex items-center gap-3">

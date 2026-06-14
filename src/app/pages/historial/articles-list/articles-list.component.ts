@@ -7,10 +7,10 @@ import {
   AlertController
 } from '@ionic/angular/standalone';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { FinanceService } from '../../../core/services/finance.service';
+import { ArticleService } from '../../../core/services/article.service';
 import { addIcons } from 'ionicons';
 import { addOutline, createOutline, trashOutline, cubeOutline, cashOutline, trendingUpOutline, walletOutline } from 'ionicons/icons';
-import { Articulo } from '../../../core/models/models';
+import { Articulo } from '../../../core/models';
 
 @Component({
   selector: 'app-articles-list',
@@ -25,7 +25,7 @@ import { Articulo } from '../../../core/models/models';
   ],
 })
 export class ArticlesListComponent {
-  public financeService = inject(FinanceService);
+  public articleService = inject(ArticleService);
   private fb = inject(FormBuilder);
   private alertCtrl = inject(AlertController);
 
@@ -75,7 +75,7 @@ export class ArticlesListComponent {
           role: 'destructive',
           handler: async () => {
             try {
-              await this.financeService.deleteArticle(id);
+              await this.articleService.deleteArticle(id);
             } catch (error) {
               const errorAlert = await this.alertCtrl.create({
                 header: 'Error',
@@ -101,9 +101,9 @@ export class ArticlesListComponent {
           precioVentaContado: Number(this.articleForm.value.precioVentaContado)
         };
         if (this.editingArticleId) {
-          await this.financeService.updateArticle(this.editingArticleId, articleData);
+          await this.articleService.updateArticle(this.editingArticleId, articleData);
         } else {
-          await this.financeService.addArticle(articleData);
+          await this.articleService.addArticle(articleData);
         }
         this.closeModal();
       } catch (error: any) {

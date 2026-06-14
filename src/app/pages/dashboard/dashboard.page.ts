@@ -3,13 +3,13 @@ import {
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonDatetime, IonChip, IonIcon, IonLabel} from '@ionic/angular/standalone';
-import { FinanceService } from '../../core/services/finance.service';
+import { OperationService } from '../../core/services/operation.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
 import { CurrencyPipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { swapHorizontalOutline, personOutline, businessOutline } from 'ionicons/icons';
-import { CuentaAccesible } from '../../core/models/models';
+import { CuentaAccesible } from '../../core/models';
 import { DashboardCardsComponent } from './dashboard-cards/dashboard-cards.component';
 
 @Component({
@@ -25,7 +25,7 @@ import { DashboardCardsComponent } from './dashboard-cards/dashboard-cards.compo
 ],
 })
 export class DashboardPage {
-    public financeService = inject(FinanceService);
+    public operationService = inject(OperationService);
     private authService = inject(AuthService);
     public accountService = inject(AccountService);
 
@@ -34,7 +34,7 @@ export class DashboardPage {
     }
 
     readonly highlightedDates = computed(() => {
-        return this.financeService.userInstalments()
+        return this.operationService.userInstalments()
             .filter(i => i.estado === 'PENDIENTE' && i.vencimiento)
             .map(i => ({
                 date: new Date(i.vencimiento!).toISOString().split('T')[0],

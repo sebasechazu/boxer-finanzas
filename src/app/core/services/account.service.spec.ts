@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AccountService } from './account.service';
 import { AuthService } from './auth.service';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { Invitacion, Colaborador } from '../models/models';
+import { Invitacion, Colaborador } from '../models';
 
 vi.mock('../../firebase.config', () => ({
     db: {}

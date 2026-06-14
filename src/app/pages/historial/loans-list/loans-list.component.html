@@ -1,6 +1,6 @@
 <!-- Lista de préstamos configurados -->
 <ion-list>
-  @for (loan of financeService.userLoanPlans(); track loan.id) {
+  @for (loan of loanPlanService.userLoanPlans(); track loan.id) {
     <ion-item>
       <ion-icon name="list-outline" slot="start" color="medium"></ion-icon>
       <ion-label>

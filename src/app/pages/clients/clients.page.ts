@@ -4,7 +4,7 @@ import {
   IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonModal,
   AlertController, IonButtons, IonFab, IonFabButton } from '@ionic/angular/standalone';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { FinanceService } from '../../core/services/finance.service';
+import { ClientService } from '../../core/services/client.service';
 import { addIcons } from 'ionicons';
 import { logoWhatsapp, addOutline, personAddOutline, trashOutline, createOutline } from 'ionicons/icons';
 
@@ -19,7 +19,7 @@ import { logoWhatsapp, addOutline, personAddOutline, trashOutline, createOutline
     ReactiveFormsModule, IonFab],
 })
 export class ClientsPage {
-  public financeService = inject(FinanceService);
+  public clientService = inject(ClientService);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
   private alertCtrl = inject(AlertController);
@@ -74,7 +74,7 @@ export class ClientsPage {
           role: 'destructive',
           handler: async () => {
             try {
-              await this.financeService.deleteClient(id);
+              await this.clientService.deleteClient(id);
             } catch (error) {
               console.error('Error deleting client:', error);
               const errorAlert = await this.alertCtrl.create({
@@ -97,9 +97,9 @@ export class ClientsPage {
       this.cdr.detectChanges();
       try {
         if (this.editingClientId) {
-          await this.financeService.updateClient(this.editingClientId, this.clientForm.value);
+          await this.clientService.updateClient(this.editingClientId, this.clientForm.value);
         } else {
-          await this.financeService.addClient(this.clientForm.value);
+          await this.clientService.addClient(this.clientForm.value);
         }
         this.clientForm.reset();
         this.closeModal();

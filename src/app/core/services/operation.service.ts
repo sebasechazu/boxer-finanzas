@@ -1,112 +1,26 @@
-import { Injectable, inject, computed, signal, effect, OnDestroy } from '@angular/core';
-import { collection, addDoc, getDocs, query, where, onSnapshot, DocumentData, QuerySnapshot, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AuthService } from './auth.service';
+import { Injectable, inject, signal, computed, effect, OnDestroy } from '@angular/core';
+import { collection, addDoc, getDocs, query, where, onSnapshot, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { AccountService } from './account.service';
-import { Operacion, Cuota, Articulo, Cliente, PlanPrestamo, Prestamo, Venta } from '../models/models';
+import { Operacion, Cuota, Prestamo, Venta } from '../models';
 import { db } from '../../firebase.config';
 
 @Injectable({
     providedIn: 'root'
 })
-export class FinanceService implements OnDestroy {
-    private authService = inject(AuthService);
+export class OperationService implements OnDestroy {
     private accountService = inject(AccountService);
 
-    private _clientesSignal = signal<Cliente[]>([]);
     private _operacionesSignal = signal<Operacion[]>([]);
-    private _articulosSignal = signal<Articulo[]>([]);
-    private _planesPrestamoSignal = signal<PlanPrestamo[]>([]);
     private _prestamosSignal = signal<Prestamo[]>([]);
     private _ventasSignal = signal<Venta[]>([]);
     private _cuotasSignal = signal<Cuota[]>([]);
 
-    // Suscripciones actuales (para desuscribir al cambiar de cuenta)
-    private _unsubClientes?: () => void;
     private _unsubOperaciones?: () => void;
-    private _unsubArticulos?: () => void;
-    private _unsubPlanesPrestamo?: () => void;
     private _unsubPrestamos?: () => void;
     private _unsubVentas?: () => void;
     private _unsubCuotas?: () => void;
 
-    constructor() {
-        // Reaccionar al cambio de cuenta activa y al login/logout
-        effect(() => {
-            const uid = this.accountService.effectiveAccountUid();
-            if (!uid) {
-                this._limpiarSuscripciones();
-                this._clientesSignal.set([]);
-                this._operacionesSignal.set([]);
-                this._articulosSignal.set([]);
-                this._planesPrestamoSignal.set([]);
-                this._prestamosSignal.set([]);
-                this._ventasSignal.set([]);
-                this._cuotasSignal.set([]);
-                return;
-            }
-            this._suscribirDatos(uid);
-        });
-    }
-
-    ngOnDestroy() {
-        this._limpiarSuscripciones();
-    }
-
-    private _limpiarSuscripciones() {
-        this._unsubClientes?.();
-        this._unsubOperaciones?.();
-        this._unsubArticulos?.();
-        this._unsubPlanesPrestamo?.();
-        this._unsubPrestamos?.();
-        this._unsubVentas?.();
-        this._unsubCuotas?.();
-    }
-
-    private _suscribirDatos(uid: string) {
-        this._limpiarSuscripciones();
-
-        const qClientes = query(collection(db, 'clientes'), where('usuarioId', '==', uid));
-        this._unsubClientes = onSnapshot(qClientes, snap => {
-            this._clientesSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Cliente)));
-        });
-
-        const qOps = query(collection(db, 'operaciones'), where('usuarioId', '==', uid));
-        this._unsubOperaciones = onSnapshot(qOps, snap => {
-            this._operacionesSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Operacion)));
-        });
-
-        const qArts = query(collection(db, 'articulos'), where('usuarioId', '==', uid));
-        this._unsubArticulos = onSnapshot(qArts, snap => {
-            this._articulosSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Articulo)));
-        });
-
-        const qPlanes = query(collection(db, 'planes_prestamo'), where('usuarioId', '==', uid));
-        this._unsubPlanesPrestamo = onSnapshot(qPlanes, snap => {
-            this._planesPrestamoSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as PlanPrestamo)));
-        });
-
-        const qPrestamos = query(collection(db, 'prestamos'), where('usuarioId', '==', uid));
-        this._unsubPrestamos = onSnapshot(qPrestamos, snap => {
-            this._prestamosSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Prestamo)));
-        });
-
-        const qVentas = query(collection(db, 'ventas'), where('usuarioId', '==', uid));
-        this._unsubVentas = onSnapshot(qVentas, snap => {
-            this._ventasSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Venta)));
-        });
-
-        const qCuotas = query(collection(db, 'cuotas'), where('usuarioId', '==', uid));
-        this._unsubCuotas = onSnapshot(qCuotas, snap => {
-            this._cuotasSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Cuota)));
-        });
-    }
-
-    // Señales públicas (readonly)
-    readonly userClients = this._clientesSignal.asReadonly();
     readonly userOperations = this._operacionesSignal.asReadonly();
-    readonly userArticles = this._articulosSignal.asReadonly();
-    readonly userLoanPlans = this._planesPrestamoSignal.asReadonly();
     readonly userLoans = this._prestamosSignal.asReadonly();
     readonly userSales = this._ventasSignal.asReadonly();
     readonly userInstalments = this._cuotasSignal.asReadonly();
@@ -151,21 +65,56 @@ export class FinanceService implements OnDestroy {
             .reduce((sum, i) => sum + i.monto, 0);
     });
 
-    readonly totalArticlePurchasePrice = computed(() => {
-        return this.userArticles().reduce((sum, art) => sum + (art.precioCompra || 0), 0);
-    });
+    constructor() {
+        effect(() => {
+            const uid = this.accountService.effectiveAccountUid();
+            if (!uid) {
+                this._limpiarSuscripciones();
+                this._operacionesSignal.set([]);
+                this._prestamosSignal.set([]);
+                this._ventasSignal.set([]);
+                this._cuotasSignal.set([]);
+                return;
+            }
+            this._suscribirDatos(uid);
+        });
+    }
 
-    readonly totalArticleSalePrice = computed(() => {
-        return this.userArticles().reduce((sum, art) => sum + (art.precioVentaContado || 0), 0);
-    });
+    ngOnDestroy() {
+        this._limpiarSuscripciones();
+    }
 
-    readonly totalPotentialProfit = computed(() => {
-        return this.totalArticleSalePrice() - this.totalArticlePurchasePrice();
-    });
+    private _limpiarSuscripciones() {
+        this._unsubOperaciones?.();
+        this._unsubPrestamos?.();
+        this._unsubVentas?.();
+        this._unsubCuotas?.();
+    }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
+    private _suscribirDatos(uid: string) {
+        this._limpiarSuscripciones();
 
-    /** UID de la cuenta activa (propietario). Usado en escrituras. */
+        const qOps = query(collection(db, 'operaciones'), where('usuarioId', '==', uid));
+        this._unsubOperaciones = onSnapshot(qOps, snap => {
+            this._operacionesSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Operacion)));
+        });
+
+        const qPrestamos = query(collection(db, 'prestamos'), where('usuarioId', '==', uid));
+        this._unsubPrestamos = onSnapshot(qPrestamos, snap => {
+            this._prestamosSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Prestamo)));
+        });
+
+        const qVentas = query(collection(db, 'ventas'), where('usuarioId', '==', uid));
+        this._unsubVentas = onSnapshot(qVentas, snap => {
+            this._ventasSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Venta)));
+        });
+
+        const qCuotas = query(collection(db, 'cuotas'), where('usuarioId', '==', uid));
+        this._unsubCuotas = onSnapshot(qCuotas, snap => {
+            this._cuotasSignal.set(snap.docs.map(d => ({ id: d.id, ...d.data() } as Cuota)));
+        });
+    }
+
     private get activeUid(): string {
         const uid = this.accountService.effectiveAccountUid();
         if (!uid) throw new Error('No hay cuenta activa');
@@ -177,86 +126,6 @@ export class FinanceService implements OnDestroy {
         const base = Number(montoBase);
         const recargo = base * (Number(porcentajeRecargo) / 100);
         return Math.round((base + recargo) * 100) / 100;
-    }
-
-    // ─── CRUD Clientes ────────────────────────────────────────────────────────
-
-    async addClient(cliente: Omit<Cliente, 'id' | 'usuarioId' | 'saldoPendiente'>) {
-        console.log('Iniciando guardado de cliente...', cliente);
-        const uid = this.activeUid;
-
-        try {
-            const q = query(
-                collection(db, 'clientes'),
-                where('usuarioId', '==', uid),
-                where('nombre', '==', cliente.nombre),
-                where('telefono', '==', cliente.telefono)
-            );
-
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                throw new Error('Ya existe un cliente con este nombre y teléfono');
-            }
-
-            const newClient = {
-                ...cliente,
-                usuarioId: uid,
-                saldoPendiente: 0
-            };
-
-            const docRef = await addDoc(collection(db, 'clientes'), newClient);
-            console.log('Cliente guardado con ID:', docRef.id);
-            return docRef;
-        } catch (error) {
-            console.error('Error detallado en addClient:', error);
-            throw error;
-        }
-    }
-
-    async updateClient(id: string, cliente: Partial<Cliente>) {
-        const docRef = doc(db, 'clientes', id);
-        return await updateDoc(docRef, cliente);
-    }
-
-    async deleteClient(id: string) {
-        const docRef = doc(db, 'clientes', id);
-        return await deleteDoc(docRef);
-    }
-
-    // ─── CRUD Artículos ───────────────────────────────────────────────────────
-
-    async addArticle(articulo: Omit<Articulo, 'id' | 'usuarioId'>) {
-        const uid = this.activeUid;
-        const newArticle = { ...articulo, usuarioId: uid };
-        return await addDoc(collection(db, 'articulos'), newArticle);
-    }
-
-    async updateArticle(id: string, articulo: Partial<Articulo>) {
-        const docRef = doc(db, 'articulos', id);
-        return await updateDoc(docRef, articulo);
-    }
-
-    async deleteArticle(id: string) {
-        const docRef = doc(db, 'articulos', id);
-        return await deleteDoc(docRef);
-    }
-
-    // ─── CRUD Planes de Préstamo ────────────────────────────────────────────────
-    
-    async addLoanPlan(plan: Omit<PlanPrestamo, 'id' | 'usuarioId'>) {
-        const uid = this.activeUid;
-        const newPlan = { ...plan, usuarioId: uid };
-        return await addDoc(collection(db, 'planes_prestamo'), newPlan);
-    }
-
-    async updateLoanPlan(id: string, plan: Partial<PlanPrestamo>) {
-        const docRef = doc(db, 'planes_prestamo', id);
-        return await updateDoc(docRef, plan);
-    }
-
-    async deleteLoanPlan(id: string) {
-        const docRef = doc(db, 'planes_prestamo', id);
-        return await deleteDoc(docRef);
     }
 
     // ─── CRUD Operaciones ─────────────────────────────────────────────────────
@@ -382,7 +251,6 @@ export class FinanceService implements OnDestroy {
     }
 
     async deleteOperation(id: string) {
-        // 1. Buscar la operación localmente para saber las referencias transaccionales
         const op = this._operacionesSignal().find(o => o.id === id);
         if (op) {
             if (op.tipo === 'VENTA' && op.ventaId) {
@@ -392,10 +260,8 @@ export class FinanceService implements OnDestroy {
             }
         }
 
-        // 2. Borrar la operación
         await deleteDoc(doc(db, 'operaciones', id));
         
-        // 3. Borrar cuotas asociadas
         const q = query(collection(db, 'cuotas'), where('operacionId', '==', id));
         const snapshot = await getDocs(q);
         const deletePromises = snapshot.docs.map(d => deleteDoc(doc(db, 'cuotas', d.id)));
@@ -409,7 +275,7 @@ export class FinanceService implements OnDestroy {
             montoBase?: number;
             porcentajeRecargo?: number;
             articuloId?: string;
-            prestamoId?: string; // ID del PlanPrestamo seleccionado
+            prestamoId?: string;
         }
     ) {
         const { tieneVencimiento, montoBase, porcentajeRecargo, articuloId, prestamoId, ...cleanOp } = op;

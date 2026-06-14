@@ -8,8 +8,11 @@ import {
   IonDatetime, IonDatetimeButton, IonButtons, IonHeader, IonToolbar, IonTitle,
   IonFab, IonFabButton, IonContent, AlertController
 } from '@ionic/angular/standalone';
-import { FinanceService } from '../../../core/services/finance.service';
-import { Operacion, Venta, Prestamo } from '../../../core/models/models';
+import { OperationService } from '../../../core/services/operation.service';
+import { ClientService } from '../../../core/services/client.service';
+import { ArticleService } from '../../../core/services/article.service';
+import { LoanPlanService } from '../../../core/services/loan-plan.service';
+import { Operacion, Venta, Prestamo } from '../../../core/models';
 import { addIcons } from 'ionicons';
 import {
   trashOutline, cashOutline, receiptOutline, createOutline,
@@ -31,7 +34,10 @@ import {
   ],
 })
 export class OperationsListComponent {
-  public financeService = inject(FinanceService);
+  public operationService = inject(OperationService);
+  public clientService = inject(ClientService);
+  public articleService = inject(ArticleService);
+  public loanPlanService = inject(LoanPlanService);
   private alertCtrl = inject(AlertController);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
@@ -97,7 +103,7 @@ export class OperationsListComponent {
   }
 
   private loadOperation(id: string) {
-    const op = this.financeService.userOperations().find(o => o.id === id);
+    const op = this.operationService.userOperations().find(o => o.id === id);
     if (op) {
       let montoBase = 0;
       let porcentajeRecargo = 0;
@@ -105,14 +111,14 @@ export class OperationsListComponent {
       let planPrestamoId = '';
 
       if (op.tipo === 'VENTA' && op.ventaId) {
-        const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+        const venta = this.operationService.userSales().find(v => v.id === op.ventaId);
         if (venta) {
           montoBase = venta.montoBase;
           porcentajeRecargo = venta.porcentajeRecargo;
           articuloId = venta.articuloId || '';
         }
       } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
-        const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+        const prestamo = this.operationService.userLoans().find(p => p.id === op.prestamoId);
         if (prestamo) {
           montoBase = prestamo.montoBase;
           porcentajeRecargo = prestamo.porcentajeRecargo;
@@ -140,7 +146,7 @@ export class OperationsListComponent {
   onArticleChange(event: any) {
     const articleId = event.detail.value;
     if (articleId) {
-      const article = this.financeService.userArticles().find(a => a.id === articleId);
+      const article = this.articleService.userArticles().find(a => a.id === articleId);
       if (article) {
         this.opForm.patchValue({ montoBase: article.precioVentaContado });
       }
@@ -150,7 +156,7 @@ export class OperationsListComponent {
   onLoanChange(event: any) {
     const planId = event.detail.value;
     if (planId) {
-      const plan = this.financeService.userLoanPlans().find(p => p.id === planId);
+      const plan = this.loanPlanService.userLoanPlans().find(p => p.id === planId);
       if (plan) {
         this.opForm.patchValue({
           montoBase: plan.montoBase,
@@ -167,15 +173,15 @@ export class OperationsListComponent {
 
   calculatePreview() {
     const { montoBase, porcentajeRecargo } = this.opForm.value;
-    return this.financeService.calculateTotal(montoBase, porcentajeRecargo);
+    return this.operationService.calculateTotal(montoBase, porcentajeRecargo);
   }
 
   getMontoBase(op: Operacion): number {
     if (op.tipo === 'VENTA' && op.ventaId) {
-      const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+      const venta = this.operationService.userSales().find(v => v.id === op.ventaId);
       return venta ? venta.montoBase : 0;
     } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
-      const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+      const prestamo = this.operationService.userLoans().find(p => p.id === op.prestamoId);
       return prestamo ? prestamo.montoBase : 0;
     }
     return 0;
@@ -183,10 +189,10 @@ export class OperationsListComponent {
 
   getPorcentajeRecargo(op: Operacion): number {
     if (op.tipo === 'VENTA' && op.ventaId) {
-      const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+      const venta = this.operationService.userSales().find(v => v.id === op.ventaId);
       return venta ? venta.porcentajeRecargo : 0;
     } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
-      const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+      const prestamo = this.operationService.userLoans().find(p => p.id === op.prestamoId);
       return prestamo ? prestamo.porcentajeRecargo : 0;
     }
     return 0;
@@ -194,10 +200,10 @@ export class OperationsListComponent {
 
   getTotalFinal(op: Operacion): number {
     if (op.tipo === 'VENTA' && op.ventaId) {
-      const venta = this.financeService.userSales().find(v => v.id === op.ventaId);
+      const venta = this.operationService.userSales().find(v => v.id === op.ventaId);
       return venta ? venta.totalFinal : 0;
     } else if (op.tipo === 'PRESTAMO' && op.prestamoId) {
-      const prestamo = this.financeService.userLoans().find(p => p.id === op.prestamoId);
+      const prestamo = this.operationService.userLoans().find(p => p.id === op.prestamoId);
       return prestamo ? prestamo.totalFinal : 0;
     }
     return 0;
@@ -217,9 +223,9 @@ export class OperationsListComponent {
         };
 
         if (this.operationIdToEdit) {
-          await this.financeService.updateOperation(this.operationIdToEdit, opData);
+          await this.operationService.updateOperation(this.operationIdToEdit, opData);
         } else {
-          await this.financeService.addOperation(opData);
+          await this.operationService.addOperation(opData);
         }
 
         const successAlert = await this.alertCtrl.create({
@@ -248,12 +254,12 @@ export class OperationsListComponent {
   }
 
   getClientName(id: string) {
-    const client = this.financeService.userClients().find(c => c.id === id);
+    const client = this.clientService.userClients().find(c => c.id === id);
     return client ? client.nombre : 'Cliente Desconocido';
   }
 
   getInstalments(opId: string) {
-    return this.financeService.userInstalments()
+    return this.operationService.userInstalments()
       .filter(i => i.operacionId === opId)
       .sort((a, b) => {
         if (!a.vencimiento) return 1;
@@ -264,7 +270,7 @@ export class OperationsListComponent {
 
   async payInstallment(cuotaId: string) {
     try {
-      await this.financeService.payInstallment(cuotaId);
+      await this.operationService.payInstallment(cuotaId);
     } catch (error) {
       const errorAlert = await this.alertCtrl.create({
         header: 'Error',
@@ -295,7 +301,7 @@ export class OperationsListComponent {
           role: 'destructive',
           handler: async () => {
             try {
-              await this.financeService.deleteOperation(id);
+              await this.operationService.deleteOperation(id);
             } catch (error) {
               const errorAlert = await this.alertCtrl.create({
                 header: 'Error',

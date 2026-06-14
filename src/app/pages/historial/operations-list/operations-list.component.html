@@ -1,5 +1,5 @@
 <ion-accordion-group>
-  @for (op of financeService.userOperations(); track op.id) {
+  @for (op of operationService.userOperations(); track op.id) {
     <ion-accordion [value]="op.id">
       <ion-item slot="header">
         <ion-icon
@@ -97,7 +97,7 @@
           <ion-item>
             <ion-label position="stacked">Cliente</ion-label>
             <ion-select formControlName="clienteId" placeholder="Seleccionar Cliente">
-              @for (client of financeService.userClients(); track client.id) {
+              @for (client of clientService.userClients(); track client.id) {
                 <ion-select-option [value]="client.id">{{ client.nombre }}</ion-select-option>
               }
             </ion-select>
@@ -118,7 +118,7 @@
               <ion-label position="stacked">Artículo (Opcional)</ion-label>
               <ion-select formControlName="articuloId" placeholder="Seleccionar Artículo" (ionChange)="onArticleChange($event)">
                 <ion-select-option value="">Ninguno</ion-select-option>
-                @for (article of financeService.userArticles(); track article.id) {
+                @for (article of articleService.userArticles(); track article.id) {
                   <ion-select-option [value]="article.id">{{ article.nombre }} ($ {{article.precioVentaContado}})</ion-select-option>
                 }
               </ion-select>
@@ -131,7 +131,7 @@
               <ion-label position="stacked">Plan de Préstamo (Opcional)</ion-label>
               <ion-select formControlName="prestamoId" placeholder="Seleccionar Plan" (ionChange)="onLoanChange($event)">
                 <ion-select-option value="">Ninguno</ion-select-option>
-                @for (loan of financeService.userLoanPlans(); track loan.id) {
+                @for (loan of loanPlanService.userLoanPlans(); track loan.id) {
                   <ion-select-option [value]="loan.id">{{ loan.nombre }} ($ {{loan.montoBase}} - {{loan.cuotasCount}}c - {{loan.periodicidad}})</ion-select-option>
                 }
               </ion-select>

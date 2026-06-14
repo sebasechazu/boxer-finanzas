@@ -12,7 +12,7 @@
 <ion-content class="ion-padding">
 
   <ion-list>
-    @for (article of financeService.userArticles(); track article.id) {
+    @for (article of articleService.userArticles(); track article.id) {
       <ion-item>
         <ion-icon name="cube-outline" slot="start" color="medium" class="large-list-icon"></ion-icon>
         <ion-label>

@@ -26,9 +26,9 @@
   </div>
   }
 
-  <app-dashboard-cards [totalPaid]="financeService.totalPaid()" [moneyOnTheStreet]="financeService.moneyOnTheStreet()"
-    [collectedToday]="financeService.collectedToday()"
-    [pendingCollectionsToday]="financeService.pendingCollectionsToday()">
+  <app-dashboard-cards [totalPaid]="operationService.totalPaid()" [moneyOnTheStreet]="operationService.moneyOnTheStreet()"
+    [collectedToday]="operationService.collectedToday()"
+    [pendingCollectionsToday]="operationService.pendingCollectionsToday()">
   </app-dashboard-cards>
 
   <ion-card>

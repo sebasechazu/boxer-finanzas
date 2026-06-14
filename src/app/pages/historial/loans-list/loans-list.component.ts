@@ -6,10 +6,11 @@ import {
   IonSelect, IonSelectOption, IonText, AlertController
 } from '@ionic/angular/standalone';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { FinanceService } from '../../../core/services/finance.service';
+import { LoanPlanService } from '../../../core/services/loan-plan.service';
+import { OperationService } from '../../../core/services/operation.service';
 import { addIcons } from 'ionicons';
 import { addOutline, createOutline, trashOutline, cashOutline, calendarOutline, listOutline } from 'ionicons/icons';
-import { PlanPrestamo } from '../../../core/models/models';
+import { PlanPrestamo } from '../../../core/models';
 
 @Component({
   selector: 'app-loans-list',
@@ -24,7 +25,8 @@ import { PlanPrestamo } from '../../../core/models/models';
   ],
 })
 export class LoansListComponent {
-  public financeService = inject(FinanceService);
+  public loanPlanService = inject(LoanPlanService);
+  private operationService = inject(OperationService);
   private fb = inject(FormBuilder);
   private alertCtrl = inject(AlertController);
 
@@ -90,7 +92,7 @@ export class LoansListComponent {
           role: 'destructive',
           handler: async () => {
             try {
-              await this.financeService.deleteLoanPlan(id);
+              await this.loanPlanService.deleteLoanPlan(id);
             } catch (error) {
               const errorAlert = await this.alertCtrl.create({
                 header: 'Error',
@@ -127,9 +129,9 @@ export class LoansListComponent {
         }
 
         if (this.editingLoanId) {
-          await this.financeService.updateLoanPlan(this.editingLoanId, loanData);
+          await this.loanPlanService.updateLoanPlan(this.editingLoanId, loanData);
         } else {
-          await this.financeService.addLoanPlan(loanData);
+          await this.loanPlanService.addLoanPlan(loanData);
         }
         this.closeModal();
       } catch (error: any) {
@@ -147,6 +149,6 @@ export class LoansListComponent {
 
   calculateTotalPreview() {
     const { montoBase, porcentajeRecargo } = this.loanForm.value;
-    return this.financeService.calculateTotal(montoBase, porcentajeRecargo);
+    return this.operationService.calculateTotal(montoBase, porcentajeRecargo);
   }
 }

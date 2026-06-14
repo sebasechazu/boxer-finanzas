@@ -1,24 +1,36 @@
-import { Injectable, inject, signal, computed, effect, OnDestroy } from '@angular/core';
+import { Injectable, inject, signal, computed, effect, OnDestroy, linkedSignal } from '@angular/core';
 import {
-    collection, doc, getDoc, getDocs, setDoc, updateDoc, addDoc,
-    query, where, onSnapshot, DocumentData, QuerySnapshot
-} from 'firebase/firestore';
+    collection, doc, getDoc, setDoc, updateDoc, addDoc,
+    query, where, onSnapshot} from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { AuthService } from './auth.service';
+import { User } from 'firebase/auth';
 import {
     PerfilUsuario, Invitacion, Colaborador, CuentaAccesible
-} from '../models/models';
+} from '../models';
 
 @Injectable({
     providedIn: 'root'
-})
+    })
 export class AccountService implements OnDestroy {
     private authService = inject(AuthService);
     
-    private _misColaboradores = signal<Colaborador[]>([]);
-    private _cuentasAjenas = signal<Colaborador[]>([]);
-    private _invitacionesRecibidas = signal<Invitacion[]>([]);
-    private _invitacionesEnviadas = signal<Invitacion[]>([]);
+    private _misColaboradores = linkedSignal<User | null, Colaborador[]>({
+        source: () => this.authService.userSignal(),
+        computation: () => []
+    });
+    private _cuentasAjenas = linkedSignal<User | null, Colaborador[]>({
+        source: () => this.authService.userSignal(),
+        computation: () => []
+    });
+    private _invitacionesRecibidas = linkedSignal<User | null, Invitacion[]>({
+        source: () => this.authService.userSignal(),
+        computation: () => []
+    });
+    private _invitacionesEnviadas = linkedSignal<User | null, Invitacion[]>({
+        source: () => this.authService.userSignal(),
+        computation: () => []
+    });
 
     private _unsubColaboradores?: () => void;
     private _unsubAjenas?: () => void;
@@ -52,7 +64,10 @@ export class AccountService implements OnDestroy {
         return [propia, ...ajenas];
     });
 
-    readonly activeAccountUid = signal<string | null>(null);
+    readonly activeAccountUid = linkedSignal<User | null, string | null>({
+        source: () => this.authService.userSignal(),
+        computation: (user) => user ? user.uid : null
+    });
 
     readonly effectiveAccountUid = computed(() => {
         return this.activeAccountUid() ?? this.authService.currentUserUid ?? null;
@@ -74,15 +89,8 @@ export class AccountService implements OnDestroy {
             this._unsubInvEnviadas?.();
 
             if (!user) {
-                this._misColaboradores.set([]);
-                this._cuentasAjenas.set([]);
-                this._invitacionesRecibidas.set([]);
-                this._invitacionesEnviadas.set([]);
-                this.activeAccountUid.set(null);
                 return;
             }
-
-            this.activeAccountUid.set(user.uid);
 
             const qMisColab = query(collection(db, 'colaboradores'), where('propietarioUid', '==', user.uid));
             this._unsubColaboradores = onSnapshot(qMisColab, snap => {

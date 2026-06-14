@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, OnDestroy } from '@angular/core';
 import { onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, User, Unsubscribe } from 'firebase/auth';
 import { Router } from '@angular/router';
-import { PerfilUsuario } from '../models/models';
+import { PerfilUsuario } from '../models';
 import { auth, db } from '../../firebase.config';
 import { AlertController, NavController } from '@ionic/angular';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';

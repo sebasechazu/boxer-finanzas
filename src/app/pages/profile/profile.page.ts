@@ -2,7 +2,7 @@ import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/cor
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote, IonListHeader, IonItemSliding, IonItemOptions, IonItemOption, AlertController, ToastController, IonThumbnail, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordion, IonCardSubtitle, IonButtons } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
-import { Invitacion, Colaborador } from '../../core/models/models';
+import { Invitacion, Colaborador } from '../../core/models';
 import { addIcons } from 'ionicons';
 import {
     logOutOutline, mailOutline, personAddOutline, trashOutline,

@@ -5,7 +5,7 @@ import { AccountService } from '../../core/services/account.service';
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { signal } from '@angular/core';
-import { Invitacion } from '../../core/models/models';
+import { Invitacion } from '../../core/models';
 
 describe('ProfilePage', () => {
     let component: ProfilePage;
