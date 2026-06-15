@@ -1,4 +1,4 @@
-export type EstadoCuota = 'PENDIENTE' | 'PAGADA' | 'VENCIDA';
+import { EstadoCuota } from "../types/estado-cuota.type";
 
 export interface Cuota {
     id: string;

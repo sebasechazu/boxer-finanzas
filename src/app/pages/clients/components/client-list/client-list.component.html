@@ -1,0 +1,32 @@
+@if(clients.length > 0) {
+<ion-list>
+  @for (client of clients; track client.id) {
+  <ion-item-sliding>
+
+    <ion-item-options side="start">
+      <ion-item-option side="start" color="danger" (click)="delete.emit(client.id)">
+        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+      </ion-item-option>
+    </ion-item-options>
+
+    <ion-item button (click)="edit.emit(client)">
+      <ion-label>
+        <h2 class="m-0 text-[1.1rem] font-medium">{{ client.nombre }}</h2>
+      </ion-label>
+      <ion-note slot="end" class="text-sm text-gray-500">{{ client.saldoPendiente | currency }}</ion-note>
+    </ion-item>
+
+    <ion-item-options side="end">
+      <ion-item-option side="end" color="secondary" (click)="openWhatsApp.emit(client.telefono)">
+        <ion-icon name="logo-whatsapp" slot="icon-only"></ion-icon>
+      </ion-item-option>
+    </ion-item-options>
+
+  </ion-item-sliding>
+  } 
+</ion-list>
+} @else {
+<ion-card class="ion-padding ion-text-center">
+  <p>No tienes clientes registrados todavía.</p>
+</ion-card>
+}

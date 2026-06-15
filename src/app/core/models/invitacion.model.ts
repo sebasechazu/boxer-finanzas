@@ -1,6 +1,5 @@
-export type EstadoInvitacion = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
+import { EstadoInvitacion } from "../types/estado-invitacion.type";
 
-/** Invitación enviada por un propietario a otro usuario (colección `invitaciones`) */
 export interface Invitacion {
     id: string;
     propietarioUid: string;

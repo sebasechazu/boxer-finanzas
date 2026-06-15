@@ -1,0 +1,1 @@
+export type EstadoInvitacion = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';

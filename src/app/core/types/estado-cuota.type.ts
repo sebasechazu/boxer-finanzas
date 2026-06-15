@@ -1,0 +1,1 @@
+export type EstadoCuota = 'PENDIENTE' | 'PAGADA' | 'VENCIDA';

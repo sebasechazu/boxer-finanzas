@@ -1,0 +1,54 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="didDismiss.emit()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}</ion-title>
+        <ion-button slot="end" fill="clear" (click)="didDismiss.emit()">Cerrar</ion-button>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+        <ion-item lines="full" [class.ion-invalid]="clientForm.get('nombre')?.invalid && clientForm.get('nombre')?.touched" class="ion-touched">
+          <ion-label position="stacked">Nombre Completo</ion-label>
+          <ion-input formControlName="nombre" placeholder="Nombre completo" type="text" maxlength="40"></ion-input>
+          @if (clientForm.get('nombre')?.invalid && clientForm.get('nombre')?.touched) {
+            <ion-note slot="error">
+              @if (clientForm.get('nombre')?.errors?.['required']) {
+                El nombre es requerido.
+              } @else if (clientForm.get('nombre')?.errors?.['minlength']) {
+                Debe tener al menos 3 caracteres.
+              } @else if (clientForm.get('nombre')?.errors?.['maxlength']) {
+                No debe superar los 40 caracteres.
+              } @else if (clientForm.get('nombre')?.errors?.['maxWords']) {
+                No debe exceder de un nombre y apellido (2 palabras).
+              } @else if (clientForm.get('nombre')?.errors?.['pattern']) {
+                Solo se permiten letras y espacios.
+              }
+            </ion-note>
+          }
+        </ion-item>
+        <ion-item lines="full" [class.ion-invalid]="clientForm.get('telefono')?.invalid && clientForm.get('telefono')?.touched" class="ion-touched">
+          <ion-label position="stacked">Teléfono</ion-label>
+          <ion-input formControlName="telefono" placeholder="Ej: +54 9..." type="tel" maxlength="15"></ion-input>
+          @if (clientForm.get('telefono')?.invalid && clientForm.get('telefono')?.touched) {
+            <ion-note slot="error">
+              @if (clientForm.get('telefono')?.errors?.['required']) {
+                El teléfono es requerido.
+              } @else if (clientForm.get('telefono')?.errors?.['minlength']) {
+                Debe tener al menos 8 caracteres.
+              } @else if (clientForm.get('telefono')?.errors?.['maxlength']) {
+                No debe superar los 15 caracteres.
+              } @else if (clientForm.get('telefono')?.errors?.['pattern']) {
+                Solo números, espacios, '+' y '-'.
+              }
+            </ion-note>
+          }
+        </ion-item>
+        
+        <ion-button expand="block" type="submit" [disabled]="clientForm.invalid || isSaving" class="ion-margin-top">
+          {{ isSaving ? 'Guardando...' : (isEditing ? 'Actualizar Cliente' : 'Guardar Cliente') }}
+        </ion-button>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
