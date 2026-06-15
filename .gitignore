@@ -84,3 +84,6 @@ auth-debug.log
 # Agents / Skills
 .agents/
 skills-lock.json
+
+*storybook.log
+storybook-static

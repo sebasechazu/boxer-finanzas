@@ -5,6 +5,7 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  
   <app-client-list
     [clients]="clientService.userClients()"
     (edit)="editClient($event)"
@@ -26,4 +27,5 @@
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
 </ion-content>
