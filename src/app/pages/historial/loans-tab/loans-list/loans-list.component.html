@@ -1,0 +1,29 @@
+<ion-list>
+  @for (loan of loans; track loan.id) {
+    <ion-item>
+      <ion-icon name="list-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>{{ loan.nombre }}</h2>
+        <p>Monto Base: $ {{ loan.montoBase }} | Recargo: {{ loan.porcentajeRecargo }}%</p>
+        <p>{{ loan.cuotasCount }} cuotas | Periodicidad: {{ loan.periodicidad }}</p>
+        @if (loan.periodicidad === 'MENSUAL') {
+          <p>Día vencimiento: {{ loan.diaVencimiento }}</p>
+        } @else {
+          <p>Día de semana: {{ loan.diaSemana === 1 ? 'Lunes' : loan.diaSemana === 2 ? 'Martes' : loan.diaSemana === 3 ? 'Miércoles' : loan.diaSemana === 4 ? 'Jueves' : loan.diaSemana === 5 ? 'Viernes' : loan.diaSemana === 6 ? 'Sábado' : 'Domingo' }}</p>
+        }
+      </ion-label>
+      <div slot="end">
+        <ion-button fill="clear" (click)="edit.emit(loan)">
+          <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="danger" (click)="delete.emit(loan.id)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-item>
+  } @empty {
+    <div class="ion-padding ion-text-center">
+      <p>No tienes planes de préstamo registrados todavía.</p>
+    </div>
+  }
+</ion-list>

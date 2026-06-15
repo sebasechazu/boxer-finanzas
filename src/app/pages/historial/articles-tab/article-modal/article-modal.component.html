@@ -1,0 +1,34 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="dismiss.emit()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ editingArticleId ? 'Editar Artículo' : 'Nuevo Artículo' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" (click)="dismiss.emit()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <form [formGroup]="articleForm" (ngSubmit)="onSubmit()">
+        <ion-item lines="full">
+          <ion-label position="stacked">Nombre del Artículo</ion-label>
+          <ion-input formControlName="nombre" placeholder="Ej: Celular Samsung"></ion-input>
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label position="stacked">Precio de Compra</ion-label>
+          <ion-input type="number" formControlName="precioCompra" placeholder="0.00"></ion-input>
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label position="stacked">Precio Venta Contado</ion-label>
+          <ion-input type="number" formControlName="precioVentaContado" placeholder="0.00"></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit"
+          [disabled]="articleForm.invalid || isSaving"
+          class="ion-margin-top">
+          {{ isSaving ? 'Guardando...' : (editingArticleId ? 'Actualizar' : 'Guardar Artículo') }}
+        </ion-button>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

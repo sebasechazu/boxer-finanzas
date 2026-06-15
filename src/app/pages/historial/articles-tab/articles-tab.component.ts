@@ -1,67 +1,53 @@
-import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonModal,
-  IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonButtons, IonInput,
-  IonHeader, IonToolbar, IonTitle, IonFab, IonFabButton,
-  AlertController
-} from '@ionic/angular/standalone';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { IonFab, IonFabButton, IonIcon, AlertController } from '@ionic/angular/standalone';
 import { ArticleService } from '../../../core/services/article.service';
 import { addIcons } from 'ionicons';
-import { addOutline, createOutline, trashOutline, cubeOutline, cashOutline, trendingUpOutline, walletOutline } from 'ionicons/icons';
+import { addOutline, createOutline, trashOutline, cubeOutline } from 'ionicons/icons';
 import { Articulo } from '../../../core/models';
+import { ArticlesListComponent } from './articles-list/articles-list.component';
+import { ArticleModalComponent } from './article-modal/article-modal.component';
 
 @Component({
-  selector: 'app-articles-list',
-  templateUrl: 'articles-list.component.html',
+  selector: 'app-articles-tab',
+  templateUrl: 'articles-tab.component.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
-    CommonModule, ReactiveFormsModule,
-    IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonModal,
-    IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonButtons, IonInput,
-    IonHeader, IonToolbar, IonTitle, IonFab, IonFabButton,
-  ],
+    CommonModule,
+    IonFab, IonFabButton, IonIcon,
+    ArticlesListComponent, ArticleModalComponent
+],
 })
-export class ArticlesListComponent {
+export class ArticlesTabComponent {
   public articleService = inject(ArticleService);
-  private fb = inject(FormBuilder);
   private alertCtrl = inject(AlertController);
 
   isModalOpen = false;
   isSaving = false;
   editingArticleId: string | null = null;
-
-  articleForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3)]],
-    precioCompra: [0, [Validators.required, Validators.min(0)]],
-    precioVentaContado: [0, [Validators.required, Validators.min(0)]]
-  });
+  initialArticleData: Partial<Articulo> | null = null;
 
   constructor() {
-    addIcons({ addOutline, createOutline, trashOutline, cubeOutline, cashOutline, trendingUpOutline, walletOutline });
+    addIcons({ addOutline, createOutline, trashOutline, cubeOutline });
   }
 
   openAddModal() {
     this.editingArticleId = null;
-    this.articleForm.reset({ precioCompra: 0, precioVentaContado: 0 });
+    this.initialArticleData = null;
     this.isModalOpen = true;
   }
 
   editArticle(article: Articulo) {
     this.editingArticleId = article.id;
-    this.articleForm.patchValue({
-      nombre: article.nombre,
-      precioCompra: article.precioCompra || 0,
-      precioVentaContado: article.precioVentaContado
-    });
+    this.initialArticleData = { ...article };
     this.isModalOpen = true;
   }
 
   closeModal() {
     this.isModalOpen = false;
     this.editingArticleId = null;
+    this.initialArticleData = null;
   }
 
   async deleteArticle(id: string) {
@@ -91,14 +77,14 @@ export class ArticlesListComponent {
     await alert.present();
   }
 
-  async onSubmit() {
-    if (this.articleForm.valid && !this.isSaving) {
+  async onSaveArticle(articleFormData: any) {
+    if (!this.isSaving) {
       this.isSaving = true;
       try {
         const articleData = {
-          ...this.articleForm.value,
-          precioCompra: Number(this.articleForm.value.precioCompra),
-          precioVentaContado: Number(this.articleForm.value.precioVentaContado)
+          ...articleFormData,
+          precioCompra: Number(articleFormData.precioCompra),
+          precioVentaContado: Number(articleFormData.precioVentaContado)
         };
         if (this.editingArticleId) {
           await this.articleService.updateArticle(this.editingArticleId, articleData);

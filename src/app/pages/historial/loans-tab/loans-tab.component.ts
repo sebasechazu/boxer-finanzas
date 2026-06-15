@@ -1,84 +1,57 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
-  IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonModal,
-  IonButtons, IonInput, IonHeader, IonToolbar, IonTitle, IonFab, IonFabButton,
-  IonSelect, IonSelectOption, IonText, AlertController
-} from '@ionic/angular/standalone';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+  IonFab, IonFabButton, IonIcon, AlertController} from '@ionic/angular/standalone';
 import { LoanPlanService } from '../../../core/services/loan-plan.service';
-import { OperationService } from '../../../core/services/operation.service';
 import { addIcons } from 'ionicons';
-import { addOutline, createOutline, trashOutline, cashOutline, calendarOutline, listOutline } from 'ionicons/icons';
+import { addOutline, createOutline, trashOutline, listOutline } from 'ionicons/icons';
 import { PlanPrestamo } from '../../../core/models';
+import { LoansListComponent } from './loans-list/loans-list.component';
+import { LoanModalComponent } from './loan-modal/loan-modal.component';
 
 @Component({
-  selector: 'app-loans-list',
-  templateUrl: 'loans-list.component.html',
+  selector: 'app-loans-tab',
+  templateUrl: 'loans-tab.component.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
-    CommonModule, ReactiveFormsModule, DecimalPipe,
-    IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonModal,
-    IonButtons, IonInput, IonHeader, IonToolbar, IonTitle, IonFab, IonFabButton,
-    IonSelect, IonSelectOption, IonText
-  ],
+    CommonModule,
+    IonFab,
+    IonFabButton,
+    IonIcon,
+    LoansListComponent,
+    LoanModalComponent
+],
 })
-export class LoansListComponent {
+export class LoansTabComponent {
   public loanPlanService = inject(LoanPlanService);
-  private operationService = inject(OperationService);
-  private fb = inject(FormBuilder);
   private alertCtrl = inject(AlertController);
 
   isModalOpen = false;
   isSaving = false;
   editingLoanId: string | null = null;
-
-  loanForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3)]],
-    montoBase: [0, [Validators.required, Validators.min(1)]],
-    porcentajeRecargo: [0, [Validators.required, Validators.min(0)]],
-    cuotasCount: [1, [Validators.required, Validators.min(1)]],
-    periodicidad: ['MENSUAL', Validators.required],
-    diaSemana: [1],
-    diaVencimiento: [5, [Validators.min(1), Validators.max(31)]]
-  });
+  initialLoanData: Partial<PlanPrestamo> | null = null;
 
   constructor() {
-    addIcons({ addOutline, createOutline, trashOutline, cashOutline, calendarOutline, listOutline });
+    addIcons({ addOutline, createOutline, trashOutline, listOutline });
   }
 
   openAddModal() {
     this.editingLoanId = null;
-    this.loanForm.reset({
-      nombre: '',
-      montoBase: 0,
-      porcentajeRecargo: 0,
-      cuotasCount: 1,
-      periodicidad: 'MENSUAL',
-      diaSemana: 1,
-      diaVencimiento: 5
-    });
+    this.initialLoanData = null;
     this.isModalOpen = true;
   }
 
   editLoan(loan: PlanPrestamo) {
     this.editingLoanId = loan.id;
-    this.loanForm.patchValue({
-      nombre: loan.nombre,
-      montoBase: loan.montoBase,
-      porcentajeRecargo: loan.porcentajeRecargo,
-      cuotasCount: loan.cuotasCount,
-      periodicidad: loan.periodicidad,
-      diaSemana: loan.diaSemana ?? 1,
-      diaVencimiento: loan.diaVencimiento ?? 5
-    });
+    this.initialLoanData = { ...loan };
     this.isModalOpen = true;
   }
 
   closeModal() {
     this.isModalOpen = false;
     this.editingLoanId = null;
+    this.initialLoanData = null;
   }
 
   async deleteLoan(id: string) {
@@ -108,15 +81,15 @@ export class LoansListComponent {
     await alert.present();
   }
 
-  async onSubmit() {
-    if (this.loanForm.valid && !this.isSaving) {
+  async onSaveLoan(loanFormData: any) {
+    if (!this.isSaving) {
       this.isSaving = true;
       try {
         const loanData = {
-          ...this.loanForm.value,
-          montoBase: Number(this.loanForm.value.montoBase),
-          porcentajeRecargo: Number(this.loanForm.value.porcentajeRecargo),
-          cuotasCount: Number(this.loanForm.value.cuotasCount)
+          ...loanFormData,
+          montoBase: Number(loanFormData.montoBase),
+          porcentajeRecargo: Number(loanFormData.porcentajeRecargo),
+          cuotasCount: Number(loanFormData.cuotasCount)
         };
 
         // Limpieza de campos según periodicidad
@@ -145,10 +118,5 @@ export class LoansListComponent {
         this.isSaving = false;
       }
     }
-  }
-
-  calculateTotalPreview() {
-    const { montoBase, porcentajeRecargo } = this.loanForm.value;
-    return this.operationService.calculateTotal(montoBase, porcentajeRecargo);
   }
 }

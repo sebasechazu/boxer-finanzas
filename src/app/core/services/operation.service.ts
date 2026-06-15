@@ -25,8 +25,6 @@ export class OperationService implements OnDestroy {
     readonly userSales = this._ventasSignal.asReadonly();
     readonly userInstalments = this._cuotasSignal.asReadonly();
 
-    // ─── Computed ─────────────────────────────────────────────────────────────
-
     readonly totalPaid = computed(() => {
         const opIds = new Set(this.userOperations().map(op => op.id));
         return this.userInstalments()
@@ -47,7 +45,7 @@ export class OperationService implements OnDestroy {
 
         const opIds = new Set(this.userOperations().map(op => op.id));
         return this.userInstalments()
-            .filter(i => opIds.has(i.operacionId) && 
+            .filter(i => opIds.has(i.operacionId) &&
                 i.estado === 'PAGADA' && i.fechaPago &&
                 new Date(i.fechaPago).getTime() >= startOfToday)
             .reduce((sum, i) => sum + i.monto, 0);
@@ -60,7 +58,7 @@ export class OperationService implements OnDestroy {
         const opIds = new Set(this.userOperations().map(op => op.id));
         return this.userInstalments()
             .filter(i => opIds.has(i.operacionId) &&
-                i.estado === 'PENDIENTE' && 
+                i.estado === 'PENDIENTE' &&
                 (!i.vencimiento || new Date(i.vencimiento).getTime() <= startOfToday))
             .reduce((sum, i) => sum + i.monto, 0);
     });
@@ -202,7 +200,7 @@ export class OperationService implements OnDestroy {
                         fechaBase.setTime(vencimiento.getTime());
                     }
                     vencimiento.setDate(fechaBase.getDate() + (i * 7));
-                } 
+                }
                 else if (op.periodicidad === 'QUINCENAL') {
                     if (i === 0 && op.diaSemana !== undefined) {
                         const diff = (op.diaSemana + 7 - vencimiento.getDay()) % 7;
@@ -210,7 +208,7 @@ export class OperationService implements OnDestroy {
                         fechaBase.setTime(vencimiento.getTime());
                     }
                     vencimiento.setDate(fechaBase.getDate() + (i * 14));
-                } 
+                }
                 else { // MENSUAL por defecto
                     if (i === 0 && op.diaVencimiento !== undefined) {
                         vencimiento.setDate(op.diaVencimiento);
@@ -221,7 +219,7 @@ export class OperationService implements OnDestroy {
                         vencimiento.setDate(op.diaVencimiento);
                     }
                 }
-                
+
                 vencimientoISO = vencimiento.toISOString();
             }
 
@@ -261,7 +259,7 @@ export class OperationService implements OnDestroy {
         }
 
         await deleteDoc(doc(db, 'operaciones', id));
-        
+
         const q = query(collection(db, 'cuotas'), where('operacionId', '==', id));
         const snapshot = await getDocs(q);
         const deletePromises = snapshot.docs.map(d => deleteDoc(doc(db, 'cuotas', d.id)));
@@ -269,8 +267,8 @@ export class OperationService implements OnDestroy {
     }
 
     async updateOperation(
-        id: string, 
-        op: Partial<Operacion> & { 
+        id: string,
+        op: Partial<Operacion> & {
             tieneVencimiento?: boolean;
             montoBase?: number;
             porcentajeRecargo?: number;

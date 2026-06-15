@@ -16,12 +16,12 @@
 
 <ion-content class="ion-padding">
   @if(selectedTab() === 'operaciones') {
-    <app-operations-list></app-operations-list>
+  <app-operations-tab />
   }
   @if(selectedTab() === 'articulos') {
-    <app-articles-list></app-articles-list>
+  <app-articles-tab />
   }
   @if(selectedTab() === 'prestamos') {
-    <app-loans-list></app-loans-list>
+  <app-loans-tab />
   }
 </ion-content>

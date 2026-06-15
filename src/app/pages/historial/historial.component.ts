@@ -1,13 +1,23 @@
 import { Component, signal } from '@angular/core';
 import { IonHeader, IonContent, IonSegment, IonSegmentButton, IonLabel, IonToolbar } from "@ionic/angular/standalone";
-import { OperationsListComponent } from "./operations-list/operations-list.component";
-import { ArticlesListComponent } from "./articles-list/articles-list.component";
-import { LoansListComponent } from "./loans-list/loans-list.component";
+import { OperationsTabComponent } from "./operations-tab/operations-tab.component";
+import { ArticlesTabComponent } from "./articles-tab/articles-tab.component";
+import { LoansTabComponent } from "./loans-tab/loans-tab.component";
 
 @Component({
   selector: 'app-historial',
   templateUrl: './historial.component.html',
-  imports: [IonToolbar, IonLabel, IonSegmentButton, IonSegment, IonHeader, IonContent, OperationsListComponent, ArticlesListComponent, LoansListComponent]
+  imports: [
+    IonToolbar, 
+    IonLabel, 
+    IonSegmentButton, 
+    IonSegment, 
+    IonHeader, 
+    IonContent, 
+    OperationsTabComponent,
+    ArticlesTabComponent, 
+    LoansTabComponent
+  ]
 })
 export class HistorialComponent {
 

@@ -1,0 +1,12 @@
+<app-operations-list [operations]="operationService.userOperations()" (edit)="openEditModal($event)"
+  (delete)="deleteOperation($event)" (pay)="payInstallment($event)"/>
+
+<app-operation-modal [isOpen]="isModalOpen" [isSaving]="isSavingOp" [operationIdToEdit]="operationIdToEdit"
+  [initialData]="initialOperationData" (dismiss)="closeModal()" (save)="onSubmitOperation($event)"/>
+
+<!-- Botón flotante para agregar nueva operación -->
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab-button (click)="openAddModal()">
+    <ion-icon name="add-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

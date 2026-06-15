@@ -1,97 +1,15 @@
-<ion-accordion-group>
-  @for (op of operationService.userOperations(); track op.id) {
-    <ion-accordion [value]="op.id">
-      <ion-item slot="header">
-        <ion-icon
-          [name]="op.tipo === 'VENTA' ? 'receipt-outline' : 'cash-outline'"
-          slot="start"
-          [color]="op.tipo === 'VENTA' ? 'primary' : 'success'">
-        </ion-icon>
-        <ion-label>
-          <h2>{{ getClientName(op.clienteId) }}</h2>
-          <p>
-            <ion-badge [color]="op.tipo === 'VENTA' ? 'primary' : 'success'">{{ op.tipo }}</ion-badge>
-            <span class="ion-margin-start">Total: <strong>$ {{ getTotalFinal(op) | number:'1.2-2' }}</strong></span>
-          </p>
-          <ion-note>{{ op.cuotasCount }} cuotas | Recargo: {{ getPorcentajeRecargo(op) }}%</ion-note>
-        </ion-label>
-      </ion-item>
-
-      <div class="ion-padding" slot="content">
-        <ion-list lines="none">
-          <ion-item-divider>
-            <ion-label>Cronograma de Pagos</ion-label>
-          </ion-item-divider>
-
-          @for (cuota of getInstalments(op.id); track cuota.id; let i = $index) {
-            <ion-item class="cuota-item">
-              <ion-label>
-                <h3>Cuota {{ i + 1 }} / {{ op.cuotasCount }}</h3>
-                <p>
-                  @if (cuota.vencimiento) {
-                    Vencimiento: {{ cuota.vencimiento | date:'dd/MM/yyyy' }}
-                  } @else {
-                    Sin fecha de vencimiento
-                  }
-                </p>
-                @if (cuota.fechaPago) {
-                  <p>Cobrado el: <ion-text color="success">{{ cuota.fechaPago | date:'dd/MM/yyyy' }}</ion-text></p>
-                }
-              </ion-label>
-              <div slot="end" class="ion-text-end">
-                <ion-badge [color]="getStatusColor(cuota.estado)">{{ cuota.estado }}</ion-badge>
-                <p class="ion-no-margin"><ion-note>$ {{ cuota.monto | number:'1.2-2' }}</ion-note></p>
-              </div>
-
-              @if (cuota.estado === 'PENDIENTE' || cuota.estado === 'VENCIDA') {
-                <ion-button slot="end" fill="outline" size="small" (click)="payInstallment(cuota.id)">
-                  <ion-icon name="cash-outline" slot="start"></ion-icon>
-                  Cobrar
-                </ion-button>
-              }
-            </ion-item>
-          }
-        </ion-list>
-
-        <div class="ion-text-end ion-padding-top">
-          <ion-button fill="clear" color="primary" (click)="openEditModal(op.id)">
-            <ion-icon name="create-outline" slot="start"></ion-icon>
-            Editar Operación
-          </ion-button>
-          <ion-button fill="clear" color="danger" (click)="deleteOperation(op.id)">
-            <ion-icon name="trash-outline" slot="start"></ion-icon>
-            Eliminar Operación
-          </ion-button>
-        </div>
-      </div>
-    </ion-accordion>
-  } @empty {
-    <div class="ion-padding ion-text-center">
-      <p>No hay operaciones registradas todavía.</p>
-    </div>
-  }
-</ion-accordion-group>
-
-<!-- Botón flotante para agregar nueva operación -->
-<ion-fab slot="fixed" vertical="bottom" horizontal="end">
-  <ion-fab-button (click)="openAddModal()">
-    <ion-icon name="add-outline"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
-
-<!-- Modal a pantalla completa para crear/editar operación -->
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" class="fullscreen-modal">
+<ion-modal [isOpen]="isOpen" (didDismiss)="dismiss.emit()" class="fullscreen-modal">
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ operationIdToEdit ? 'Editar Operación' : 'Nueva Operación' }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button fill="clear" (click)="closeModal()">Cerrar</ion-button>
+          <ion-button fill="clear" (click)="dismiss.emit()">Cerrar</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
-      <form [formGroup]="opForm" (ngSubmit)="onSubmitOperation()">
+      <form [formGroup]="opForm" (ngSubmit)="onSubmit()">
         <ion-list lines="full">
           <!-- Cliente -->
           <ion-item>
@@ -216,8 +134,8 @@
             </div>
           }
 
-          <ion-button expand="block" type="submit" [disabled]="opForm.invalid || isSavingOp" class="ion-margin-top">
-            {{ isSavingOp ? 'Guardando...' : (operationIdToEdit ? 'Actualizar Operación' : 'Confirmar Operación') }}
+          <ion-button expand="block" type="submit" [disabled]="opForm.invalid || isSaving" class="ion-margin-top">
+            {{ isSaving ? 'Guardando...' : (operationIdToEdit ? 'Actualizar Operación' : 'Confirmar Operación') }}
           </ion-button>
         </ion-list>
       </form>

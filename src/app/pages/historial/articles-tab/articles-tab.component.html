@@ -1,0 +1,14 @@
+<app-articles-list [articles]="articleService.userArticles()" (edit)="editArticle($event)"
+  (delete)="deleteArticle($event)" />
+
+
+<app-article-modal [isOpen]="isModalOpen" [isSaving]="isSaving" [editingArticleId]="editingArticleId"
+  [initialData]="initialArticleData" (dismiss)="closeModal()" (save)="onSaveArticle($event)">
+</app-article-modal>
+
+<!-- Botón flotante para agregar nuevo artículo -->
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab-button (click)="openAddModal()">
+    <ion-icon name="add-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
