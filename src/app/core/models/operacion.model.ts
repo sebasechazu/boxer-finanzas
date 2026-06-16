@@ -1,6 +1,5 @@
+import { TipoOperacion } from '../types/tipo-operacion.type';
 import { TipoPeriodicidad } from './periodicidad.model';
-
-export type TipoOperacion = 'PRESTAMO' | 'VENTA';
 
 export interface Operacion {
     id: string;
