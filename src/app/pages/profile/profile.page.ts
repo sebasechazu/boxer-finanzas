@@ -44,7 +44,7 @@ export class ProfilePage {
             logOutOutline, mailOutline, personAddOutline, trashOutline,
             checkmarkCircleOutline, closeCircleOutline, businessOutline,
             peopleOutline, personOutline, shieldCheckmarkOutline,
-            cafeOutline, cafe, addOutline: personAddOutline
+            cafeOutline, cafe
         });
     }
 

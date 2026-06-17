@@ -12,7 +12,7 @@ import {
 import { Router } from '@angular/router';
 import { PerfilUsuario } from '../models';
 import { auth, db } from '../../firebase.config';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 @Injectable({
@@ -22,6 +22,7 @@ export class AuthService implements OnDestroy {
     private router = inject(Router);
     private navCtrl = inject(NavController);
     private alertController = inject(AlertController);
+    private toastController = inject(ToastController);
     private _authStateInitialized = signal(false);
     readonly authStateInitialized = this._authStateInitialized.asReadonly();
     private _authUnsubscribe?: Unsubscribe;
@@ -94,14 +95,27 @@ export class AuthService implements OnDestroy {
         }
     }
 
-    private async _showAuthError(message: string, error?: unknown) {
-        console.error('AuthService: Error de autenticación', error);
-        const alert = await this.alertController.create({
-            header: 'Error de Autenticación',
+    private async _showAuthError(message: string) {
+        const toast = await this.toastController.create({
             message,
-            buttons: ['OK']
+            duration: 3500,
+            position: 'top',
+            color: 'danger'
         });
-        await alert.present();
+        await toast.present();
+    }
+
+    private validateEmail(email: string): string | null {
+        const normalizedEmail = email.trim().toLowerCase();
+        if (!normalizedEmail) {
+            return 'Ingresa un correo electrónico.';
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+            return 'El correo ingresado no es válido.';
+        }
+
+        return null;
     }
 
     async loginWithGoogle() {
@@ -110,27 +124,53 @@ export class AuthService implements OnDestroy {
             await signInWithPopup(auth, provider);
         } catch (error: any) {
             await this._showAuthError(
-                'No se pudo completar el inicio de sesión. Si estás usando una PWA instalada, asegúrate de que tu navegador permita abrir ventanas emergentes o vuelve a intentarlo.',
-                error
+                'No se pudo completar el inicio de sesión. Si estás usando una PWA instalada, asegúrate de que tu navegador permita abrir ventanas emergentes o vuelve a intentarlo.'
             );
             throw error;
         }
     }
 
     async loginWithEmailAndPassword(email: string, password: string) {
+        const emailError = this.validateEmail(email);
+        if (emailError) {
+            await this._showAuthError(emailError);
+            throw new Error(emailError);
+        }
+
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
         } catch (error: any) {
-            await this._showAuthError('No se pudo iniciar sesión con el correo y la contraseña proporcionados.', error);
+            const message = error?.code === 'auth/invalid-email'
+                ? 'El correo ingresado no es válido.'
+                : error?.code === 'auth/user-not-found' || error?.code === 'auth/wrong-password'
+                    ? 'Correo o contraseña incorrectos.'
+                    : 'No se pudo iniciar sesión. Revisa tus datos e inténtalo nuevamente.';
+            await this._showAuthError(message);
             throw error;
         }
     }
 
     async registerWithEmailAndPassword(email: string, password: string) {
+        const emailError = this.validateEmail(email);
+        if (emailError) {
+            await this._showAuthError(emailError);
+            throw new Error(emailError);
+        }
+
+        if (password.trim().length < 6) {
+            await this._showAuthError('La contraseña debe tener al menos 6 caracteres.');
+            throw new Error('password-too-short');
+        }
+
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
+            await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
         } catch (error: any) {
-            await this._showAuthError('No se pudo crear la cuenta. Verifica que el correo sea válido y que la contraseña tenga al menos 6 caracteres.', error);
+            const message = error?.code === 'auth/invalid-email'
+                ? 'El correo ingresado no es válido.'
+                : error?.code === 'auth/email-already-in-use'
+                    ? 'Este correo ya está registrado.'
+                    : 'No se pudo crear la cuenta. Verifica que el correo sea válido y que la contraseña tenga al menos 6 caracteres.';
+            await this._showAuthError(message);
             throw error;
         }
     }

@@ -21,7 +21,7 @@
             </div>
           } @else {
             <div class="action-area">
-              <div class="auth-form">
+              <form class="auth-form" (ngSubmit)="submit()">
                 <ion-item class="auth-input" lines="none">
                   <ion-label position="stacked">Correo</ion-label>
                   <ion-input type="email" [(ngModel)]="email" name="email"></ion-input>
@@ -32,14 +32,14 @@
                   <ion-input type="password" [(ngModel)]="password" name="password"></ion-input>
                 </ion-item>
 
-                <ion-button class="auth-submit" expand="block" color="primary" (click)="submit()">
+                <ion-button class="auth-submit" expand="block" color="primary" type="submit">
                   Registrarse
                 </ion-button>
 
                 <ion-button class="auth-link" fill="clear" expand="block" routerLink="/login">
                   Volver al login
                 </ion-button>
-              </div>
+              </form>
             </div>
           }
         </ion-card-content>

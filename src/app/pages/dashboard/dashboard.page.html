@@ -36,8 +36,17 @@
       <ion-card-title>Próximos Vencimientos</ion-card-title>
     </ion-card-header>
     <ion-card-content class="contenedor-calendario">
-      <ion-datetime presentation="date" [highlightedDates]="highlightedDates()"></ion-datetime>
+      <ion-datetime presentation="date" [highlightedDates]="highlightedDates()" (ionChange)="onDateChange($event)"></ion-datetime>
     </ion-card-content>
   </ion-card>
+
+  <app-vencimientos-modal
+    [isOpen]="isModalOpen()"
+    [selectedDate]="selectedDate()"
+    [cuotas]="cuotasDelDia()"
+    (dismiss)="onModalDismiss()"
+    (pay)="payInstallment($event)"
+    (viewAll)="goToOperations()">
+  </app-vencimientos-modal>
 
 </ion-content>

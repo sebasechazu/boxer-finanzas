@@ -31,7 +31,7 @@
                   <p class="auth-spinner-text">Autenticando...</p>
                 </div>
               } @else {
-                <div class="auth-form">
+                <form class="auth-form" (ngSubmit)="submitEmailAuth()">
                   <ion-item class="auth-input" lines="none">
                     <ion-label position="stacked">Correo</ion-label>
                     <ion-input type="email" [(ngModel)]="email" name="email"></ion-input>
@@ -42,7 +42,7 @@
                     <ion-input type="password" [(ngModel)]="password" name="password"></ion-input>
                   </ion-item>
 
-                  <ion-button class="auth-submit" expand="block" color="primary" (click)="submitEmailAuth()">
+                  <ion-button class="auth-submit" expand="block" color="primary" type="submit">
                     Iniciar sesión
                   </ion-button>
 
@@ -63,7 +63,7 @@
                     </div>
                     <span class="google-btn-text">Continuar con Google</span>
                   </button>
-                </div>
+                </form>
               }
             </div>
           </ion-card-content>
