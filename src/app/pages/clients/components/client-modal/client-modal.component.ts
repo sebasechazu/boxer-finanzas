@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonModal, IonNote } from '@ionic/angular/standalone';
 import { Cliente } from '../../../../core/models';
 
+type ClienteFormData = Pick<Cliente, 'nombre' | 'telefono'>;
+
 function maxWordsValidator(maxWords: number) {
   return (control: AbstractControl): ValidationErrors | null => {
     if (!control.value) return null;
@@ -23,7 +25,7 @@ export class ClientModalComponent implements OnChanges {
   readonly isEditing = input(false);
   readonly clientData = input<Cliente | null>(null);
   readonly didDismiss = output<void>();
-  readonly save = output<Partial<Cliente>>();
+  readonly save = output<ClienteFormData>();
 
   private fb = inject(FormBuilder);
 
@@ -58,7 +60,8 @@ export class ClientModalComponent implements OnChanges {
 
   onSubmit() {
     if (this.clientForm.valid && !this.isSaving()) {
-      this.save.emit(this.clientForm.getRawValue());
+      const formData = this.clientForm.getRawValue() as ClienteFormData;
+      this.save.emit(formData);
     }
   }
 }

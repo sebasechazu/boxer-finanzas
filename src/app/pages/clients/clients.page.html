@@ -19,7 +19,7 @@
     [isEditing]="editingClientId !== null"
     [clientData]="editingClientData"
     (didDismiss)="closeModal()"
-    (save)="onSubmit($event)">
+    (save)="onSubmit($event!)">
   </app-client-modal>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
