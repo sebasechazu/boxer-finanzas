@@ -2,11 +2,12 @@ import { Component, inject, computed, ChangeDetectionStrategy, signal } from '@a
 import {
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonDatetime, IonChip, IonIcon, IonLabel, AlertController
+    IonDatetime, IonChip, IonIcon, IonLabel
 } from '@ionic/angular/standalone';
 import { OperationService } from '../../core/services/operation.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
+import { UiService } from '../../core/services/ui.service';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { swapHorizontalOutline, personOutline, businessOutline } from 'ionicons/icons';
@@ -18,7 +19,7 @@ import { VencimientosModalComponent } from './vencimientos-modal/vencimientos-mo
     selector: 'app-dashboard',
     templateUrl: 'dashboard.page.html',
     standalone: true,
-    changeDetection: ChangeDetectionStrategy.Eager,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
@@ -31,7 +32,7 @@ export class DashboardPage {
     private authService = inject(AuthService);
     public accountService = inject(AccountService);
     private router = inject(Router);
-    private alertCtrl = inject(AlertController);
+    private uiService = inject(UiService);
 
     private pendingNavigation = false;
 
@@ -77,19 +78,14 @@ export class DashboardPage {
     async payInstallment(cuotaId: string) {
         try {
             await this.operationService.payInstallment(cuotaId);
-            const successAlert = await this.alertCtrl.create({
+            await this.uiService.showConfirmAlert({
                 header: 'Éxito',
                 message: 'Pago registrado con éxito',
-                buttons: ['OK']
+                confirmText: 'OK',
+                onConfirm: () => {}
             });
-            await successAlert.present();
         } catch (error: any) {
-            const errorAlert = await this.alertCtrl.create({
-                header: 'Error',
-                message: error.message || 'No se pudo registrar el pago',
-                buttons: ['OK']
-            });
-            await errorAlert.present();
+            await this.uiService.showErrorAlert('No se pudo registrar el pago', error);
         }
     }
 

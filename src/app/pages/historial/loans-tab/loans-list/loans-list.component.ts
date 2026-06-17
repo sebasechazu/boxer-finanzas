@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonList, IonItem, IonIcon, IonLabel, IonButton } from '@ionic/angular/standalone';
 import { PlanPrestamo } from '../../../../core/models';
@@ -10,7 +10,7 @@ import { PlanPrestamo } from '../../../../core/models';
   imports: [CommonModule, IonList, IonItem, IonIcon, IonLabel, IonButton]
 })
 export class LoansListComponent {
-  @Input() loans: PlanPrestamo[] = [];
-  @Output() edit = new EventEmitter<PlanPrestamo>();
-  @Output() delete = new EventEmitter<string>();
+  readonly loans = input<PlanPrestamo[]>([]);
+  readonly edit = output<PlanPrestamo>();
+  readonly delete = output<string>();
 }

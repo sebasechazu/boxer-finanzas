@@ -1,6 +1,6 @@
-@if (articles.length > 0) {
+@if (articles().length > 0) {
 <ion-list>
-  @for (article of articles; track article.id) {
+  @for (article of articles(); track article.id) {
 
   <ion-item-sliding>
 

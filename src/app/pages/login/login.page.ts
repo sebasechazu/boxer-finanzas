@@ -17,7 +17,7 @@ import { AuthService } from '../../core/services/auth.service';
     selector: 'app-login',
     templateUrl: 'login.page.html',
     standalone: true,
-    changeDetection: ChangeDetectionStrategy.Eager,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         IonContent, IonImg,
         IonCard, IonCardContent,

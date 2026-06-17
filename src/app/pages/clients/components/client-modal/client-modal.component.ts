@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, OnChanges, SimpleChanges, input, output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonModal, IonNote } from '@ionic/angular/standalone';
 import { Cliente } from '../../../../core/models';
@@ -18,16 +18,16 @@ function maxWordsValidator(maxWords: number) {
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonModal, IonNote, ReactiveFormsModule]
 })
 export class ClientModalComponent implements OnChanges {
-  @Input() isOpen = false;
-  @Input() isSaving = false;
-  @Input() isEditing = false;
-  @Input() clientData: Cliente | null = null;
-  @Output() didDismiss = new EventEmitter<void>();
-  @Output() save = new EventEmitter<Partial<Cliente>>();
+  readonly isOpen = input(false);
+  readonly isSaving = input(false);
+  readonly isEditing = input(false);
+  readonly clientData = input<Cliente | null>(null);
+  readonly didDismiss = output<void>();
+  readonly save = output<Partial<Cliente>>();
 
   private fb = inject(FormBuilder);
 
-  clientForm: FormGroup = this.fb.group({
+  clientForm = this.fb.nonNullable.group({
     nombre: ['', [
       Validators.required, 
       Validators.minLength(3),
@@ -45,10 +45,10 @@ export class ClientModalComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && changes['isOpen'].currentValue) {
-      if (this.isEditing && this.clientData) {
+      if (this.isEditing() && this.clientData()) {
         this.clientForm.patchValue({
-          nombre: this.clientData.nombre,
-          telefono: this.clientData.telefono
+          nombre: this.clientData()!.nombre,
+          telefono: this.clientData()!.telefono
         });
       } else {
         this.clientForm.reset();
@@ -57,8 +57,8 @@ export class ClientModalComponent implements OnChanges {
   }
 
   onSubmit() {
-    if (this.clientForm.valid && !this.isSaving) {
-      this.save.emit(this.clientForm.value);
+    if (this.clientForm.valid && !this.isSaving()) {
+      this.save.emit(this.clientForm.getRawValue());
     }
   }
 }

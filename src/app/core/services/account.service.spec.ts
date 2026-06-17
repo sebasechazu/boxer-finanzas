@@ -160,7 +160,8 @@ describe('AccountService', () => {
                 propietarioUid: 'prop123',
                 colaboradorUid: 'user123',
                 colaboradorEmail: 'me@example.com',
-                colaboradorNombre: 'Mi Nombre'
+                colaboradorNombre: 'Mi Nombre',
+                invitacionId: 'inv1'
             });
 
             // Verificar updateDoc de invitación

@@ -1,8 +1,9 @@
 import { Component, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
-  IonIcon, AlertController, IonFab, IonFabButton } from '@ionic/angular/standalone';
+  IonIcon, IonFab, IonFabButton } from '@ionic/angular/standalone';
 import { ClientService } from '../../core/services/client.service';
+import { UiService } from '../../core/services/ui.service';
 import { addIcons } from 'ionicons';
 import { logoWhatsapp, addOutline, personAddOutline, trashOutline, createOutline } from 'ionicons/icons';
 import { ClientListComponent } from './components/client-list/client-list.component';
@@ -13,7 +14,7 @@ import { Cliente } from '../../core/models';
   selector: 'app-clients',
   templateUrl: 'clients.page.html',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IonFabButton, IonHeader, IonToolbar, IonTitle, IonContent,
     IonIcon, IonFab, ClientListComponent, ClientModalComponent
@@ -22,7 +23,7 @@ import { Cliente } from '../../core/models';
 export class ClientsPage {
   public clientService = inject(ClientService);
   private cdr = inject(ChangeDetectorRef);
-  private alertCtrl = inject(AlertController);
+  private uiService = inject(UiService);
 
   isModalOpen = false;
   isSaving = false;
@@ -57,31 +58,20 @@ export class ClientsPage {
   }
 
   async deleteClient(id: string) {
-    const alert = await this.alertCtrl.create({
+    await this.uiService.showConfirmAlert({
       header: 'Confirmar eliminación',
       message: '¿Estás seguro de que deseas eliminar este cliente?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.clientService.deleteClient(id);
-            } catch (error) {
-              console.error('Error deleting client:', error);
-              const errorAlert = await this.alertCtrl.create({
-                header: 'Error',
-                message: 'No se pudo eliminar el cliente',
-                buttons: ['OK']
-              });
-              await errorAlert.present();
-            }
-          }
+      confirmText: 'Eliminar',
+      confirmRole: 'destructive',
+      onConfirm: async () => {
+        try {
+          await this.clientService.deleteClient(id);
+        } catch (error) {
+          console.error('Error deleting client:', error);
+          await this.uiService.showErrorAlert('No se pudo eliminar el cliente', error);
         }
-      ]
+      }
     });
-    await alert.present();
   }
 
   async onSubmit(formData: Partial<Cliente>) {
@@ -98,12 +88,7 @@ export class ClientsPage {
         this.cdr.detectChanges();
       } catch (error: any) {
         console.error('Error saving client:', error);
-        const errorAlert = await this.alertCtrl.create({
-          header: 'Error',
-          message: error.message || 'Error al guardar el cliente',
-          buttons: ['OK']
-        });
-        await errorAlert.present();
+        await this.uiService.showErrorAlert('Error al guardar el cliente', error);
       } finally {
         this.isSaving = false;
         this.cdr.detectChanges();

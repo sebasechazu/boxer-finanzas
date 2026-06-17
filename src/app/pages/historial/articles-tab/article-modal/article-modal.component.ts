@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnChanges, SimpleChanges, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -21,35 +21,35 @@ import { Articulo } from '../../../../core/models';
 export class ArticleModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
 
-  @Input() isOpen = false;
-  @Input() isSaving = false;
-  @Input() editingArticleId: string | null = null;
-  @Input() initialData: Partial<Articulo> | null = null;
+  readonly isOpen = input(false);
+  readonly isSaving = input(false);
+  readonly editingArticleId = input<string | null>(null);
+  readonly initialData = input<Partial<Articulo> | null>(null);
 
-  @Output() dismiss = new EventEmitter<void>();
-  @Output() save = new EventEmitter<any>();
+  readonly dismiss = output<void>();
+  readonly save = output<{ nombre: string; precioCompra: number; precioVentaContado: number }>();
 
-  articleForm: FormGroup = this.fb.group({
+  articleForm = this.fb.nonNullable.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     precioCompra: [0, [Validators.required, Validators.min(0)]],
     precioVentaContado: [0, [Validators.required, Validators.min(0)]]
   });
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['initialData'] && this.initialData) {
+    if (changes['initialData'] && this.initialData()) {
       this.articleForm.patchValue({
-        nombre: this.initialData.nombre || '',
-        precioCompra: this.initialData.precioCompra || 0,
-        precioVentaContado: this.initialData.precioVentaContado || 0
+        nombre: this.initialData()!.nombre || '',
+        precioCompra: this.initialData()!.precioCompra || 0,
+        precioVentaContado: this.initialData()!.precioVentaContado || 0
       });
-    } else if (changes['isOpen'] && this.isOpen && !this.editingArticleId) {
+    } else if (changes['isOpen'] && this.isOpen() && !this.editingArticleId()) {
        this.articleForm.reset({ precioCompra: 0, precioVentaContado: 0 });
     }
   }
 
   onSubmit() {
-    if (this.articleForm.valid && !this.isSaving) {
-      this.save.emit(this.articleForm.value);
+    if (this.articleForm.valid && !this.isSaving()) {
+      this.save.emit(this.articleForm.getRawValue());
     }
   }
 }

@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonModal, IonNote,
-  AlertController, IonButtons } from '@ionic/angular/standalone';
+  IonButtons } from '@ionic/angular/standalone';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ArticleService } from '../../core/services/article.service';
+import { UiService } from '../../core/services/ui.service';
 import { addIcons } from 'ionicons';
 import { addOutline, createOutline, trashOutline, cubeOutline } from 'ionicons/icons';
 import { Articulo } from '../../core/models';
@@ -14,7 +15,7 @@ import { Articulo } from '../../core/models';
   selector: 'app-articles',
   templateUrl: 'articles.page.html',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonButtons, CommonModule,
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonModal,
@@ -25,13 +26,13 @@ export class ArticlesPage {
   public articleService = inject(ArticleService);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
-  private alertCtrl = inject(AlertController);
+  private uiService = inject(UiService);
 
   isModalOpen = false;
   isSaving = false;
   editingArticleId: string | null = null;
 
-  articleForm: FormGroup = this.fb.group({
+  articleForm = this.fb.nonNullable.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     precioCompra: [0, [Validators.required, Validators.min(0)]],
     precioVentaContado: [0, [Validators.required, Validators.min(0)]]
@@ -63,31 +64,20 @@ export class ArticlesPage {
   }
 
   async deleteArticle(id: string) {
-    const alert = await this.alertCtrl.create({
+    await this.uiService.showConfirmAlert({
       header: 'Confirmar eliminación',
       message: '¿Estás seguro de que deseas eliminar este artículo?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.articleService.deleteArticle(id);
-            } catch (error) {
-              console.error('Error deleting article:', error);
-              const errorAlert = await this.alertCtrl.create({
-                header: 'Error',
-                message: 'No se pudo eliminar el artículo',
-                buttons: ['OK']
-              });
-              await errorAlert.present();
-            }
-          }
+      confirmText: 'Eliminar',
+      confirmRole: 'destructive',
+      onConfirm: async () => {
+        try {
+          await this.articleService.deleteArticle(id);
+        } catch (error) {
+          console.error('Error deleting article:', error);
+          await this.uiService.showErrorAlert('No se pudo eliminar el artículo', error);
         }
-      ]
+      }
     });
-    await alert.present();
   }
 
   async onSubmit() {
@@ -96,10 +86,11 @@ export class ArticlesPage {
       this.cdr.detectChanges();
 
       try {
+        const rawValues = this.articleForm.getRawValue();
         const articleData = {
-          ...this.articleForm.value,
-          precioCompra: Number(this.articleForm.value.precioCompra),
-          precioVentaContado: Number(this.articleForm.value.precioVentaContado)
+          nombre: rawValues.nombre,
+          precioCompra: Number(rawValues.precioCompra),
+          precioVentaContado: Number(rawValues.precioVentaContado)
         };
 
         if (this.editingArticleId) {
@@ -108,14 +99,9 @@ export class ArticlesPage {
           await this.articleService.addArticle(articleData);
         }
         this.closeModal();
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error saving article:', error);
-        const errorAlert = await this.alertCtrl.create({
-          header: 'Error',
-          message: error.message || 'Error al guardar el artículo',
-          buttons: ['OK']
-        });
-        await errorAlert.present();
+        await this.uiService.showErrorAlert('Error al guardar el artículo', error);
       } finally {
         this.isSaving = false;
         this.cdr.detectChanges();

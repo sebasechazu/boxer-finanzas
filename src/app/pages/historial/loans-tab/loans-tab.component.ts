@@ -1,8 +1,9 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  IonFab, IonFabButton, IonIcon, AlertController} from '@ionic/angular/standalone';
+  IonFab, IonFabButton, IonIcon} from '@ionic/angular/standalone';
 import { LoanPlanService } from '../../../core/services/loan-plan.service';
+import { UiService } from '../../../core/services/ui.service';
 import { addIcons } from 'ionicons';
 import { addOutline, createOutline, trashOutline, listOutline } from 'ionicons/icons';
 import { PlanPrestamo } from '../../../core/models';
@@ -13,7 +14,7 @@ import { LoanModalComponent } from './loan-modal/loan-modal.component';
   selector: 'app-loans-tab',
   templateUrl: 'loans-tab.component.html',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     IonFab,
@@ -25,7 +26,7 @@ import { LoanModalComponent } from './loan-modal/loan-modal.component';
 })
 export class LoansTabComponent {
   public loanPlanService = inject(LoanPlanService);
-  private alertCtrl = inject(AlertController);
+  private uiService = inject(UiService);
 
   isModalOpen = false;
   isSaving = false;
@@ -55,33 +56,22 @@ export class LoansTabComponent {
   }
 
   async deleteLoan(id: string) {
-    const alert = await this.alertCtrl.create({
+    await this.uiService.showConfirmAlert({
       header: 'Confirmar eliminación',
       message: '¿Estás seguro de que deseas eliminar este plan de préstamo configurable?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.loanPlanService.deleteLoanPlan(id);
-            } catch (error) {
-              const errorAlert = await this.alertCtrl.create({
-                header: 'Error',
-                message: 'No se pudo eliminar el plan de préstamo',
-                buttons: ['OK']
-              });
-              await errorAlert.present();
-            }
-          }
+      confirmText: 'Eliminar',
+      confirmRole: 'destructive',
+      onConfirm: async () => {
+        try {
+          await this.loanPlanService.deleteLoanPlan(id);
+        } catch (error) {
+          await this.uiService.showErrorAlert('No se pudo eliminar el plan de préstamo', error);
         }
-      ]
+      }
     });
-    await alert.present();
   }
 
-  async onSaveLoan(loanFormData: any) {
+  async onSaveLoan(loanFormData: Partial<PlanPrestamo>) {
     if (!this.isSaving) {
       this.isSaving = true;
       try {
@@ -102,18 +92,13 @@ export class LoansTabComponent {
         }
 
         if (this.editingLoanId) {
-          await this.loanPlanService.updateLoanPlan(this.editingLoanId, loanData);
+          await this.loanPlanService.updateLoanPlan(this.editingLoanId, loanData as any);
         } else {
-          await this.loanPlanService.addLoanPlan(loanData);
+          await this.loanPlanService.addLoanPlan(loanData as any);
         }
         this.closeModal();
-      } catch (error: any) {
-        const errorAlert = await this.alertCtrl.create({
-          header: 'Error',
-          message: error.message || 'Error al guardar el plan de préstamo',
-          buttons: ['OK']
-        });
-        await errorAlert.present();
+      } catch (error) {
+        await this.uiService.showErrorAlert('Error al guardar el plan de préstamo', error);
       } finally {
         this.isSaving = false;
       }

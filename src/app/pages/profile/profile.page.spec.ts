@@ -4,8 +4,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { signal } from '@angular/core';
 import { Invitacion } from '../../core/models';
+import { createAuthServiceMock, createAccountServiceMock } from '../../testing/mocks';
 
 describe('ProfilePage', () => {
     let component: ProfilePage;
@@ -16,25 +16,8 @@ describe('ProfilePage', () => {
     let mockToastController: any;
 
     beforeEach(async () => {
-        mockAuthService = {
-            userSignal: signal({ uid: 'user123', email: 'me@example.com', displayName: 'Test User' }),
-            profileSignal: signal({ nombreNegocio: 'Negocio Test' }),
-            logout: vi.fn()
-        };
-
-        mockAccountService = {
-            misColaboradores: signal([]),
-            cuentasAjenas: signal([]),
-            invitacionesPendientesRecibidas: signal([]),
-            invitacionesEnviadas: signal([]),
-            actualizarNombreNegocio: vi.fn(),
-            enviarInvitacion: vi.fn(),
-            aceptarInvitacion: vi.fn(),
-            rechazarInvitacion: vi.fn(),
-            eliminarColaborador: vi.fn(),
-            getNombreNegocioPropietario: vi.fn().mockReturnValue('Negocio Ajeno'),
-            getNombrePropietario: vi.fn().mockReturnValue('Otro Propietario')
-        };
+        mockAuthService = createAuthServiceMock();
+        mockAccountService = createAccountServiceMock();
 
         mockAlertController = {
             create: vi.fn().mockResolvedValue({

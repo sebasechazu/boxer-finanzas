@@ -5,7 +5,7 @@ import { PwaService } from './core/services/pwa.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {

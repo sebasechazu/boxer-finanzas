@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnChanges, SimpleChanges, inject, input, output } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -10,6 +10,21 @@ import { ClientService } from '../../../../core/services/client.service';
 import { ArticleService } from '../../../../core/services/article.service';
 import { LoanPlanService } from '../../../../core/services/loan-plan.service';
 import { OperationService } from '../../../../core/services/operation.service';
+
+export interface OperationFormData {
+  tipo: 'VENTA' | 'PRESTAMO';
+  montoBase: number;
+  porcentajeRecargo: number;
+  clienteId: string;
+  articuloId?: string;
+  prestamoId?: string;
+  cuotasCount: number;
+  tieneVencimiento: boolean;
+  periodicidad?: 'SEMANAL' | 'QUINCENAL' | 'MENSUAL';
+  diaSemana?: number;
+  diaVencimiento?: number;
+  fechaPrimerVencimiento?: string;
+}
 
 @Component({
   selector: 'app-operation-modal',
@@ -30,16 +45,16 @@ export class OperationModalComponent implements OnChanges {
   public operationService = inject(OperationService);
   private fb = inject(FormBuilder);
 
-  @Input() isOpen = false;
-  @Input() isSaving = false;
-  @Input() operationIdToEdit: string | null = null;
-  @Input() initialData: any = null;
+  readonly isOpen = input(false);
+  readonly isSaving = input(false);
+  readonly operationIdToEdit = input<string | null>(null);
+  readonly initialData = input<Partial<OperationFormData> | null>(null);
 
-  @Output() dismiss = new EventEmitter<void>();
-  @Output() save = new EventEmitter<any>();
+  readonly dismiss = output<void>();
+  readonly save = output<OperationFormData>();
 
-  opForm: FormGroup = this.fb.group({
-    tipo: ['VENTA', Validators.required],
+  opForm = this.fb.nonNullable.group({
+    tipo: ['VENTA' as 'VENTA' | 'PRESTAMO', Validators.required],
     montoBase: [0, [Validators.required, Validators.min(1)]],
     porcentajeRecargo: [0, [Validators.required, Validators.min(0)]],
     clienteId: ['', Validators.required],
@@ -47,16 +62,16 @@ export class OperationModalComponent implements OnChanges {
     prestamoId: [''],
     cuotasCount: [1, [Validators.required, Validators.min(1)]],
     tieneVencimiento: [false],
-    periodicidad: ['MENSUAL'],
+    periodicidad: ['MENSUAL' as 'SEMANAL' | 'QUINCENAL' | 'MENSUAL'],
     diaSemana: [new Date().getDay()],
     diaVencimiento: [5, [Validators.min(1), Validators.max(31)]],
     fechaPrimerVencimiento: [new Date().toISOString()]
   });
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['initialData'] && this.initialData) {
-      this.opForm.patchValue(this.initialData);
-    } else if (changes['isOpen'] && this.isOpen && !this.operationIdToEdit) {
+    if (changes['initialData'] && this.initialData()) {
+      this.opForm.patchValue(this.initialData()!);
+    } else if (changes['isOpen'] && this.isOpen() && !this.operationIdToEdit()) {
       this.opForm.reset({
         tipo: 'VENTA',
         montoBase: 0,
@@ -102,13 +117,13 @@ export class OperationModalComponent implements OnChanges {
   }
 
   calculatePreview() {
-    const { montoBase, porcentajeRecargo } = this.opForm.value;
+    const { montoBase, porcentajeRecargo } = this.opForm.getRawValue();
     return this.operationService.calculateTotal(montoBase, porcentajeRecargo);
   }
 
   onSubmit() {
-    if (this.opForm.valid && !this.isSaving) {
-      this.save.emit(this.opForm.value);
+    if (this.opForm.valid && !this.isSaving()) {
+      this.save.emit(this.opForm.getRawValue());
     }
   }
 }

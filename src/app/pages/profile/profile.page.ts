@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
     selector: 'app-profile',
     templateUrl: 'profile.page.html',
     standalone: true,
-    changeDetection: ChangeDetectionStrategy.Eager,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [IonButtons, IonCardTitle, IonCardHeader, IonCard,
         IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
         IonLabel, IonButton, IonIcon, IonBadge, IonNote,

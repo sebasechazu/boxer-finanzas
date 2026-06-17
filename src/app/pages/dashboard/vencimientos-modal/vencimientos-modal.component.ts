@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonModal, IonButton,
@@ -27,13 +27,13 @@ export class VencimientosModalComponent {
   public clientService = inject(ClientService);
   public operationService = inject(OperationService);
 
-  @Input() isOpen = false;
-  @Input() selectedDate: string | null = null;
-  @Input() cuotas: Cuota[] = [];
+  readonly isOpen = input(false);
+  readonly selectedDate = input<string | null>(null);
+  readonly cuotas = input<Cuota[]>([]);
 
-  @Output() dismiss = new EventEmitter<void>();
-  @Output() pay = new EventEmitter<string>();
-  @Output() viewAll = new EventEmitter<void>();
+  readonly dismiss = output<void>();
+  readonly pay = output<string>();
+  readonly viewAll = output<void>();
 
   constructor() {
     addIcons({
@@ -43,7 +43,7 @@ export class VencimientosModalComponent {
   }
 
   get formattedSelectedDate(): string {
-    const date = this.selectedDate;
+    const date = this.selectedDate();
     if (!date) return '';
     const parts = date.split('-');
     if (parts.length !== 3) return date;

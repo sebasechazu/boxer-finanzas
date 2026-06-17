@@ -1,8 +1,8 @@
-<ion-modal [isOpen]="isOpen" (didDismiss)="dismiss.emit()" class="fullscreen-modal">
+<ion-modal [isOpen]="isOpen()" (didDismiss)="dismiss.emit()" class="fullscreen-modal">
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ operationIdToEdit ? 'Editar Operación' : 'Nueva Operación' }}</ion-title>
+        <ion-title>{{ operationIdToEdit() ? 'Editar Operación' : 'Nueva Operación' }}</ion-title>
         <ion-buttons slot="end">
           <ion-button fill="clear" (click)="dismiss.emit()">Cerrar</ion-button>
         </ion-buttons>
@@ -127,15 +127,15 @@
                 <ion-item lines="none">
                   <ion-label>
                     <p>Total Final: <strong>{{ calculatePreview() | number:'1.2-2' }}</strong></p>
-                    <p>Monto por Cuota: <strong>{{ (calculatePreview() / opForm.value.cuotasCount) | number:'1.2-2' }}</strong></p>
+                    <p>Monto por Cuota: <strong>{{ (calculatePreview() / opForm.controls.cuotasCount.value) | number:'1.2-2' }}</strong></p>
                   </ion-label>
                 </ion-item>
               </ion-list>
             </div>
           }
 
-          <ion-button expand="block" type="submit" [disabled]="opForm.invalid || isSaving" class="ion-margin-top">
-            {{ isSaving ? 'Guardando...' : (operationIdToEdit ? 'Actualizar Operación' : 'Confirmar Operación') }}
+          <ion-button expand="block" type="submit" [disabled]="opForm.invalid || isSaving()" class="ion-margin-top">
+            {{ isSaving() ? 'Guardando...' : (operationIdToEdit() ? 'Actualizar Operación' : 'Confirmar Operación') }}
           </ion-button>
         </ion-list>
       </form>

@@ -6,4 +6,5 @@ export interface Colaborador {
     colaboradorEmail: string;
     colaboradorNombre: string;
     creadoEn: string;        
+    invitacionId?: string;
 }

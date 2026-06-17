@@ -200,7 +200,8 @@ export class AccountService implements OnDestroy {
             colaboradorUid: user.uid,
             colaboradorEmail: user.email ?? '',
             colaboradorNombre: user.displayName ?? user.email ?? '',
-            creadoEn: new Date().toISOString()
+            creadoEn: new Date().toISOString(),
+            invitacionId: invitacion.id
         };
 
         await setDoc(doc(db, 'colaboradores', colaboradorId), colaborador);

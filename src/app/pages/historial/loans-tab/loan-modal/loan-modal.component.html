@@ -1,8 +1,8 @@
-<ion-modal [isOpen]="isOpen" (didDismiss)="dismiss.emit()">
+<ion-modal [isOpen]="isOpen()" (didDismiss)="dismiss.emit()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ editingLoanId ? 'Editar Plan de Préstamo' : 'Nuevo Plan de Préstamo' }}</ion-title>
+        <ion-title>{{ editingLoanId() ? 'Editar Plan de Préstamo' : 'Nuevo Plan de Préstamo' }}</ion-title>
         <ion-buttons slot="end">
           <ion-button fill="clear" (click)="dismiss.emit()">Cerrar</ion-button>
         </ion-buttons>
@@ -69,7 +69,7 @@
               <ion-item lines="none">
                 <ion-label>
                   <p>Total Final: <strong>$ {{ calculateTotalPreview() | number:'1.2-2' }}</strong></p>
-                  <p>Monto por Cuota: <strong>$ {{ (calculateTotalPreview() / loanForm.value.cuotasCount) | number:'1.2-2' }}</strong></p>
+                  <p>Monto por Cuota: <strong>$ {{ (calculateTotalPreview() / loanForm.controls.cuotasCount.value) | number:'1.2-2' }}</strong></p>
                 </ion-label>
               </ion-item>
             </ion-list>
@@ -77,9 +77,9 @@
         }
 
         <ion-button expand="block" type="submit"
-          [disabled]="loanForm.invalid || isSaving"
+          [disabled]="loanForm.invalid || isSaving()"
           class="ion-margin-top">
-          {{ isSaving ? 'Guardando...' : (editingLoanId ? 'Actualizar' : 'Guardar Plan') }}
+          {{ isSaving() ? 'Guardando...' : (editingLoanId() ? 'Actualizar' : 'Guardar Plan') }}
         </ion-button>
       </form>
     </ion-content>

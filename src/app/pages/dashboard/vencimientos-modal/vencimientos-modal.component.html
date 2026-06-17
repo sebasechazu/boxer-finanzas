@@ -1,4 +1,4 @@
-<ion-modal [isOpen]="isOpen" (didDismiss)="dismiss.emit()" [breakpoints]="[0, 0.5, 0.75, 1.0]" [initialBreakpoint]="0.75">
+<ion-modal [isOpen]="isOpen()" (didDismiss)="dismiss.emit()" [breakpoints]="[0, 0.5, 0.75, 1.0]" [initialBreakpoint]="0.75">
   <ng-template>
     <ion-header>
       <ion-toolbar color="light">
@@ -15,7 +15,7 @@
     </ion-header>
       <ion-content class="ion-padding">
         <ion-list lines="inset">
-          @for (cuota of cuotas; track cuota.id; let i = $index) {
+          @for (cuota of cuotas(); track cuota.id; let i = $index) {
             @let op = getOperation(cuota.operacionId);
             <ion-item class="vencimiento-item ion-margin-bottom" style="--border-radius: 8px; --background: var(--ion-color-step-50, #f9f9f9);">
               <ion-icon

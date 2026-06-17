@@ -15,6 +15,18 @@ export class ArticleService implements OnDestroy {
 
     readonly userArticles = this._articulosSignal.asReadonly();
 
+    readonly totalArticlePurchasePrice = computed(() => {
+        return this._articulosSignal().reduce((sum, art) => sum + (art.precioCompra || 0), 0);
+    });
+
+    readonly totalArticleSalePrice = computed(() => {
+        return this._articulosSignal().reduce((sum, art) => sum + (art.precioVentaContado || 0), 0);
+    });
+
+    readonly totalPotentialProfit = computed(() => {
+        return this.totalArticleSalePrice() - this.totalArticlePurchasePrice();
+    });
+
     constructor() {
         effect(() => {
             const uid = this.accountService.effectiveAccountUid();

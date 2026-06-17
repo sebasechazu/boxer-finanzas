@@ -10,7 +10,7 @@ import {
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
 })
 export class TabsPage {

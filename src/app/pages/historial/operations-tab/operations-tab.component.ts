@@ -1,21 +1,22 @@
 import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  IonFab, IonFabButton, IonIcon, AlertController
+  IonFab, IonFabButton, IonIcon
 } from '@ionic/angular/standalone';
 import { OperationService } from '../../../core/services/operation.service';
+import { UiService } from '../../../core/services/ui.service';
 import { addIcons } from 'ionicons';
 import {
   trashOutline, cashOutline, receiptOutline, createOutline,
   calendarOutline, personOutline, addOutline
 } from 'ionicons/icons';
 import { OperationsListComponent } from './operations-list/operations-list.component';
-import { OperationModalComponent } from './operation-modal/operation-modal.component';
+import { OperationModalComponent, OperationFormData } from './operation-modal/operation-modal.component';
 
 @Component({
   selector: 'app-operations-tab',
   templateUrl: 'operations-tab.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     IonFab, IonFabButton, IonIcon,
@@ -24,7 +25,7 @@ import { OperationModalComponent } from './operation-modal/operation-modal.compo
 })
 export class OperationsTabComponent {
   public operationService = inject(OperationService);
-  private alertCtrl = inject(AlertController);
+  private uiService = inject(UiService);
   private cdr = inject(ChangeDetectorRef);
 
   isModalOpen = false;
@@ -98,7 +99,7 @@ export class OperationsTabComponent {
     }
   }
 
-  async onSubmitOperation(opFormData: any) {
+  async onSubmitOperation(opFormData: OperationFormData) {
     if (!this.isSavingOp) {
       this.isSavingOp = true;
       this.cdr.detectChanges();
@@ -112,29 +113,22 @@ export class OperationsTabComponent {
         };
 
         if (this.operationIdToEdit) {
-          await this.operationService.updateOperation(this.operationIdToEdit, opData);
+          await this.operationService.updateOperation(this.operationIdToEdit, opData as any);
         } else {
-          await this.operationService.addOperation(opData);
+          await this.operationService.addOperation(opData as any);
         }
 
-        const successAlert = await this.alertCtrl.create({
+        await this.uiService.showConfirmAlert({
           header: 'Éxito',
           message: this.operationIdToEdit ? 'Operación actualizada con éxito' : 'Operación guardada con éxito',
-          buttons: [{
-            text: 'OK',
-            handler: () => {
-              this.closeModal();
-            }
-          }]
+          confirmText: 'OK',
+          cancelText: 'Cerrar',
+          onConfirm: () => {
+            this.closeModal();
+          }
         });
-        await successAlert.present();
-      } catch (error: any) {
-        const errorAlert = await this.alertCtrl.create({
-          header: 'Error',
-          message: error.message || 'Error al guardar la operación',
-          buttons: ['OK']
-        });
-        await errorAlert.present();
+      } catch (error) {
+        await this.uiService.showErrorAlert('Error al guardar la operación', error);
       } finally {
         this.isSavingOp = false;
         this.cdr.detectChanges();
@@ -146,39 +140,23 @@ export class OperationsTabComponent {
     try {
       await this.operationService.payInstallment(cuotaId);
     } catch (error) {
-      const errorAlert = await this.alertCtrl.create({
-        header: 'Error',
-        message: 'No se pudo registrar el pago',
-        buttons: ['OK']
-      });
-      await errorAlert.present();
+      await this.uiService.showErrorAlert('No se pudo registrar el pago', error);
     }
   }
 
   async deleteOperation(id: string) {
-    const alert = await this.alertCtrl.create({
+    await this.uiService.showConfirmAlert({
       header: 'Confirmar eliminación',
       message: '¿Estás seguro de que deseas eliminar esta operación? Se eliminarán también todas sus cuotas asociadas.',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.operationService.deleteOperation(id);
-            } catch (error) {
-              const errorAlert = await this.alertCtrl.create({
-                header: 'Error',
-                message: 'No se pudo eliminar la operación',
-                buttons: ['OK']
-              });
-              await errorAlert.present();
-            }
-          }
+      confirmText: 'Eliminar',
+      confirmRole: 'destructive',
+      onConfirm: async () => {
+        try {
+          await this.operationService.deleteOperation(id);
+        } catch (error) {
+          await this.uiService.showErrorAlert('No se pudo eliminar la operación', error);
         }
-      ]
+      }
     });
-    await alert.present();
   }
 }

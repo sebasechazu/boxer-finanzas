@@ -1,7 +1,8 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonFab, IonFabButton, IonIcon, AlertController } from '@ionic/angular/standalone';
+import { IonFab, IonFabButton, IonIcon } from '@ionic/angular/standalone';
 import { ArticleService } from '../../../core/services/article.service';
+import { UiService } from '../../../core/services/ui.service';
 import { addIcons } from 'ionicons';
 import { addOutline, createOutline, trashOutline, cubeOutline } from 'ionicons/icons';
 import { Articulo } from '../../../core/models';
@@ -12,7 +13,7 @@ import { ArticleModalComponent } from './article-modal/article-modal.component';
   selector: 'app-articles-tab',
   templateUrl: 'articles-tab.component.html',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     IonFab, IonFabButton, IonIcon,
@@ -21,7 +22,7 @@ import { ArticleModalComponent } from './article-modal/article-modal.component';
 })
 export class ArticlesTabComponent {
   public articleService = inject(ArticleService);
-  private alertCtrl = inject(AlertController);
+  private uiService = inject(UiService);
 
   isModalOpen = false;
   isSaving = false;
@@ -51,38 +52,27 @@ export class ArticlesTabComponent {
   }
 
   async deleteArticle(id: string) {
-    const alert = await this.alertCtrl.create({
+    await this.uiService.showConfirmAlert({
       header: 'Confirmar eliminación',
       message: '¿Estás seguro de que deseas eliminar este artículo?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.articleService.deleteArticle(id);
-            } catch (error) {
-              const errorAlert = await this.alertCtrl.create({
-                header: 'Error',
-                message: 'No se pudo eliminar el artículo',
-                buttons: ['OK']
-              });
-              await errorAlert.present();
-            }
-          }
+      confirmText: 'Eliminar',
+      confirmRole: 'destructive',
+      onConfirm: async () => {
+        try {
+          await this.articleService.deleteArticle(id);
+        } catch (error) {
+          await this.uiService.showErrorAlert('No se pudo eliminar el artículo', error);
         }
-      ]
+      }
     });
-    await alert.present();
   }
 
-  async onSaveArticle(articleFormData: any) {
+  async onSaveArticle(articleFormData: { nombre: string; precioCompra: number; precioVentaContado: number }) {
     if (!this.isSaving) {
       this.isSaving = true;
       try {
         const articleData = {
-          ...articleFormData,
+          nombre: articleFormData.nombre,
           precioCompra: Number(articleFormData.precioCompra),
           precioVentaContado: Number(articleFormData.precioVentaContado)
         };
@@ -92,13 +82,8 @@ export class ArticlesTabComponent {
           await this.articleService.addArticle(articleData);
         }
         this.closeModal();
-      } catch (error: any) {
-        const errorAlert = await this.alertCtrl.create({
-          header: 'Error',
-          message: error.message || 'Error al guardar el artículo',
-          buttons: ['OK']
-        });
-        await errorAlert.present();
+      } catch (error) {
+        await this.uiService.showErrorAlert('Error al guardar el artículo', error);
       } finally {
         this.isSaving = false;
       }

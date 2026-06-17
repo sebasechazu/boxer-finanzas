@@ -1,5 +1,5 @@
 <ion-list>
-  @for (loan of loans; track loan.id) {
+  @for (loan of loans(); track loan.id) {
     <ion-item>
       <ion-icon name="list-outline" slot="start" color="medium"></ion-icon>
       <ion-label>

@@ -23,24 +23,35 @@ service cloud.firestore {
         request.auth.token.email.lower() == resource.data.emailInvitado.lower()
       );
       allow create: if request.auth != null
-        && request.resource.data.propietarioUid == request.auth.uid;
-      allow update: if request.auth != null && (
-        resource.data.propietarioUid == request.auth.uid ||
-        request.auth.token.email.lower() == resource.data.emailInvitado.lower()
-      );
+        && request.resource.data.propietarioUid == request.auth.uid
+        && request.resource.data.estado == 'PENDIENTE';
+      allow update: if request.auth != null
+        && request.resource.data.propietarioUid == resource.data.propietarioUid
+        && request.resource.data.emailInvitado.lower() == resource.data.emailInvitado.lower()
+        && (
+          resource.data.propietarioUid == request.auth.uid
+          || (
+            request.auth.token.email.lower() == resource.data.emailInvitado.lower()
+            && (request.resource.data.estado == 'ACEPTADA' || request.resource.data.estado == 'RECHAZADA')
+          )
+        );
     }
 
     // ── Colaboradores ───────────────────────────────────────────────────────
     // Solo pueden leer quienes son propietario o colaborador en ese documento.
     // La creación la hace el colaborador al aceptar (su UID debe coincidir).
-    // El propietario puede borrar (revocar acceso).
+    // Se valida contra la invitación correspondiente para evitar autopromociones no autorizadas.
+    // El propietario o colaborador pueden borrar (revocar acceso).
     match /colaboradores/{colId} {
       allow read: if request.auth != null && (
         resource.data.propietarioUid == request.auth.uid ||
         resource.data.colaboradorUid == request.auth.uid
       );
       allow create: if request.auth != null
-        && request.resource.data.colaboradorUid == request.auth.uid;
+        && request.resource.data.colaboradorUid == request.auth.uid
+        && exists(/databases/$(database)/documents/invitaciones/$(request.resource.data.invitacionId))
+        && get(/databases/$(database)/documents/invitaciones/$(request.resource.data.invitacionId)).data.emailInvitado.lower() == request.auth.token.email.lower()
+        && get(/databases/$(database)/documents/invitaciones/$(request.resource.data.invitacionId)).data.propietarioUid == request.resource.data.propietarioUid;
       allow delete: if request.auth != null && (
         resource.data.propietarioUid == request.auth.uid ||
         resource.data.colaboradorUid == request.auth.uid
@@ -57,39 +68,45 @@ service cloud.firestore {
     }
 
     match /clientes/{id} {
-      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+      allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
     }
 
     match /articulos/{id} {
-      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+      allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
     }
 
     match /planes_prestamo/{id} {
-      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+      allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
     }
 
     match /prestamos/{id} {
-      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+      allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
     }
 
     match /ventas/{id} {
-      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+      allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
     }
 
     match /operaciones/{id} {
-      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+      allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
     }
 
-    // Las cuotas ahora incluyen usuarioId para una validación eficiente
     match /cuotas/{id} {
-      allow read, write: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && request.resource.data.usuarioId == request.auth.uid;
+      allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
     }
   }
 }

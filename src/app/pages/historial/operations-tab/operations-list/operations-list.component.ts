@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, output } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import {
   IonList, IonItem, IonLabel, IonButton, IonIcon, IonNote, IonBadge,
@@ -23,10 +23,10 @@ export class OperationsListComponent {
   public clientService = inject(ClientService);
   public operationService = inject(OperationService);
 
-  @Input() operations: Operacion[] = [];
-  @Output() edit = new EventEmitter<string>();
-  @Output() delete = new EventEmitter<string>();
-  @Output() pay = new EventEmitter<string>();
+  readonly operations = input<Operacion[]>([]);
+  readonly edit = output<string>();
+  readonly delete = output<string>();
+  readonly pay = output<string>();
 
   getClientName(id: string) {
     const client = this.clientService.userClients().find(c => c.id === id);

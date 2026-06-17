@@ -1,6 +1,6 @@
-@if(clients.length > 0) {
+@if(clients().length > 0) {
 <ion-list>
-  @for (client of clients; track client.id) {
+  @for (client of clients(); track client.id) {
   <ion-item-sliding>
 
     <ion-item-options side="start">
