@@ -14,6 +14,7 @@ import { swapHorizontalOutline, personOutline, businessOutline } from 'ionicons/
 import { CuentaAccesible } from '../../core/models';
 import { DashboardCardsComponent } from './dashboard-cards/dashboard-cards.component';
 import { VencimientosModalComponent } from './vencimientos-modal/vencimientos-modal.component';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
     selector: 'app-dashboard',
@@ -24,7 +25,7 @@ import { VencimientosModalComponent } from './vencimientos-modal/vencimientos-mo
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonDatetime, IonChip, IonIcon, IonLabel,
-    DashboardCardsComponent, VencimientosModalComponent
+    DashboardCardsComponent, VencimientosModalComponent, NotificationBellComponent
 ],
 })
 export class DashboardPage {

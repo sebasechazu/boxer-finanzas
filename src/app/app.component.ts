@@ -2,6 +2,8 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { PwaService } from './core/services/pwa.service';
 
+import { NotificationService } from './core/services/notification.service';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -9,5 +11,8 @@ import { PwaService } from './core/services/pwa.service';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  constructor(private pwaService: PwaService) {}
+  constructor(
+    private pwaService: PwaService,
+    private notificationService: NotificationService
+  ) {}
 }

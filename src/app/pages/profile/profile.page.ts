@@ -11,6 +11,7 @@ import {
     cafeOutline, cafe, logoWhatsapp
 } from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
     selector: 'app-profile',
@@ -22,7 +23,7 @@ import { CommonModule } from '@angular/common';
         IonLabel, IonButton, IonIcon, IonBadge, IonNote,
         IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
         CommonModule,
-        IonThumbnail, IonCardContent]
+        IonThumbnail, IonCardContent, NotificationBellComponent]
 })
 export class ProfilePage {
     private authService = inject(AuthService);

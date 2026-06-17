@@ -1,0 +1,10 @@
+<ion-buttons slot="start">
+  <ion-button (click)="onClick()" class="bell-button">
+    <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+    @if (notificationService.tieneVencimientosHoy()) {
+      <ion-badge color="danger" class="notification-badge">
+        {{ notificationService.cantidadVencimientosHoy() }}
+      </ion-badge>
+    }
+  </ion-button>
+</ion-buttons>

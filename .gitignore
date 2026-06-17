@@ -1,4 +1,4 @@
-﻿# Specifies intentionally untracked files to ignore when using Git
+# Specifies intentionally untracked files to ignore when using Git
 # http://git-scm.com/docs/gitignore
 
 *~
@@ -31,6 +31,8 @@ log.txt
 
 # Node
 /node_modules
+/functions/node_modules
+/functions/lib
 npm-debug.log
 yarn-error.log
 

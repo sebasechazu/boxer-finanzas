@@ -60,7 +60,7 @@ describe('RegisterPage', () => {
         const blurSpy = vi.spyOn(button, 'blur');
 
         button.focus();
-        await component.submit();
+        component.ionViewWillLeave();
 
         expect(blurSpy).toHaveBeenCalled();
         document.body.removeChild(button);

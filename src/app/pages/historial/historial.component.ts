@@ -3,6 +3,7 @@ import { IonHeader, IonContent, IonSegment, IonSegmentButton, IonLabel, IonToolb
 import { OperationsTabComponent } from "./operations-tab/operations-tab.component";
 import { ArticlesTabComponent } from "./articles-tab/articles-tab.component";
 import { LoansTabComponent } from "./loans-tab/loans-tab.component";
+import { NotificationBellComponent } from "../../shared/components/notification-bell/notification-bell.component";
 
 @Component({
   selector: 'app-historial',
@@ -16,7 +17,8 @@ import { LoansTabComponent } from "./loans-tab/loans-tab.component";
     IonContent, 
     OperationsTabComponent,
     ArticlesTabComponent, 
-    LoansTabComponent
+    LoansTabComponent,
+    NotificationBellComponent
   ]
 })
 export class HistorialComponent {

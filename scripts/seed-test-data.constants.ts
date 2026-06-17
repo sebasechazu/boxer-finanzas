@@ -1,4 +1,30 @@
-export const TEST_USERS = [
+export interface TestUser {
+  email: string;
+  password?: string;
+  nombre: string;
+  nombreNegocio?: string;
+}
+
+export interface TestCliente {
+  nombre: string;
+  telefono: string;
+  saldoPendiente: number;
+}
+
+export interface TestArticulo {
+  nombre: string;
+  precioCompra: number;
+  precioVentaContado: number;
+}
+
+export interface TestPlanPrestamo {
+  nombre: string;
+  interesMensual: number;
+  plazoDias: number;
+  cuotaMinima: number;
+}
+
+export const TEST_USERS: TestUser[] = [
   {
     email: 'usuario1@local.test',
     password: '123456',
@@ -13,19 +39,19 @@ export const TEST_USERS = [
   }
 ];
 
-export const TEST_CLIENTES = [
+export const TEST_CLIENTES: TestCliente[] = [
   { nombre: 'Ana Pérez', telefono: '099111222', saldoPendiente: 0 },
   { nombre: 'Luis Gómez', telefono: '098333444', saldoPendiente: 0 },
   { nombre: 'Carla Ríos', telefono: '097555666', saldoPendiente: 0 }
 ];
 
-export const TEST_ARTICULOS = [
+export const TEST_ARTICULOS: TestArticulo[] = [
   { nombre: 'Arroz 1kg', precioCompra: 1800, precioVentaContado: 2200 },
   { nombre: 'Leche 1L', precioCompra: 1600, precioVentaContado: 2000 },
   { nombre: 'Aceite 500ml', precioCompra: 3200, precioVentaContado: 3900 }
 ];
 
-export const TEST_PLANES_PRESTAMO = [
+export const TEST_PLANES_PRESTAMO: TestPlanPrestamo[] = [
   { nombre: 'Plan Básico', interesMensual: 5, plazoDias: 30, cuotaMinima: 1000 },
   { nombre: 'Plan Premium', interesMensual: 8, plazoDias: 15, cuotaMinima: 1500 }
 ];

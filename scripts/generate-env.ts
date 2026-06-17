@@ -1,12 +1,12 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env tsx
 /**
- * generate-env.mjs
+ * generate-env.ts
  *
  * Genera src/app/core/environments/environment.prod.ts a partir de
  * variables de entorno del sistema o de un archivo .env.local.
  *
  * Uso:
- *   node scripts/generate-env.mjs
+ *   npm run generate:env
  *
  * Variables de entorno requeridas:
  *   FIREBASE_API_KEY
@@ -17,24 +17,25 @@
  *   FIREBASE_APP_ID
  *
  * En desarrollo local, podés cargar un archivo .env.local así:
- *   node --env-file=.env.local scripts/generate-env.mjs   (Node >= 20.6)
+ *   npm run generate:env:local
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..');
 
-function loadEnvFile(filePath) {
+function loadEnvFile(filePath: string): Record<string, string> {
   if (!existsSync(filePath)) {
     return {};
   }
 
   return readFileSync(filePath, 'utf-8')
     .split(/\r?\n/)
-    .reduce((acc, line) => {
+    .reduce((acc: Record<string, string>, line: string) => {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#')) {
         return acc;
@@ -59,8 +60,8 @@ function loadEnvFile(filePath) {
     }, {});
 }
 
-const envValues = {
-  ...process.env,
+const envValues: Record<string, string> = {
+  ...(process.env as Record<string, string>),
   ...loadEnvFile(resolve(ROOT, '.env.local'))
 };
 
@@ -84,18 +85,18 @@ if (missing.length > 0) {
 
 // ── Generar el archivo ────────────────────────────────────────────────────────
 const content = `// ⚠️  ARCHIVO GENERADO AUTOMÁTICAMENTE — NO EDITAR NI COMITEAR
-// Generado por: scripts/generate-env.mjs
+// Generado por: scripts/generate-env.ts
 // Fuente: variables de entorno del sistema / CI-CD
 
 export const environment = {
   production: true,
   firebase: {
-    apiKey: "${envValues.FIREBASE_API_KEY}",
-    authDomain: "${envValues.FIREBASE_AUTH_DOMAIN}",
-    projectId: "${envValues.FIREBASE_PROJECT_ID}",
-    storageBucket: "${envValues.FIREBASE_STORAGE_BUCKET}",
-    messagingSenderId: "${envValues.FIREBASE_MESSAGING_SENDER_ID}",
-    appId: "${envValues.FIREBASE_APP_ID}"
+    apiKey: "${envValues['FIREBASE_API_KEY']}",
+    authDomain: "${envValues['FIREBASE_AUTH_DOMAIN']}",
+    projectId: "${envValues['FIREBASE_PROJECT_ID']}",
+    storageBucket: "${envValues['FIREBASE_STORAGE_BUCKET']}",
+    messagingSenderId: "${envValues['FIREBASE_MESSAGING_SENDER_ID']}",
+    appId: "${envValues['FIREBASE_APP_ID']}"
   },
   useEmulators: false
 };

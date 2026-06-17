@@ -7,6 +7,7 @@ export function createAuthServiceMock() {
     profileSignal: signal<any>({ nombreNegocio: 'Mi Negocio Test' }),
     authStateInitialized: signal(false),
     waitForAuth: vi.fn().mockResolvedValue(null),
+    emailCheckReady: signal(true),
     loginWithGoogle: vi.fn().mockResolvedValue(undefined),
     loginWithEmailAndPassword: vi.fn().mockResolvedValue(undefined),
     logout: vi.fn().mockResolvedValue(undefined)

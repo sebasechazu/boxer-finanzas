@@ -1,57 +1,50 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, connectAuthEmulator, fetchSignInMethodsForEmail } from 'firebase/auth';
-import {
-  initializeFirestore,
-  connectFirestoreEmulator,
-  collection,
-  addDoc,
-  doc,
-  setDoc
-} from 'firebase/firestore';
+import { initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
 import {
   TEST_ARTICULOS,
   TEST_CLIENTES,
   TEST_PLANES_PRESTAMO,
-  TEST_USERS
-} from './seed-test-data.constants.mjs';
+  TEST_USERS,
+  TestUser
+} from './seed-test-data.constants';
 
-const firebaseConfig = {
-  apiKey: 'DEVELOPMENT_KEY_FOR_EMULATORS',
-  authDomain: 'finanzas-1810.firebaseapp.com',
-  projectId: 'finanzas-1810',
-  storageBucket: 'finanzas-1810.firebasestorage.app',
-  messagingSenderId: '198774591128',
-  appId: '1:198774591128:web:57a9d8fe9abe38bfc88aed'
-};
+process.env['FIRESTORE_EMULATOR_HOST'] = '127.0.0.1:8080';
+process.env['FIREBASE_AUTH_EMULATOR_HOST'] = '127.0.0.1:9099';
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp({
+  projectId: 'finanzas-1810'
+});
+
 const auth = getAuth(app);
-const db = initializeFirestore(app, {});
+const db = getFirestore(app);
 
-connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-connectFirestoreEmulator(db, '127.0.0.1', 8080);
-
-async function seedUserData(userConfig, index) {
+async function seedUserData(userConfig: TestUser, index: number) {
   const { email, password, nombre, nombreNegocio } = userConfig;
   console.log(`Procesando usuario ${index + 1}: ${email}`);
 
-  let uid;
-  const methods = await fetchSignInMethodsForEmail(auth, email);
-
-  if (methods.length === 0) {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    uid = userCredential.user.uid;
-  } else {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    uid = userCredential.user.uid;
+  let uid: string;
+  try {
+    const userRecord = await auth.getUserByEmail(email);
+    uid = userRecord.uid;
+    await auth.updateUser(uid, { password, emailVerified: true });
+  } catch (error: any) {
+    if (error.code === 'auth/user-not-found') {
+      const userRecord = await auth.createUser({
+        email,
+        password,
+        displayName: nombre,
+        emailVerified: true
+      });
+      uid = userRecord.uid;
+    } else {
+      throw error;
+    }
   }
-
-  await signOut(auth);
-  await signInWithEmailAndPassword(auth, email, password);
 
   const createdAt = new Date().toISOString();
 
-  await setDoc(doc(db, 'usuarios', uid), {
+  await db.collection('usuarios').doc(uid).set({
     uid,
     nombre,
     email,
@@ -65,7 +58,7 @@ async function seedUserData(userConfig, index) {
 
   const clientesRefs = [];
   for (const cliente of clientes) {
-    const ref = await addDoc(collection(db, 'clientes'), {
+    const ref = await db.collection('clientes').add({
       ...cliente,
       usuarioId: uid,
       creadoEn: createdAt
@@ -75,7 +68,7 @@ async function seedUserData(userConfig, index) {
 
   const articulosRefs = [];
   for (const articulo of articulos) {
-    const ref = await addDoc(collection(db, 'articulos'), {
+    const ref = await db.collection('articulos').add({
       ...articulo,
       usuarioId: uid,
       creadoEn: createdAt
@@ -85,7 +78,7 @@ async function seedUserData(userConfig, index) {
 
   const planesRefs = [];
   for (const plan of planesPrestamo) {
-    const ref = await addDoc(collection(db, 'planes_prestamo'), {
+    const ref = await db.collection('planes_prestamo').add({
       ...plan,
       usuarioId: uid,
       creadoEn: createdAt
@@ -98,7 +91,7 @@ async function seedUserData(userConfig, index) {
   const clientePrestamo = clientesRefs[1];
   const planPrestamo = planesRefs[0];
 
-  const ventaRef = await addDoc(collection(db, 'ventas'), {
+  const ventaRef = await db.collection('ventas').add({
     usuarioId: uid,
     clienteId: clienteVenta.id,
     articuloId: articuloVenta.id,
@@ -108,7 +101,7 @@ async function seedUserData(userConfig, index) {
     creadoEn: createdAt
   });
 
-  const operacionVentaRef = await addDoc(collection(db, 'operaciones'), {
+  const operacionVentaRef = await db.collection('operaciones').add({
     usuarioId: uid,
     clienteId: clienteVenta.id,
     tipo: 'VENTA',
@@ -119,7 +112,7 @@ async function seedUserData(userConfig, index) {
     fechaPrimerVencimiento: new Date('2026-07-05T00:00:00.000Z').toISOString()
   });
 
-  await addDoc(collection(db, 'cuotas'), {
+  await db.collection('cuotas').add({
     operacionId: operacionVentaRef.id,
     usuarioId: uid,
     monto: 2420 + index * 330,
@@ -127,7 +120,7 @@ async function seedUserData(userConfig, index) {
     vencimiento: new Date('2026-07-05T00:00:00.000Z').toISOString()
   });
 
-  const prestamoRef = await addDoc(collection(db, 'prestamos'), {
+  const prestamoRef = await db.collection('prestamos').add({
     usuarioId: uid,
     clienteId: clientePrestamo.id,
     planId: planPrestamo.id,
@@ -137,7 +130,7 @@ async function seedUserData(userConfig, index) {
     creadoEn: createdAt
   });
 
-  const operacionPrestamoRef = await addDoc(collection(db, 'operaciones'), {
+  const operacionPrestamoRef = await db.collection('operaciones').add({
     usuarioId: uid,
     clienteId: clientePrestamo.id,
     tipo: 'PRESTAMO',
@@ -162,7 +155,7 @@ async function seedUserData(userConfig, index) {
       ...(i === 0 ? { fechaPago: new Date('2026-06-22T00:00:00.000Z').toISOString() } : {})
     };
 
-    await addDoc(collection(db, 'cuotas'), cuotaData);
+    await db.collection('cuotas').add(cuotaData);
   }
 
   console.log(`Datos de prueba insertados para ${email} (uid: ${uid})`);

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 vi.mock('../../firebase.config', () => ({
@@ -10,14 +10,12 @@ vi.mock('../../firebase.config', () => ({
 }));
 
 vi.mock('firebase/auth', () => ({
-    onAuthStateChanged: vi.fn().mockImplementation((auth, cb) => {
-        // immediately return an unsubscribe function
-        return vi.fn();
-    }),
-    signOut: vi.fn(),
-    signInWithPopup: vi.fn(),
-    signInWithEmailAndPassword: vi.fn(),
-    createUserWithEmailAndPassword: vi.fn(),
+    onAuthStateChanged: vi.fn().mockImplementation((auth, cb) => vi.fn()),
+    signOut: vi.fn().mockResolvedValue(undefined),
+    signInWithPopup: vi.fn().mockResolvedValue(undefined),
+    signInWithEmailAndPassword: vi.fn().mockResolvedValue({ user: { uid: 'mock' } }),
+    createUserWithEmailAndPassword: vi.fn().mockResolvedValue({ user: { uid: 'mock' } }),
+    sendEmailVerification: vi.fn().mockResolvedValue(undefined),
     GoogleAuthProvider: vi.fn()
 }));
 
@@ -33,6 +31,7 @@ describe('AuthService', () => {
     let mockRouter: any;
     let mockAlertCtrl: any;
     let mockNavCtrl: any;
+    let mockToastCtrl: any;
 
     beforeEach(() => {
         mockRouter = {
@@ -49,12 +48,17 @@ describe('AuthService', () => {
             navigateRoot: vi.fn()
         };
 
+        mockToastCtrl = {
+            create: vi.fn().mockResolvedValue({ present: vi.fn() })
+        };
+
         TestBed.configureTestingModule({
             providers: [
                 AuthService,
                 { provide: Router, useValue: mockRouter },
                 { provide: AlertController, useValue: mockAlertCtrl },
-                { provide: NavController, useValue: mockNavCtrl }
+                { provide: NavController, useValue: mockNavCtrl },
+                { provide: ToastController, useValue: mockToastCtrl }
             ]
         });
 

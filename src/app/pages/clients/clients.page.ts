@@ -9,6 +9,7 @@ import { logoWhatsapp, addOutline, personAddOutline, trashOutline, createOutline
 import { ClientListComponent } from './components/client-list/client-list.component';
 import { ClientModalComponent } from './components/client-modal/client-modal.component';
 import { Cliente } from '../../core/models';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-clients',
@@ -17,7 +18,7 @@ import { Cliente } from '../../core/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IonFabButton, IonHeader, IonToolbar, IonTitle, IonContent,
-    IonIcon, IonFab, ClientListComponent, ClientModalComponent
+    IonIcon, IonFab, ClientListComponent, ClientModalComponent, NotificationBellComponent
   ],
 })
 export class ClientsPage {
