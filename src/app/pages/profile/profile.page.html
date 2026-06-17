@@ -146,13 +146,24 @@
 
   <ion-card>
     <ion-card-header>
-      Si querés seguir apoyando el desarrollo:
+      <ion-title class="ion-text-center">
+      Soporte y apoyo
+      </ion-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-button fill="outline" color="warning" size="small" href="https://mpago.la/1FKmvkK" slot="end">
-        <ion-icon name="cafe-outline" slot="end"></ion-icon>
+
+      <p class="ion-margin-bottom ion-padding-bottom">Si tenés problemas, sugerencias o querés contactarme:</p>
+
+      <ion-button expand="block" fill="outline" color="success" size="small" href="https://wa.me/542615564713" target="_blank">
+        <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+        Contactar por WhatsApp
+      </ion-button>
+
+      <ion-button expand="block" fill="outline" color="warning" size="small" class="ion-margin-top" (click)="abrirModalCafe()">
+        <ion-icon name="cafe-outline" slot="start"></ion-icon>
         Invitame un café
       </ion-button>
+
     </ion-card-content>
   </ion-card>
 

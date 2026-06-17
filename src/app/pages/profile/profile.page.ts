@@ -1,5 +1,5 @@
 import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote, IonListHeader, IonItemSliding, IonItemOptions, IonItemOption, AlertController, ToastController, IonThumbnail, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordion, IonCardSubtitle, IonButtons } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote, IonListHeader, IonItemSliding, IonItemOptions, IonItemOption, AlertController, ToastController, IonThumbnail, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordion, IonCardSubtitle, IonButtons, IonText } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
 import { Invitacion, Colaborador } from '../../core/models';
@@ -8,7 +8,7 @@ import {
     logOutOutline, mailOutline, personAddOutline, trashOutline,
     checkmarkCircleOutline, closeCircleOutline, businessOutline,
     peopleOutline, personOutline, shieldCheckmarkOutline,
-    cafeOutline, cafe
+    cafeOutline, cafe, logoWhatsapp
 } from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
 
@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
     templateUrl: 'profile.page.html',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [IonButtons, IonCardTitle, IonCardHeader, IonCard,
+    imports: [ IonButtons, IonCardTitle, IonCardHeader, IonCard,
         IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
         IonLabel, IonButton, IonIcon, IonBadge, IonNote,
         IonListHeader, IonItemSliding, IonItemOptions, IonItemOption,
@@ -44,7 +44,7 @@ export class ProfilePage {
             logOutOutline, mailOutline, personAddOutline, trashOutline,
             checkmarkCircleOutline, closeCircleOutline, businessOutline,
             peopleOutline, personOutline, shieldCheckmarkOutline,
-            cafeOutline, cafe
+            cafeOutline, cafe, logoWhatsapp
         });
     }
 
@@ -196,6 +196,23 @@ export class ProfilePage {
             ]
         });
         await confirm.present();
+    }
+
+    async abrirModalCafe() {
+        const alert = await this.alertController.create({
+            header: 'Invitame un café',
+            message: 'Tu colaboración es totalmente opcional. Si querés ayudar a mantener la app en funcionamiento y seguir desarrollándola, podés apoyar con un café.',
+            buttons: [
+                { text: 'Cancelar', role: 'cancel' },
+                {
+                    text: 'Continuar',
+                    handler: async () => {
+                        window.open('https://mpago.la/1FKmvkK', '_blank');
+                    }
+                }
+            ]
+        });
+        await alert.present();
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
