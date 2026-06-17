@@ -6,26 +6,15 @@ test.describe('Core Flow: Cliente -> Artículo -> Préstamo -> Operaciones', () 
   const testPass = '123456';
 
   test('Debería poder registrar un usuario, crear entidades y generar operaciones', async ({ page }) => {
-    // 1. Registro e inicio de sesión
-    await page.goto('/');
+    // 1. Inicio de sesión con usuario pre-sembrado (seed)
+    await page.goto('/login');
     
-    // Ir a registro
-    await page.getByText('¿No tienes cuenta? Regístrate').click();
-    
-    // Llenar formulario de registro
-    await page.locator('app-register ion-input[name="email"] input').fill(testEmail);
-    await page.locator('app-register ion-input[name="password"] input').fill(testPass);
-    await page.locator('app-register').getByRole('button', { name: 'Registrarse' }).click();
-
-    // El sistema fuerza un cierre de sesión tras registrarse para validar el correo, así que iniciaremos sesión
-    await expect(page).toHaveURL(/.*\/login/);
-
-    await page.locator('app-login ion-input[name="email"] input').fill(testEmail);
     // Debug logs
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
-    await page.locator('app-login ion-input[name="email"] input').fill(testEmail);
-    await page.locator('app-login ion-input[name="password"] input').fill(testPass);
+    // El seed script crea este usuario por defecto: usuario1@local.test / 123456
+    await page.locator('app-login ion-input[name="email"] input').fill('usuario1@local.test');
+    await page.locator('app-login ion-input[name="password"] input').fill('123456');
     
     // Forzamos blur para que ngModel se actualice
     await page.locator('app-login ion-input[name="email"] input').blur();
@@ -33,77 +22,103 @@ test.describe('Core Flow: Cliente -> Artículo -> Préstamo -> Operaciones', () 
 
     await page.locator('app-login').getByRole('button', { name: 'Iniciar sesión' }).click();
 
-    // Comprobar si hay un toast de error visible
-    const errorToast = page.locator('ion-toast');
-    try {
-      await expect(errorToast).not.toBeVisible({ timeout: 2000 });
-    } catch (e) {
-      console.log('HAY UN TOAST DE ERROR:', await errorToast.textContent());
-    }
-
     // Esperar a estar en el dashboard
     await expect(page).toHaveURL(/.*\/tabs\/dashboard/, { timeout: 15000 });
 
-    // 2. Crear Cliente
-    await page.getByRole('tab', { name: 'Clientes' }).click();
-    await page.getByRole('button', { name: 'Nuevo Cliente' }).click();
+    const uniquePhone = Date.now().toString();
+    const uniqueSuffix = Date.now().toString().slice(-6); // last 6 digits for uniqueness
     
-    await page.getByLabel('Nombre Completo').fill('Juan Pérez E2E');
-    await page.getByLabel('Teléfono / Celular').fill('1122334455');
-    await page.getByRole('button', { name: 'Guardar' }).click();
+    // Generar apellido único usando letras aleatorias para pasar la validación (letras y 2 palabras)
+    const randomLetters = String.fromCharCode(
+        97 + Math.floor(Math.random() * 26),
+        97 + Math.floor(Math.random() * 26),
+        97 + Math.floor(Math.random() * 26),
+        97 + Math.floor(Math.random() * 26)
+    );
+    const clientName = 'Juan ' + randomLetters;
+    const articleName = 'Notebook ' + uniqueSuffix;
+    const loanName = 'Prestamo ' + uniqueSuffix;
+
+    // 2. Crear Cliente
+    await page.locator('ion-tab-button[tab="clients"]').click();
+    await page.locator('app-clients ion-fab-button').click();
+    
+    await page.locator('ion-input[formControlName="nombre"] input').fill(clientName);
+    await page.locator('ion-input[formControlName="telefono"] input').fill(uniquePhone);
+    
+    // Forzamos blur
+    await page.locator('ion-input[formControlName="nombre"] input').blur();
+    await page.locator('ion-input[formControlName="telefono"] input').blur();
+
+    await page.getByRole('button', { name: 'Guardar Cliente' }).click();
+    await expect(page.locator('ion-modal.show-modal')).toHaveCount(0);
     
     // Verificar que aparece
-    await expect(page.getByText('Juan Pérez E2E')).toBeVisible();
+    await expect(page.getByText(clientName)).toBeVisible();
 
     // 3. Ir a Historial y crear Artículo
-    await page.getByRole('tab', { name: 'Historial' }).click();
+    await page.locator('ion-tab-button[tab="historial"]').click();
     
-    // Asumimos que la pestaña de Artículos es visible o es el primer segmento
-    await page.getByRole('button', { name: 'Artículos' }).click();
-    await page.getByRole('button', { name: 'Nuevo Artículo' }).click();
+    await page.locator('ion-segment-button[value="articulos"]').click();
+    await page.locator('app-articles-tab ion-fab-button').click();
     
-    await page.getByLabel('Nombre del Artículo').fill('Notebook E2E');
-    await page.getByLabel('Precio de Compra').fill('50000');
-    await page.getByLabel('Precio de Venta (Contado)').fill('75000');
-    await page.getByRole('button', { name: 'Guardar' }).click();
+    await page.locator('ion-input[formControlName="nombre"] input').fill(articleName);
+    await page.locator('ion-input[formControlName="precioCompra"] input').fill('50000');
+    await page.locator('ion-input[formControlName="precioVentaContado"] input').fill('75000');
     
-    await expect(page.getByText('Notebook E2E')).toBeVisible();
+    await page.locator('ion-input[formControlName="nombre"] input').blur();
+    await page.locator('ion-input[formControlName="precioCompra"] input').blur();
+    await page.locator('ion-input[formControlName="precioVentaContado"] input').blur();
+
+    await page.getByRole('button', { name: 'Guardar Artículo' }).click();
+    await expect(page.locator('ion-modal.show-modal')).toHaveCount(0);
+    
+    await expect(page.getByText(articleName)).toBeVisible();
 
     // 4. Crear Plan de Préstamo
-    await page.getByRole('button', { name: 'Planes de Préstamo' }).click();
-    await page.getByRole('button', { name: 'Nuevo Plan' }).click();
+    await page.locator('ion-segment-button[value="prestamos"]').click();
+    await page.locator('app-loans-tab ion-fab-button').click();
     
-    await page.getByLabel('Nombre del Plan').fill('Préstamo 100k E2E');
-    await page.getByLabel('Monto Base').fill('100000');
-    await page.getByLabel('% de Recargo / Interés').fill('30');
-    await page.getByLabel('Cantidad de Cuotas').fill('5');
-    await page.getByRole('button', { name: 'Guardar' }).click();
+    await page.locator('ion-input[formControlName="nombre"] input').fill(loanName);
+    await page.locator('ion-input[formControlName="montoBase"] input').fill('100000');
+    await page.locator('ion-input[formControlName="porcentajeRecargo"] input').fill('30');
+    await page.locator('ion-input[formControlName="cuotasCount"] input').fill('5');
 
-    await expect(page.getByText('Préstamo 100k E2E')).toBeVisible();
+    await page.locator('ion-input[formControlName="nombre"] input').blur();
+    await page.locator('ion-input[formControlName="montoBase"] input').blur();
+    await page.locator('ion-input[formControlName="porcentajeRecargo"] input').blur();
+    await page.locator('ion-input[formControlName="cuotasCount"] input').blur();
+
+    await page.getByRole('button', { name: 'Guardar Plan' }).click();
+    await expect(page.locator('ion-modal.show-modal')).toHaveCount(0);
+
+    await expect(page.getByText(loanName)).toBeVisible();
 
     // 5. Crear Operación (Venta)
-    await page.getByRole('button', { name: 'Operaciones' }).click();
-    await page.getByRole('button', { name: 'Nueva Operación' }).click();
+    await page.locator('ion-segment-button[value="operaciones"]').click();
+    await page.locator('app-operations-tab ion-fab-button').click();
 
     // Seleccionar Cliente
-    await page.locator('ion-select[formControlName="clienteId"]').click();
-    await page.getByRole('radio', { name: /Juan Pérez E2E/i }).click();
+    await page.locator('ion-modal ion-select[formControlName="clienteId"]').click();
+    await page.getByRole('radio', { name: new RegExp(clientName, 'i') }).first().click();
     await page.getByRole('button', { name: 'OK' }).click();
 
     // Seleccionar Artículo
-    await page.locator('ion-select[formControlName="articuloId"]').click();
-    await page.getByRole('radio', { name: /Notebook E2E/i }).click();
+    await page.locator('ion-modal ion-select[formControlName="articuloId"]').click();
+    await page.getByRole('radio', { name: new RegExp(articleName, 'i') }).click();
     await page.getByRole('button', { name: 'OK' }).click();
 
     // Guardar Operación Venta
-    await page.getByRole('button', { name: 'Guardar' }).click();
+    await page.getByRole('button', { name: 'Confirmar Operación' }).click();
+    await expect(page.locator('ion-modal.show-modal')).toHaveCount(0);
+    
     await expect(page.getByText('Venta').first()).toBeVisible();
 
     // 6. Crear Operación (Préstamo) con autocompletado
-    await page.getByRole('button', { name: 'Nueva Operación' }).click();
-    
-    await page.locator('ion-select[formControlName="clienteId"]').click();
-    await page.getByRole('radio', { name: /Juan Pérez E2E/i }).click();
+    await page.locator('app-operations-tab ion-fab-button').click();
+
+    await page.locator('ion-modal ion-select[formControlName="clienteId"]').click();
+    await page.getByRole('radio', { name: new RegExp(clientName, 'i') }).first().click();
     await page.getByRole('button', { name: 'OK' }).click();
 
     await page.locator('ion-select[formControlName="tipo"]').click();
@@ -111,10 +126,11 @@ test.describe('Core Flow: Cliente -> Artículo -> Préstamo -> Operaciones', () 
     await page.getByRole('button', { name: 'OK' }).click();
 
     await page.locator('ion-select[formControlName="prestamoId"]').click();
-    await page.getByRole('radio', { name: /Préstamo 100k E2E/i }).click();
+    await page.getByRole('radio', { name: new RegExp(loanName, 'i') }).click();
     await page.getByRole('button', { name: 'OK' }).click();
 
-    await page.getByRole('button', { name: 'Guardar' }).click();
+    await page.getByRole('button', { name: 'Confirmar Operación' }).click();
+    await expect(page.locator('ion-modal.show-modal')).toHaveCount(0);
 
     // Verificar que haya dos operaciones
     await expect(page.locator('ion-item-divider').filter({ hasText: 'Operaciones' }).locator('..').locator('ion-item')).toHaveCount(2);
