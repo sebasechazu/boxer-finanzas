@@ -164,6 +164,14 @@ export class AccountService implements OnDestroy {
         if (!user) throw new Error('No autenticado');
         const perfil = this.authService.profileSignal();
 
+        // VULN-07 fix: limitar la cantidad de invitaciones pendientes por usuario
+        // para evitar spam o abuso de la colección de Firestore.
+        const MAX_INVITACIONES_PENDIENTES = 20;
+        const pendientes = this.invitacionesEnviadas().filter(inv => inv.estado === 'PENDIENTE');
+        if (pendientes.length >= MAX_INVITACIONES_PENDIENTES) {
+            throw new Error(`Has alcanzado el límite de ${MAX_INVITACIONES_PENDIENTES} invitaciones pendientes. Cancelá alguna antes de enviar una nueva.`);
+        }
+
         const existing = this.invitacionesEnviadas().find(
             inv => inv.emailInvitado === emailInvitado && inv.estado === 'PENDIENTE'
         );

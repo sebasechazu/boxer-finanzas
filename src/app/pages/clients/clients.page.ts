@@ -74,7 +74,7 @@ export class ClientsPage {
     });
   }
 
-  async onSubmit(formData: Partial<Cliente>) {
+  async onSubmit(formData: Pick<Cliente, 'nombre' | 'telefono'>) {
     if (!this.isSaving) {
       this.isSaving = true;
       this.cdr.detectChanges();
@@ -87,7 +87,6 @@ export class ClientsPage {
         this.closeModal();
         this.cdr.detectChanges();
       } catch (error: any) {
-        console.error('Error saving client:', error);
         await this.uiService.showErrorAlert('Error al guardar el cliente', error);
       } finally {
         this.isSaving = false;

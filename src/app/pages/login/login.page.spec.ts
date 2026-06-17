@@ -48,6 +48,19 @@ describe('LoginPage', () => {
         expect(mockNavCtrl.navigateRoot).toHaveBeenCalledWith('/tabs/dashboard', { animated: false });
     });
 
+    it('debe quitar el foco antes de navegar para evitar elementos ocultos con aria-hidden', async () => {
+        mockAuthService.waitForAuth.mockResolvedValue({ uid: 'user123' });
+        const button = document.createElement('button');
+        document.body.appendChild(button);
+        const blurSpy = vi.spyOn(button, 'blur');
+
+        button.focus();
+        await component.ngOnInit();
+
+        expect(blurSpy).toHaveBeenCalled();
+        document.body.removeChild(button);
+    });
+
     it('debe llamar a loginWithGoogle y cambiar isLoading', async () => {
         await component.loginWithGoogle();
         expect(mockAuthService.loginWithGoogle).toHaveBeenCalled();

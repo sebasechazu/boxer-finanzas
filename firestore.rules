@@ -3,29 +3,42 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── Función global: correo verificado ────────────────────────────────────
+    // VULN-02 fix: movida al scope global para cubrir TODAS las colecciones,
+    // no solo los datos financieros. Bloquea bots y cuentas sin verificar.
+    function emailVerificado() {
+      return request.auth.token.email_verified == true;
+    }
+
     // ── Perfiles de usuario ─────────────────────────────────────────────────
     // Cada usuario puede leer/escribir su propio perfil.
     // Los colaboradores pueden leer el perfil del propietario al que asisten.
     match /usuarios/{uid} {
-      allow read: if request.auth != null && (
+      allow read: if request.auth != null && emailVerificado() && (
         request.auth.uid == uid || 
         exists(/databases/$(database)/documents/colaboradores/$(uid + '_' + request.auth.uid))
       );
-      allow write: if request.auth != null && request.auth.uid == uid;
+      // VULN-05 fix: limitar tamaño de nombre de negocio para evitar escrituras abusivas.
+      allow write: if request.auth != null && emailVerificado() && request.auth.uid == uid
+        && (!('nombreNegocio' in request.resource.data) || request.resource.data.nombreNegocio.size() <= 100)
+        && (!('nombre' in request.resource.data) || request.resource.data.nombre.size() <= 120);
     }
 
     // ── Invitaciones ────────────────────────────────────────────────────────
     // Solo el propietario puede crear invitaciones desde su cuenta.
     // El propietario y el invitado (por email) pueden leer y actualizar.
     match /invitaciones/{invId} {
-      allow read: if request.auth != null && (
+      allow read: if request.auth != null && emailVerificado() && (
         resource.data.propietarioUid == request.auth.uid ||
         request.auth.token.email.lower() == resource.data.emailInvitado.lower()
       );
+      // VULN-02 fix: exigir emailVerificado() para crear invitaciones.
       allow create: if request.auth != null
+        && emailVerificado()
         && request.resource.data.propietarioUid == request.auth.uid
         && request.resource.data.estado == 'PENDIENTE';
       allow update: if request.auth != null
+        && emailVerificado()
         && request.resource.data.propietarioUid == resource.data.propietarioUid
         && request.resource.data.emailInvitado.lower() == resource.data.emailInvitado.lower()
         && (
@@ -43,16 +56,17 @@ service cloud.firestore {
     // Se valida contra la invitación correspondiente para evitar autopromociones no autorizadas.
     // El propietario o colaborador pueden borrar (revocar acceso).
     match /colaboradores/{colId} {
-      allow read: if request.auth != null && (
+      allow read: if request.auth != null && emailVerificado() && (
         resource.data.propietarioUid == request.auth.uid ||
         resource.data.colaboradorUid == request.auth.uid
       );
       allow create: if request.auth != null
+        && emailVerificado()
         && request.resource.data.colaboradorUid == request.auth.uid
         && exists(/databases/$(database)/documents/invitaciones/$(request.resource.data.invitacionId))
         && get(/databases/$(database)/documents/invitaciones/$(request.resource.data.invitacionId)).data.emailInvitado.lower() == request.auth.token.email.lower()
         && get(/databases/$(database)/documents/invitaciones/$(request.resource.data.invitacionId)).data.propietarioUid == request.resource.data.propietarioUid;
-      allow delete: if request.auth != null && (
+      allow delete: if request.auth != null && emailVerificado() && (
         resource.data.propietarioUid == request.auth.uid ||
         resource.data.colaboradorUid == request.auth.uid
       );
@@ -63,20 +77,36 @@ service cloud.firestore {
     // o si sos colaborador registrado (existe doc en colaboradores/{propietarioUid}_{tuUid}).
 
     function esOwnerOColaborador(ownerUid) {
-      return request.auth.uid == ownerUid
-        || exists(/databases/$(database)/documents/colaboradores/$(ownerUid + '_' + request.auth.uid));
+      return emailVerificado() && (
+        request.auth.uid == ownerUid
+        || exists(/databases/$(database)/documents/colaboradores/$(ownerUid + '_' + request.auth.uid))
+      );
     }
 
     match /clientes/{id} {
       allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
-      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
+      // VULN-05 fix: limitar tamaño de nombre y teléfono en clientes.
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId)
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 100
+        && request.resource.data.telefono is string && request.resource.data.telefono.size() <= 20;
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId)
+        && request.resource.data.usuarioId == resource.data.usuarioId
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 100
+        && request.resource.data.telefono is string && request.resource.data.telefono.size() <= 20;
     }
 
     match /articulos/{id} {
       allow read, delete: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId);
-      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId);
-      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId) && request.resource.data.usuarioId == resource.data.usuarioId;
+      // VULN-05 fix: limitar tamaño de nombre de artículo y validar que precios sean números.
+      allow create: if request.auth != null && esOwnerOColaborador(request.resource.data.usuarioId)
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 150
+        && request.resource.data.precioCompra is number
+        && request.resource.data.precioVentaContado is number;
+      allow update: if request.auth != null && esOwnerOColaborador(resource.data.usuarioId)
+        && request.resource.data.usuarioId == resource.data.usuarioId
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 150
+        && request.resource.data.precioCompra is number
+        && request.resource.data.precioVentaContado is number;
     }
 
     match /planes_prestamo/{id} {

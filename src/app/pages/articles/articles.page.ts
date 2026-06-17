@@ -73,7 +73,6 @@ export class ArticlesPage {
         try {
           await this.articleService.deleteArticle(id);
         } catch (error) {
-          console.error('Error deleting article:', error);
           await this.uiService.showErrorAlert('No se pudo eliminar el artículo', error);
         }
       }
@@ -100,7 +99,6 @@ export class ArticlesPage {
         }
         this.closeModal();
       } catch (error) {
-        console.error('Error saving article:', error);
         await this.uiService.showErrorAlert('Error al guardar el artículo', error);
       } finally {
         this.isSaving = false;

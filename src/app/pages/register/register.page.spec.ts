@@ -53,4 +53,16 @@ describe('RegisterPage', () => {
         expect(mockAuthService.registerWithEmailAndPassword).toHaveBeenCalledWith('new@example.com', 'password123');
         expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/login', { replaceUrl: true });
     });
+
+    it('debe quitar el foco antes de navegar al login', async () => {
+        const button = document.createElement('button');
+        document.body.appendChild(button);
+        const blurSpy = vi.spyOn(button, 'blur');
+
+        button.focus();
+        await component.submit();
+
+        expect(blurSpy).toHaveBeenCalled();
+        document.body.removeChild(button);
+    });
 });

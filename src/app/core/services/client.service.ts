@@ -47,7 +47,6 @@ export class ClientService implements OnDestroy {
     }
 
     async addClient(cliente: Omit<Cliente, 'id' | 'usuarioId' | 'saldoPendiente'>) {
-        console.log('Iniciando guardado de cliente...', cliente);
         const uid = this.activeUid;
 
         try {
@@ -70,17 +69,18 @@ export class ClientService implements OnDestroy {
             };
 
             const docRef = await addDoc(collection(db, 'clientes'), newClient);
-            console.log('Cliente guardado con ID:', docRef.id);
             return docRef;
         } catch (error) {
-            console.error('Error detallado en addClient:', error);
             throw error;
         }
     }
 
-    async updateClient(id: string, cliente: Partial<Cliente>) {
+    // VULN-03 fix: solo permite actualizar campos editables por el usuario.
+    // Excluye explícitamente usuarioId y saldoPendiente para evitar manipulación.
+    async updateClient(id: string, cambios: Pick<Cliente, 'nombre' | 'telefono'>) {
         const docRef = doc(db, 'clientes', id);
-        return await updateDoc(docRef, cliente);
+        const { nombre, telefono } = cambios;
+        return await updateDoc(docRef, { nombre, telefono });
     }
 
     async deleteClient(id: string) {

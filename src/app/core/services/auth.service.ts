@@ -5,6 +5,8 @@ import {
     signInWithPopup,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    sendEmailVerification,
+    reload,
     GoogleAuthProvider,
     User,
     Unsubscribe
@@ -25,6 +27,10 @@ export class AuthService implements OnDestroy {
     private toastController = inject(ToastController);
     private _authStateInitialized = signal(false);
     readonly authStateInitialized = this._authStateInitialized.asReadonly();
+    // Solo se marca true cuando el check de email_verified terminó de forma segura.
+    // Esto evita que login.page navegue al dashboard antes de completar la verificación.
+    private _emailCheckReady = signal(false);
+    readonly emailCheckReady = this._emailCheckReady.asReadonly();
     private _authUnsubscribe?: Unsubscribe;
 
     readonly userSignal = signal<User | null>(null);
@@ -33,15 +39,34 @@ export class AuthService implements OnDestroy {
         this._authUnsubscribe = onAuthStateChanged(auth, async user => {
             this.userSignal.set(user);
             this._authStateInitialized.set(true);
+            // Resetear el flag de check listo hasta completar la verificación
+            this._emailCheckReady.set(false);
 
             if (user) {
+                // Recargar el usuario para obtener el estado actualizado del correo
+                await reload(user);
+                const freshUser = auth.currentUser;
+
+                // Si el usuario usa Email/Contraseña y no verificó su correo, bloquearlo
+                if (freshUser && !freshUser.emailVerified && freshUser.providerData[0]?.providerId === 'password') {
+                    await this._handleUnverifiedEmail(freshUser);
+                    // No marcar emailCheckReady como true: el usuario fue expulsado
+                    return;
+                }
+
                 // Cargar perfil extendido desde Firestore
                 await this._loadOrCreateProfile(user);
+
+                // Check completado: usuario verificado y con perfil cargado
+                this._emailCheckReady.set(true);
 
                 // Si estamos en login, navegar al dashboard
                 if (this.router.url === '/login' || this.router.url === '/') {
                     this.navCtrl.navigateRoot('/tabs/dashboard', { animated: false });
                 }
+            } else {
+                // Sin usuario: el check está listo (no hay nada que verificar)
+                this._emailCheckReady.set(true);
             }
         });
     }
@@ -51,12 +76,21 @@ export class AuthService implements OnDestroy {
     }
 
     // Método para esperar a que Firebase nos diga si hay usuario o no
+    // y además a que el check de email_verified haya terminado.
     async waitForAuth(): Promise<User | null> {
-        if (this._authStateInitialized()) return this.userSignal();
+        if (this._emailCheckReady()) return this.userSignal();
         return new Promise((resolve) => {
+            // Esperar al primer evento del onAuthStateChanged de Firebase
             const unsubscribe = onAuthStateChanged(auth, user => {
                 unsubscribe();
-                resolve(user);
+                // No resolvemos todavía: dejamos que el flujo asíncrono del constructor
+                // complete el check de email. Usamos un intervalo corto para polling.
+                const interval = setInterval(() => {
+                    if (this._emailCheckReady()) {
+                        clearInterval(interval);
+                        resolve(this.userSignal());
+                    }
+                }, 50);
             });
         });
     }
@@ -103,6 +137,64 @@ export class AuthService implements OnDestroy {
             color: 'danger'
         });
         await toast.present();
+    }
+
+    private async _showSuccessToast(message: string) {
+        const toast = await this.toastController.create({
+            message,
+            duration: 5000,
+            position: 'top',
+            color: 'success'
+        });
+        await toast.present();
+    }
+
+    /**
+     * Muestra una alerta al usuario no verificado con la opción de reenviar el
+     * correo de verificación. El signOut ocurre DENTRO de los handlers para que
+     * el token siga activo al momento de llamar a sendEmailVerification.
+     */
+    private async _handleUnverifiedEmail(user: User): Promise<void> {
+        // Limpiar estado local ANTES de mostrar el alert
+        this.userSignal.set(null);
+        this.profileSignal.set(null);
+
+        const alert = await this.alertController.create({
+            header: 'Verifica tu correo',
+            message:
+                'Tu cuenta aún no está verificada. Revisá tu bandeja de entrada (y la carpeta de spam) para confirmar tu dirección de correo electrónico.',
+            backdropDismiss: false,
+            buttons: [
+                {
+                    text: 'Reenviar correo',
+                    handler: () => {
+                        // Ejecutamos de forma async pero sin bloquear el cierre del alert
+                        (async () => {
+                            try {
+                                // El usuario aún tiene sesión activa: podemos enviar el correo
+                                await sendEmailVerification(user);
+                                await this._showSuccessToast('Correo de verificación reenviado. Revisá tu bandeja de entrada.');
+                            } catch {
+                                await this._showAuthError('No se pudo reenviar el correo. Intentá más tarde.');
+                            } finally {
+                                // Cerrar sesión después de intentar el reenvío
+                                await signOut(auth);
+                            }
+                        })();
+                        return true; // cerrar el alert
+                    }
+                },
+                {
+                    text: 'Entendido',
+                    role: 'cancel',
+                    handler: () => {
+                        // Cerrar sesión cuando descarta el alert
+                        signOut(auth);
+                    }
+                }
+            ]
+        });
+        await alert.present();
     }
 
     private validateEmail(email: string): string | null {
@@ -163,13 +255,20 @@ export class AuthService implements OnDestroy {
         }
 
         try {
-            await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+            const credential = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+            // Enviar correo de verificación inmediatamente tras el registro
+            await sendEmailVerification(credential.user);
+            // Cerrar sesión para forzar que el usuario verifique su correo antes de ingresar
+            await signOut(auth);
+            await this._showSuccessToast(
+                '¡Cuenta creada! Te enviamos un correo de verificación. Confirmá tu dirección para poder ingresar.'
+            );
         } catch (error: any) {
             const message = error?.code === 'auth/invalid-email'
                 ? 'El correo ingresado no es válido.'
                 : error?.code === 'auth/email-already-in-use'
                     ? 'Este correo ya está registrado.'
-                    : 'No se pudo crear la cuenta. Verifica que el correo sea válido y que la contraseña tenga al menos 6 caracteres.';
+                    : 'No se pudo crear la cuenta. Verificá que el correo sea válido y que la contraseña tenga al menos 6 caracteres.';
             await this._showAuthError(message);
             throw error;
         }

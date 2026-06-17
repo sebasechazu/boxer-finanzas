@@ -35,6 +35,11 @@ export class RegisterPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  private clearActiveElementFocus(): void {
+    const activeElement = document.activeElement as HTMLElement | null;
+    activeElement?.blur();
+  }
+
   readonly isLoading = signal(false);
   email = '';
   password = '';
@@ -43,6 +48,9 @@ export class RegisterPage {
     this.isLoading.set(true);
     try {
       await this.authService.registerWithEmailAndPassword(this.email, this.password);
+      this.clearActiveElementFocus();
+      // El AuthService envía el correo de verificación y cierra la sesión automáticamente.
+      // Solo hay que llevar al usuario al login para que ingrese después de verificar.
       await this.router.navigateByUrl('/login', { replaceUrl: true });
     } catch {
       this.isLoading.set(false);

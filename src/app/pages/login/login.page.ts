@@ -33,14 +33,20 @@ export class LoginPage implements OnInit {
     private authService = inject(AuthService);
     private navCtrl = inject(NavController);
     private router = inject(Router);
+
+    private clearActiveElementFocus(): void {
+        const activeElement = document.activeElement as HTMLElement | null;
+        activeElement?.blur();
+    }
     
     // Convertimos isLoading a Signal para evitar problemas del ciclo de vida de Ionic/Angular
     public isLoading = signal(false);
     public email = '';
     public password = '';
     
-    // Reactivamente determinamos si estamos verificando la sesión
-    public isCheckingAuth = computed(() => !this.authService.authStateInitialized() || !!this.authService.userSignal());
+    // isCheckingAuth permanece true hasta que el check de email_verified termine
+    // (emailCheckReady). Así evitamos navegar al dashboard con un usuario no verificado.
+    public isCheckingAuth = computed(() => !this.authService.emailCheckReady());
 
     constructor() {}
 
@@ -48,6 +54,7 @@ export class LoginPage implements OnInit {
         // Al iniciar, esperamos a ver si Firebase tiene sesión guardada
         const user = await this.authService.waitForAuth();
         if (user) {
+            this.clearActiveElementFocus();
             // Si hay usuario, vamos directo al dashboard y no mostramos el login
             this.navCtrl.navigateRoot('/tabs/dashboard', { animated: false });
         }
@@ -76,6 +83,7 @@ export class LoginPage implements OnInit {
     }
 
     goToRegister() {
+        this.clearActiveElementFocus();
         this.router.navigateByUrl('/register');
     }
 }

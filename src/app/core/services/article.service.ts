@@ -63,9 +63,12 @@ export class ArticleService implements OnDestroy {
         return await addDoc(collection(db, 'articulos'), newArticle);
     }
 
-    async updateArticle(id: string, articulo: Partial<Articulo>) {
+    // VULN-03 fix: solo permite actualizar campos editables.
+    // Excluye explícitamente usuarioId para evitar cambio de ownership.
+    async updateArticle(id: string, cambios: Pick<Articulo, 'nombre' | 'precioCompra' | 'precioVentaContado'>) {
         const docRef = doc(db, 'articulos', id);
-        return await updateDoc(docRef, articulo);
+        const { nombre, precioCompra, precioVentaContado } = cambios;
+        return await updateDoc(docRef, { nombre, precioCompra, precioVentaContado });
     }
 
     async deleteArticle(id: string) {
