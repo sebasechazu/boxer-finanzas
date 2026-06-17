@@ -6,6 +6,38 @@
   "display": "standalone",
   "scope": "/",
   "start_url": "/",
+  "description": "Tu gestor personal de finanzas para llevar el control de tus gastos e ingresos.",
+  "categories": ["finance", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Nuevo Gasto",
+      "short_name": "Gasto",
+      "description": "Agrega un nuevo gasto a tus finanzas",
+      "url": "/nuevo-gasto",
+      "icons": [{ "src": "icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ver Reportes",
+      "short_name": "Reportes",
+      "description": "Visualiza tus reportes financieros",
+      "url": "/reportes",
+      "icons": [{ "src": "icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshots/mobile.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
   "icons": [
     {
       "src": "icons/icon-72x72.png",

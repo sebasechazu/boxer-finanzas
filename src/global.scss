@@ -27,6 +27,23 @@
 
 body {
   font-family: 'Outfit', sans-serif;
+  /* PWA Native Feel */
+  -webkit-touch-callout: none; /* iOS Safari: Evita que al mantener presionado aparezca el menú contextual */
+  -webkit-user-select: none;   /* Safari */
+  -khtml-user-select: none;    /* Konqueror HTML */
+  -moz-user-select: none;      /* Old versions of Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+  overscroll-behavior-y: none; /* Evita el "efecto goma" de rebote en los navegadores móviles (pull-to-refresh nativo) */
+}
+
+/* Reactivar selección de texto solo en campos donde el usuario debe escribir */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: auto !important;
+  -khtml-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -ms-user-select: auto !important;
+  user-select: auto !important;
 }
 
 /* Page Background Watermark */
