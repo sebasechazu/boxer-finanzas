@@ -16,6 +16,8 @@ vi.mock('firebase/auth', () => ({
     }),
     signOut: vi.fn(),
     signInWithPopup: vi.fn(),
+    signInWithEmailAndPassword: vi.fn(),
+    createUserWithEmailAndPassword: vi.fn(),
     GoogleAuthProvider: vi.fn()
 }));
 
@@ -74,5 +76,25 @@ describe('AuthService', () => {
 
     it('should clean up on destroy', () => {
         expect(() => service.ngOnDestroy()).not.toThrow();
+    });
+
+    it('should register a user with email and password', async () => {
+        const { createUserWithEmailAndPassword } = await import('firebase/auth');
+        const mockUserCredential = { user: { uid: 'abc123' } };
+        vi.mocked(createUserWithEmailAndPassword).mockResolvedValue(mockUserCredential as any);
+
+        await service.registerWithEmailAndPassword('demo@test.com', '123456');
+
+        expect(createUserWithEmailAndPassword).toHaveBeenCalled();
+    });
+
+    it('should login a user with email and password', async () => {
+        const { signInWithEmailAndPassword } = await import('firebase/auth');
+        const mockUserCredential = { user: { uid: 'abc123' } };
+        vi.mocked(signInWithEmailAndPassword).mockResolvedValue(mockUserCredential as any);
+
+        await service.loginWithEmailAndPassword('demo@test.com', '123456');
+
+        expect(signInWithEmailAndPassword).toHaveBeenCalled();
     });
 });

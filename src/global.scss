@@ -253,8 +253,9 @@ ion-fab {
 
 /* --- 6. Page-Specific Styles --- */
 
-/* Login Page Styles */
-app-login {
+/* Login / Register Page Styles */
+app-login,
+app-register {
   .login-content {
     --background: transparent;
     background: transparent;
@@ -388,6 +389,53 @@ app-login {
     justify-content: center;
     align-items: center;
     min-height: 52px;
+    width: 100%;
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .auth-input {
+    --background: rgba(255, 255, 255, 0.08);
+    --border-radius: 16px;
+    --color: var(--ion-text-color);
+    --padding-start: 14px;
+    --padding-end: 14px;
+    border-radius: 16px;
+    margin: 0;
+  }
+
+  .auth-submit {
+    --border-radius: 999px;
+    height: 48px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .auth-link {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    color: var(--ion-color-step-500);
+    font-size: 0.85rem;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
   }
 
   /* Botón Google Premium */

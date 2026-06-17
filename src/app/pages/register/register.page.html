@@ -1,0 +1,49 @@
+<ion-content class="ion-padding ion-text-center login-content">
+  <div class="animated-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="login-container">
+    <div class="login-card-wrapper">
+      <ion-card mode="ios" class="glass-card">
+        <ion-card-content>
+          <div class="brand-header">
+            <h1 class="brand-title">Crear cuenta</h1>
+            <p class="brand-subtitle">Regístrate con tu correo y contraseña.</p>
+          </div>
+
+          @if (isLoading()) {
+            <div class="auth-spinner-container">
+              <ion-spinner name="crescent" color="primary"></ion-spinner>
+              <p class="auth-spinner-text">Creando cuenta...</p>
+            </div>
+          } @else {
+            <div class="action-area">
+              <div class="auth-form">
+                <ion-item class="auth-input" lines="none">
+                  <ion-label position="stacked">Correo</ion-label>
+                  <ion-input type="email" [(ngModel)]="email" name="email"></ion-input>
+                </ion-item>
+
+                <ion-item class="auth-input" lines="none">
+                  <ion-label position="stacked">Contraseña</ion-label>
+                  <ion-input type="password" [(ngModel)]="password" name="password"></ion-input>
+                </ion-item>
+
+                <ion-button class="auth-submit" expand="block" color="primary" (click)="submit()">
+                  Registrarse
+                </ion-button>
+
+                <ion-button class="auth-link" fill="clear" expand="block" routerLink="/login">
+                  Volver al login
+                </ion-button>
+              </div>
+            </div>
+          }
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

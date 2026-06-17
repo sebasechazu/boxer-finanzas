@@ -1,9 +1,14 @@
 import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
     IonContent, IonImg,
     IonCard, IonCardContent,
-    IonSpinner
+    IonSpinner,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonButton
 } from '@ionic/angular/standalone';
 import { NavController } from '@ionic/angular';
 import { AuthService } from '../../core/services/auth.service';
@@ -16,15 +21,23 @@ import { AuthService } from '../../core/services/auth.service';
     imports: [
         IonContent, IonImg,
         IonCard, IonCardContent,
-        IonSpinner
+        IonSpinner,
+        IonItem,
+        IonLabel,
+        IonInput,
+        IonButton,
+        FormsModule
     ],
 })
 export class LoginPage implements OnInit {
     private authService = inject(AuthService);
     private navCtrl = inject(NavController);
+    private router = inject(Router);
     
     // Convertimos isLoading a Signal para evitar problemas del ciclo de vida de Ionic/Angular
     public isLoading = signal(false);
+    public email = '';
+    public password = '';
     
     // Reactivamente determinamos si estamos verificando la sesión
     public isCheckingAuth = computed(() => !this.authService.authStateInitialized() || !!this.authService.userSignal());
@@ -44,14 +57,25 @@ export class LoginPage implements OnInit {
         this.isLoading.set(false);
     }
 
-    async login() {
+    async loginWithGoogle() {
         this.isLoading.set(true);
         try {
             await this.authService.loginWithGoogle();
-            // No seteamos isLoading a false aquí, para que la transición hacia
-            // el dashboard se vea fluida y no parpadee la UI.
         } catch (error) {
             this.isLoading.set(false);
         }
+    }
+
+    async submitEmailAuth() {
+        this.isLoading.set(true);
+        try {
+            await this.authService.loginWithEmailAndPassword(this.email, this.password);
+        } catch (error) {
+            this.isLoading.set(false);
+        }
+    }
+
+    goToRegister() {
+        this.router.navigateByUrl('/register');
     }
 }

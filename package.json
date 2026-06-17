@@ -12,6 +12,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "emulators": "firebase emulators:start --import=./firebase_data --export-on-exit",
+    "seed:test-data": "node ./scripts/seed-test-data.mjs",
     "deploy": "npm run build && firebase deploy --only firestore,auth,hosting",
     "storybook": "ng run app:storybook",
     "build-storybook": "ng run app:build-storybook"

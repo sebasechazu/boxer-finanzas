@@ -1,5 +1,14 @@
 import { Injectable, inject, signal, OnDestroy } from '@angular/core';
-import { onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, User, Unsubscribe } from 'firebase/auth';
+import {
+    onAuthStateChanged,
+    signOut,
+    signInWithPopup,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    GoogleAuthProvider,
+    User,
+    Unsubscribe
+} from 'firebase/auth';
 import { Router } from '@angular/router';
 import { PerfilUsuario } from '../models';
 import { auth, db } from '../../firebase.config';
@@ -85,20 +94,43 @@ export class AuthService implements OnDestroy {
         }
     }
 
+    private async _showAuthError(message: string, error?: unknown) {
+        console.error('AuthService: Error de autenticación', error);
+        const alert = await this.alertController.create({
+            header: 'Error de Autenticación',
+            message,
+            buttons: ['OK']
+        });
+        await alert.present();
+    }
+
     async loginWithGoogle() {
-        
         const provider = new GoogleAuthProvider();
         try {
             await signInWithPopup(auth, provider);
-            // La navegación al dashboard se maneja en onAuthStateChanged para evitar doble transición
         } catch (error: any) {
-            console.error('AuthService: Error en login web:', error);
-            const alert = await this.alertController.create({
-                header: 'Error de Autenticación',
-                message: 'No se pudo completar el inicio de sesión. Si estás usando una PWA instalada, asegúrate de que tu navegador permita abrir ventanas emergentes o vuelve a intentarlo.',
-                buttons: ['OK']
-            });
-            await alert.present();
+            await this._showAuthError(
+                'No se pudo completar el inicio de sesión. Si estás usando una PWA instalada, asegúrate de que tu navegador permita abrir ventanas emergentes o vuelve a intentarlo.',
+                error
+            );
+            throw error;
+        }
+    }
+
+    async loginWithEmailAndPassword(email: string, password: string) {
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error: any) {
+            await this._showAuthError('No se pudo iniciar sesión con el correo y la contraseña proporcionados.', error);
+            throw error;
+        }
+    }
+
+    async registerWithEmailAndPassword(email: string, password: string) {
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+        } catch (error: any) {
+            await this._showAuthError('No se pudo crear la cuenta. Verifica que el correo sea válido y que la contraseña tenga al menos 6 caracteres.', error);
             throw error;
         }
     }
