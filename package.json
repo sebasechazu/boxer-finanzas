@@ -13,7 +13,9 @@
     "test:coverage": "vitest run --coverage",
     "emulators": "firebase emulators:start --import=./firebase_data --export-on-exit",
     "seed:test-data": "node ./scripts/seed-test-data.mjs",
-    "deploy": "npm run build && firebase deploy --only firestore,auth,hosting",
+    "generate:env": "node scripts/generate-env.mjs",
+    "generate:env:local": "node --env-file=.env.local scripts/generate-env.mjs",
+    "deploy": "npm run generate:env && npm run build && firebase deploy --only firestore,auth,hosting",
     "storybook": "ng run app:storybook",
     "build-storybook": "ng run app:build-storybook"
   },

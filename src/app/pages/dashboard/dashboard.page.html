@@ -35,7 +35,7 @@
     <ion-card-header>
       <ion-card-title>Próximos Vencimientos</ion-card-title>
     </ion-card-header>
-    <ion-card-content class="contenedor-calendario">
+    <ion-card-content style="display: flex; justify-content: center;">
       <ion-datetime presentation="date" [highlightedDates]="highlightedDates()" (ionChange)="onDateChange($event)"></ion-datetime>
     </ion-card-content>
   </ion-card>

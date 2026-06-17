@@ -9,8 +9,7 @@ import {
   IonLabel,
   IonInput,
   IonButton,
-  IonSpinner
-} from '@ionic/angular/standalone';
+  IonSpinner, IonGrid, IonRow, IonCol, IonCardHeader, IonCardTitle, IonCardSubtitle } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -18,7 +17,7 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   templateUrl: './register.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
+  imports: [IonCardSubtitle, IonCardTitle, IonCardHeader, IonCol, IonRow, IonGrid, 
     IonContent,
     IonCard,
     IonCardContent,
@@ -27,8 +26,7 @@ import { AuthService } from '../../core/services/auth.service';
     IonInput,
     IonButton,
     IonSpinner,
-    FormsModule,
-    RouterLink
+    FormsModule
   ]
 })
 export class RegisterPage {
@@ -40,6 +38,10 @@ export class RegisterPage {
     activeElement?.blur();
   }
 
+  ionViewWillLeave() {
+    this.clearActiveElementFocus();
+  }
+
   readonly isLoading = signal(false);
   email = '';
   password = '';
@@ -48,12 +50,15 @@ export class RegisterPage {
     this.isLoading.set(true);
     try {
       await this.authService.registerWithEmailAndPassword(this.email, this.password);
-      this.clearActiveElementFocus();
       // El AuthService envía el correo de verificación y cierra la sesión automáticamente.
       // Solo hay que llevar al usuario al login para que ingrese después de verificar.
       await this.router.navigateByUrl('/login', { replaceUrl: true });
     } catch {
       this.isLoading.set(false);
     }
+  }
+
+  goToLogin() {
+    this.router.navigateByUrl('/login');
   }
 }

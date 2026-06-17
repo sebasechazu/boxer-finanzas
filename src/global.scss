@@ -80,14 +80,6 @@ ion-button {
     --background: var(--premium-gradient);
     --background-hover: var(--ion-color-primary-shade);
   }
-
-  &.new-op-button {
-    --border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    margin-top: -30px;
-    --box-shadow: 0 8px 16px rgba(var(--ion-color-primary-rgb), 0.3);
-  }
 }
 
 /* Default height / width limit for Ionic Modals in this application */
@@ -155,7 +147,7 @@ ion-tab-button {
   }
 
   ion-card-title {
-    color: #ffffff;
+    color: var(--ion-text-color);
   }
 }
 
@@ -194,62 +186,8 @@ ion-fab {
   margin-right: 12px;
 }
 
-.fullscreen-modal {
-  --height: 100%;
-  --width: 100%;
-}
 
 /* --- 5. Component-Specific Styles (Centralized) --- */
-
-/* Shared across articles, operations, etc. */
-.stat-card {
-  margin: 4px;
-  background: var(--ion-background-color);
-  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
-  box-shadow: none;
-  --padding-start: 8px;
-  --padding-end: 8px;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-
-  ion-card-content {
-    padding: 8px;
-    text-align: center;
-  }
-
-  .contenedor-calendario {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-  }
-
-  ion-icon {
-    font-size: 1.5rem;
-    margin-bottom: 4px;
-  }
-
-  .stat-value {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--ion-text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .stat-label {
-    font-size: 0.65rem;
-    color: var(--ion-color-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-}
-
-/* Articles & Operations List spacing */
-.add-btn-row {
-  margin-bottom: 12px;
-}
 
 /* --- 6. Page-Specific Styles --- */
 
@@ -274,7 +212,7 @@ app-register {
     overflow: hidden;
     z-index: 0;
     background: var(--ion-background-color, #121212);
-    background-image: radial-gradient(circle at 50% 50%, rgba(210, 166, 121, 0.03) 0%, rgba(18, 18, 18, 0.05) 100%);
+    background-image: radial-gradient(circle at 50% 50%, rgba(var(--ion-color-primary-rgb), 0.03) 0%, rgba(18, 18, 18, 0.05) 100%);
   }
 
   .blob {
@@ -316,27 +254,12 @@ app-register {
     left: 25%;
     width: 260px;
     height: 260px;
-    background: rgba(210, 166, 121, 0.4);
+    background: rgba(var(--ion-color-primary-rgb), 0.4);
     animation-duration: 22s;
     animation-delay: -12s;
   }
 
-  /* Contenedor principal del Login */
-  .login-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    position: relative;
-    z-index: 1;
-  }
 
-  .login-card-wrapper {
-    width: 100%;
-    max-width: 360px;
-    padding: 12px;
-  }
 
   /* Glassmorphism Card */
   .glass-card {
@@ -351,23 +274,17 @@ app-register {
     @media (prefers-color-scheme: light) {
       --background: rgba(255, 255, 255, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow: 0 12px 40px 0 rgba(210, 166, 121, 0.08);
+      box-shadow: 0 12px 40px 0 rgba(var(--ion-color-primary-rgb), 0.08);
     }
   }
 
-  /* Header del Brand */
-  .brand-header {
-    margin: 16px 0 36px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+
 
   .brand-title {
     font-size: 1.75rem;
     font-weight: 700;
     margin: 0 0 6px 0;
-    background: linear-gradient(135deg, var(--ion-color-primary, #D2A679) 0%, var(--ion-color-primary-shade, #b9926a) 100%);
+    background: var(--premium-gradient);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -382,15 +299,7 @@ app-register {
     letter-spacing: 0.2px;
   }
 
-  /* Area de Accion */
-  .action-area {
-    margin: 8px 0 16px 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 52px;
-    width: 100%;
-  }
+
 
   .auth-form {
     display: flex;
@@ -560,4 +469,10 @@ app-register {
   66% {
     transform: translate(-40px, -40px) scale(0.85);
   }
+}
+
+@keyframes pulse-beat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }

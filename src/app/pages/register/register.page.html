@@ -1,26 +1,26 @@
-<ion-content class="ion-padding ion-text-center login-content">
+<ion-content class="ion-text-center login-content">
   <div class="animated-bg">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
   </div>
 
-  <div class="login-container">
-    <div class="login-card-wrapper">
-      <ion-card mode="ios" class="glass-card">
-        <ion-card-content>
-          <div class="brand-header">
-            <h1 class="brand-title">Crear cuenta</h1>
-            <p class="brand-subtitle">Regístrate con tu correo y contraseña.</p>
-          </div>
+  <ion-grid style="height: 100%; position: relative; z-index: 1;">
+    <ion-row class="ion-align-items-center ion-justify-content-center" style="height: 100%;">
+      <ion-col size="12" size-sm="10" size-md="8" size-lg="6" size-xl="4" style="max-width: 380px;">
+        <ion-card mode="ios" class="glass-card">
+          <ion-card-header class="ion-margin-top ion-margin-bottom">
+            <ion-card-title class="brand-title">Crear cuenta</ion-card-title>
+            <ion-card-subtitle class="brand-subtitle">Regístrate con tu correo y contraseña.</ion-card-subtitle>
+          </ion-card-header>
 
-          @if (isLoading()) {
-            <div class="auth-spinner-container">
-              <ion-spinner name="crescent" color="primary"></ion-spinner>
-              <p class="auth-spinner-text">Creando cuenta...</p>
-            </div>
-          } @else {
-            <div class="action-area">
+          <ion-card-content>
+            @if (isLoading()) {
+              <div class="auth-spinner-container ion-margin-bottom">
+                <ion-spinner name="crescent" color="primary"></ion-spinner>
+                <p class="auth-spinner-text">Creando cuenta...</p>
+              </div>
+            } @else {
               <form class="auth-form" (ngSubmit)="submit()">
                 <ion-item class="auth-input" lines="none">
                   <ion-label position="stacked">Correo</ion-label>
@@ -36,14 +36,14 @@
                   Registrarse
                 </ion-button>
 
-                <ion-button class="auth-link" fill="clear" expand="block" routerLink="/login">
+                <ion-button class="auth-link" fill="clear" expand="block" (click)="goToLogin()">
                   Volver al login
                 </ion-button>
               </form>
-            </div>
-          }
-        </ion-card-content>
-      </ion-card>
-    </div>
-  </div>
+            }
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

@@ -8,8 +8,7 @@ import {
     IonItem,
     IonLabel,
     IonInput,
-    IonButton
-} from '@ionic/angular/standalone';
+    IonButton, IonGrid, IonRow, IonCol, IonCardHeader, IonCardTitle, IonCardSubtitle } from '@ionic/angular/standalone';
 import { NavController } from '@ionic/angular';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -18,7 +17,7 @@ import { AuthService } from '../../core/services/auth.service';
     templateUrl: 'login.page.html',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
+    imports: [IonCardSubtitle, IonCardTitle, IonCardHeader, IonCol, IonRow, IonGrid, 
         IonContent, IonImg,
         IonCard, IonCardContent,
         IonSpinner,
@@ -64,6 +63,10 @@ export class LoginPage implements OnInit {
         this.isLoading.set(false);
     }
 
+    ionViewWillLeave() {
+        this.clearActiveElementFocus();
+    }
+
     async loginWithGoogle() {
         this.isLoading.set(true);
         try {
@@ -83,7 +86,6 @@ export class LoginPage implements OnInit {
     }
 
     goToRegister() {
-        this.clearActiveElementFocus();
         this.router.navigateByUrl('/register');
     }
 }

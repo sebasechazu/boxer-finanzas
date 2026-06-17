@@ -1,4 +1,4 @@
-<ion-content class="ion-padding ion-text-center login-content">
+<ion-content class="ion-text-center login-content">
   
   <div class="animated-bg">
     <div class="blob blob-1"></div>
@@ -15,18 +15,18 @@
       <ion-spinner name="crescent" color="primary"></ion-spinner>
     </div>
   } @else {
-    <div class="login-container">
-      <div class="login-card-wrapper">
-        <ion-card mode="ios" class="glass-card">
-          <ion-card-content>
-            <div class="brand-header">
-              <h1 class="brand-title">Boxer Finanzas</h1>
-              <p class="brand-subtitle">Finanzas simples y modernas</p>
-            </div>
+    <ion-grid style="height: 100%; position: relative; z-index: 1;">
+      <ion-row class="ion-align-items-center ion-justify-content-center" style="height: 100%;">
+        <ion-col size="12" size-sm="10" size-md="8" size-lg="6" size-xl="4" style="max-width: 380px;">
+          <ion-card mode="ios" class="glass-card">
+            <ion-card-header class="ion-margin-top ion-margin-bottom">
+              <ion-card-title class="brand-title">Boxer Finanzas</ion-card-title>
+              <ion-card-subtitle class="brand-subtitle">Finanzas simples y modernas</ion-card-subtitle>
+            </ion-card-header>
             
-            <div class="action-area">
+            <ion-card-content>
               @if (isLoading()) {
-                <div class="auth-spinner-container">
+                <div class="auth-spinner-container ion-margin-bottom">
                   <ion-spinner name="crescent" color="primary"></ion-spinner>
                   <p class="auth-spinner-text">Autenticando...</p>
                 </div>
@@ -65,11 +65,11 @@
                   </button>
                 </form>
               }
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
-    </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   }
 
 </ion-content>

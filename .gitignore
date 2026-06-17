@@ -1,4 +1,4 @@
-# Specifies intentionally untracked files to ignore when using Git
+﻿# Specifies intentionally untracked files to ignore when using Git
 # http://git-scm.com/docs/gitignore
 
 *~
@@ -78,8 +78,11 @@ ui-debug.log
 auth-debug.log
 .firebase/
 
-# Environment ts
+# Environment ts — generado por scripts/generate-env.mjs, nunca comitear
 /src/app/core/environments/environment.prod.ts
+
+# Variables de entorno locales con claves reales (NUNCA comitear)
+.env.local
 
 # Agents / Skills
 .agents/
