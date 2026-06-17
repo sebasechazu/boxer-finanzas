@@ -20,12 +20,49 @@
  *   node --env-file=.env.local scripts/generate-env.mjs   (Node >= 20.6)
  */
 
-import { writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
+
+function loadEnvFile(filePath) {
+  if (!existsSync(filePath)) {
+    return {};
+  }
+
+  return readFileSync(filePath, 'utf-8')
+    .split(/\r?\n/)
+    .reduce((acc, line) => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) {
+        return acc;
+      }
+
+      const separatorIndex = trimmed.indexOf('=');
+      if (separatorIndex === -1) {
+        return acc;
+      }
+
+      const key = trimmed.slice(0, separatorIndex).trim();
+      const value = trimmed
+        .slice(separatorIndex + 1)
+        .trim()
+        .replace(/^['"]|['"]$/g, '');
+
+      if (key) {
+        acc[key] = value;
+      }
+
+      return acc;
+    }, {});
+}
+
+const envValues = {
+  ...process.env,
+  ...loadEnvFile(resolve(ROOT, '.env.local'))
+};
 
 // ── Validar que todas las variables estén presentes ──────────────────────────
 const REQUIRED_VARS = [
@@ -37,7 +74,7 @@ const REQUIRED_VARS = [
   'FIREBASE_APP_ID',
 ];
 
-const missing = REQUIRED_VARS.filter((v) => !process.env[v]);
+const missing = REQUIRED_VARS.filter((v) => !envValues[v]);
 if (missing.length > 0) {
   console.error('\n❌ Faltan variables de entorno para generar environment.prod.ts:\n');
   missing.forEach((v) => console.error(`   - ${v}`));
@@ -53,12 +90,12 @@ const content = `// ⚠️  ARCHIVO GENERADO AUTOMÁTICAMENTE — NO EDITAR NI C
 export const environment = {
   production: true,
   firebase: {
-    apiKey: "${process.env.FIREBASE_API_KEY}",
-    authDomain: "${process.env.FIREBASE_AUTH_DOMAIN}",
-    projectId: "${process.env.FIREBASE_PROJECT_ID}",
-    storageBucket: "${process.env.FIREBASE_STORAGE_BUCKET}",
-    messagingSenderId: "${process.env.FIREBASE_MESSAGING_SENDER_ID}",
-    appId: "${process.env.FIREBASE_APP_ID}"
+    apiKey: "${envValues.FIREBASE_API_KEY}",
+    authDomain: "${envValues.FIREBASE_AUTH_DOMAIN}",
+    projectId: "${envValues.FIREBASE_PROJECT_ID}",
+    storageBucket: "${envValues.FIREBASE_STORAGE_BUCKET}",
+    messagingSenderId: "${envValues.FIREBASE_MESSAGING_SENDER_ID}",
+    appId: "${envValues.FIREBASE_APP_ID}"
   },
   useEmulators: false
 };
