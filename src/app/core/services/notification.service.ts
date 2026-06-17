@@ -38,6 +38,11 @@ export class NotificationService {
         return;
       }
 
+      if (environment.firebase.apiKey === "DEVELOPMENT_KEY_FOR_EMULATORS") {
+        console.info('Firebase Messaging requiere una API Key real para obtener el token. Omitiendo inicialización en entorno emulado.');
+        return;
+      }
+
       const app = initializeApp(environment.firebase);
       const messaging = getMessaging(app);
 

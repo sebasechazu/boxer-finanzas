@@ -14,6 +14,7 @@ import {
 import { Router } from '@angular/router';
 import { PerfilUsuario } from '../models';
 import { auth, db } from '../../firebase.config';
+import { environment } from '../environments/environment';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
@@ -48,7 +49,11 @@ export class AuthService implements OnDestroy {
                 const freshUser = auth.currentUser;
 
                 // Si el usuario usa Email/Contraseña y no verificó su correo, bloquearlo
-                if (freshUser && !freshUser.emailVerified && freshUser.providerData[0]?.providerId === 'password') {
+                // Excepción: si estamos en entorno de desarrollo/emulador, omitimos este bloqueo.
+                const isEmailProvider = freshUser?.providerData[0]?.providerId === 'password';
+                const isDevMode = environment.useEmulators;
+                
+                if (freshUser && !freshUser.emailVerified && isEmailProvider && !isDevMode) {
                     await this._handleUnverifiedEmail(freshUser);
                     // No marcar emailCheckReady como true: el usuario fue expulsado
                     return;

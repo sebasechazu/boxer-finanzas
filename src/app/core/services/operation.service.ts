@@ -169,7 +169,7 @@ export class OperationService implements OnDestroy {
             prestamoId = prestamoRef.id;
         }
 
-        const newOp = {
+        const newOpData = {
             usuarioId: uid,
             clienteId: op.clienteId,
             tipo: op.tipo,
@@ -181,6 +181,8 @@ export class OperationService implements OnDestroy {
             diaVencimiento: op.diaVencimiento,
             fechaPrimerVencimiento: op.fechaPrimerVencimiento
         };
+        
+        const newOp = Object.fromEntries(Object.entries(newOpData).filter(([_, v]) => v !== undefined));
 
         const opRef = await addDoc(collection(db, 'operaciones'), newOp);
 
