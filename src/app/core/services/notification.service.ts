@@ -54,7 +54,6 @@ export class NotificationService {
         });
         
         if (token) {
-          console.log('FCM Token obtenido:', token);
           this.fcmToken.set(token);
           // TODO: Enviar este token al backend/Firestore para asociarlo al usuario actual
         } else {
