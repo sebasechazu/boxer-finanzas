@@ -11,6 +11,20 @@ import { OperationService } from '../../../../core/services/operation.service';
 @Component({
   selector: 'app-operations-list',
   templateUrl: './operations-list.component.html',
+  styles: [`
+    .operation-actions {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      gap: 2px;
+    }
+    .operation-actions ion-button {
+      --padding-start: 4px;
+      --padding-end: 4px;
+      font-size: 11.5px;
+      margin: 0;
+    }
+  `],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
@@ -27,6 +41,7 @@ export class OperationsListComponent {
   readonly edit = output<string>();
   readonly delete = output<string>();
   readonly pay = output<string>();
+  readonly simulateInvoice = output<Operacion>();
 
   getClientName(id: string) {
     const client = this.clientService.userClients().find(c => c.id === id);

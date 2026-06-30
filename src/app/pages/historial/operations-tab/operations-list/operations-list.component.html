@@ -53,14 +53,20 @@
           }
         </ion-list>
 
-        <div class="ion-text-end ion-padding-top">
+        <div class="operation-actions ion-padding-top">
+          @if (op.tipo === 'VENTA') {
+            <ion-button fill="clear" color="primary" (click)="simulateInvoice.emit(op)">
+              <ion-icon name="receipt-outline" slot="start"></ion-icon>
+              Simular Factura
+            </ion-button>
+          }
           <ion-button fill="clear" color="primary" (click)="edit.emit(op.id)">
             <ion-icon name="create-outline" slot="start"></ion-icon>
-            Editar Operación
+            Editar
           </ion-button>
           <ion-button fill="clear" color="danger" (click)="delete.emit(op.id)">
             <ion-icon name="trash-outline" slot="start"></ion-icon>
-            Eliminar Operación
+            Eliminar
           </ion-button>
         </div>
       </div>

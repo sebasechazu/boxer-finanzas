@@ -1,0 +1,298 @@
+<ion-modal [isOpen]="isOpen()" (ionModalDidDismiss)="dismiss.emit()" class="invoice-modal">
+  <ng-template>
+    <ion-header class="no-print">
+      <ion-toolbar color="primary">
+        <ion-title>Simulador </ion-title>
+        <ion-buttons slot="start">
+          <ion-button (click)="dismiss.emit()">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button (click)="printInvoice()">
+            <ion-icon name="print-outline" slot="start"></ion-icon>
+            Imprimir
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="invoice-modal-content ion-no-padding">
+      <!-- Selector de pestañas para móvil -->
+      <div class="mobile-toggle no-print">
+        <ion-segment [value]="activeMobileTab()" (ionChange)="activeMobileTab.set($event.detail.value === 'editor' ? 'editor' : 'preview')">
+          <ion-segment-button value="editor">
+            <ion-label>Editar Datos</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="preview">
+            <ion-label>Vista Previa</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <div class="editor-container">
+        
+        <!-- PANEL DE CONTROL (EDICIÓN EN TIEMPO REAL) - OCULTO EN IMPRESIÓN -->
+        <div class="config-panel no-print" [formGroup]="simForm" [class.hide-mobile]="activeMobileTab() !== 'editor'">
+          <h3 class="panel-title">Datos del Comprobante</h3>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Punto de Venta</ion-label>
+            <ion-input formControlName="puntoVenta" placeholder="00003" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Comp. Nro</ion-label>
+            <ion-input formControlName="compNro" placeholder="00000104" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Fecha de Emisión</ion-label>
+            <ion-input type="date" formControlName="fechaEmision" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+
+          <h3 class="panel-title">Datos del Emisor</h3>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Nombre de Fantasía</ion-label>
+            <ion-input formControlName="emisorFantasia" placeholder="ELECTRONLINE" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Razón Social</ion-label>
+            <ion-input formControlName="emisorRazonSocial" placeholder="GOMEZ BAEZ MATIAS NAHUEL" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">CUIT Emisor</ion-label>
+            <ion-input formControlName="emisorCuit" placeholder="20-34533244-9" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Domicilio Comercial</ion-label>
+            <ion-input formControlName="emisorDomicilio" placeholder="25 De Mayo 512" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Condición frente al IVA</ion-label>
+            <ion-select formControlName="emisorIva" (ionChange)="onFormChange()">
+              <ion-select-option value="Responsable Monotributo">Responsable Monotributo</ion-select-option>
+              <ion-select-option value="IVA Responsable Inscripto">IVA Responsable Inscripto</ion-select-option>
+              <ion-select-option value="IVA Exento">IVA Exento</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Ingresos Brutos</ion-label>
+            <ion-input formControlName="emisorIngresosBrutos" placeholder="80000" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Inicio de Actividades</ion-label>
+            <ion-input formControlName="emisorInicioActividades" placeholder="01/12/2017" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+
+          <h3 class="panel-title">Datos del Receptor</h3>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Razón Social Cliente</ion-label>
+            <ion-input formControlName="receptorRazonSocial" placeholder="PUERTAS LAURA ITATI" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">DNI/CUIT Cliente</ion-label>
+            <ion-input formControlName="receptorCuitDni" placeholder="38263168" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Domicilio Cliente</ion-label>
+            <ion-input formControlName="receptorDomicilio" placeholder="Monseñor de Andrea 417" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Condición frente al IVA</ion-label>
+            <ion-select formControlName="receptorIva" (ionChange)="onFormChange()">
+              <ion-select-option value="Consumidor Final">Consumidor Final</ion-select-option>
+              <ion-select-option value="Responsable Monotributo">Responsable Monotributo</ion-select-option>
+              <ion-select-option value="IVA Responsable Inscripto">IVA Responsable Inscripto</ion-select-option>
+              <ion-select-option value="Exento">Exento</ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Condición de Venta</ion-label>
+            <ion-select formControlName="receptorCondicionVenta" (ionChange)="onFormChange()">
+              <ion-select-option value="Contado">Contado</ion-select-option>
+              <ion-select-option value="Tarjeta de Débito">Tarjeta de Débito</ion-select-option>
+              <ion-select-option value="Tarjeta de Crédito">Tarjeta de Crédito</ion-select-option>
+              <ion-select-option value="Cuenta Corriente">Cuenta Corriente</ion-select-option>
+              <ion-select-option value="Otra">Otra</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <h3 class="panel-title">Autorización (CAE)</h3>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">CAE N°</ion-label>
+            <ion-input formControlName="caeNro" placeholder="86030757854814" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+          
+          <ion-item class="input-item">
+            <ion-label position="stacked">Fecha de Vto. CAE</ion-label>
+            <ion-input type="date" formControlName="caeVencimiento" (ionInput)="onFormChange()"></ion-input>
+          </ion-item>
+        </div>
+
+        <!-- VISTA PREVIA DE LA FACTURA (FORMATO OFICIAL EXACTO) -->
+        <div class="preview-panel" [class.hide-mobile]="activeMobileTab() !== 'preview'">
+          <div class="invoice-container-wrapper">
+            <div class="invoice-scale-container" [style.height]="getScaledHeight()">
+              <div class="invoice-box" id="invoiceFrame" [style.transform]="'scale(' + invoiceScale() + ')'">
+              
+              <!-- TÍTULO DE ORIGINAL -->
+              <div class="watermark-title">ORIGINAL</div>
+              
+              <!-- ENCABEZADO DE FACTURA -->
+              <div class="invoice-header">
+                <!-- Columna Izquierda: Emisor -->
+                <div class="header-left">
+                  <div class="emisor-fantasia">{{ simForm.get('emisorFantasia')?.value }}</div>
+                  <div class="header-field font-bold">Razón Social: <span class="font-normal">{{ simForm.get('emisorRazonSocial')?.value }}</span></div>
+                  <div class="header-field font-bold">Domicilio Comercial: <span class="font-normal">{{ simForm.get('emisorDomicilio')?.value }}</span></div>
+                  <div class="header-field font-bold">Condición frente al IVA: <span class="font-normal">{{ simForm.get('emisorIva')?.value }}</span></div>
+                </div>
+
+                <!-- Columna Central: Tipo Comprobante C -->
+                <div class="header-center">
+                  <div class="c-badge-box">
+                    <span class="c-letter">C</span>
+                    <span class="c-code">COD. 011</span>
+                  </div>
+                </div>
+
+                <!-- Columna Derecha: Factura Nro, Fecha, CUIT -->
+                <div class="header-right">
+                  <div class="invoice-title">FACTURA</div>
+                  <div class="header-field font-bold">Punto de Venta: <span class="font-normal">{{ simForm.get('puntoVenta')?.value }}</span> &nbsp; Comp. Nro: <span class="font-normal">{{ simForm.get('compNro')?.value }}</span></div>
+                  <div class="header-field font-bold">Fecha de Emisión: <span class="font-normal">{{ getFormattedDate(simForm.get('fechaEmision')?.value) }}</span></div>
+                  <div class="header-field font-bold">CUIT: <span class="font-normal">{{ simForm.get('emisorCuit')?.value }}</span></div>
+                  <div class="header-field font-bold">Ingresos Brutos: <span class="font-normal">{{ simForm.get('emisorIngresosBrutos')?.value }}</span></div>
+                  <div class="header-field font-bold">Fecha de Inicio de Actividades: <span class="font-normal">{{ simForm.get('emisorInicioActividades')?.value }}</span></div>
+                </div>
+              </div>
+
+              <!-- DATOS DEL RECEPTOR (CLIENTE) -->
+              <div class="receptor-box">
+                <table class="w-100 table-receptor">
+                  <tbody>
+                    <tr>
+                      <td class="font-bold col-receptor-left">{{ getClientIdType() }}: <span class="font-normal">{{ simForm.get('receptorCuitDni')?.value }}</span></td>
+                      <td class="font-bold col-receptor-right">Apellido y Nombre / Razón Social: <span class="font-normal">{{ simForm.get('receptorRazonSocial')?.value }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="font-bold col-receptor-left">Condición frente al IVA: <span class="font-normal">{{ simForm.get('receptorIva')?.value }}</span></td>
+                      <td class="font-bold col-receptor-right">Domicilio: <span class="font-normal">{{ simForm.get('receptorDomicilio')?.value }}</span></td>
+                    </tr>
+                    <tr>
+                      <td class="font-bold col-receptor-full" colspan="2">Condición de venta: <span class="font-normal">{{ simForm.get('receptorCondicionVenta')?.value }}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- TABLA DE DETALLE DE ÍTEMS -->
+              <div class="items-table-container">
+                <table class="items-table">
+                  <thead>
+                    <tr>
+                      <th class="col-codigo">Código</th>
+                      <th class="col-producto">Producto / Servicio</th>
+                      <th class="col-cantidad text-right">Cantidad</th>
+                      <th class="col-medida">U. Medida</th>
+                      <th class="col-precio text-right">Precio Unit.</th>
+                      <th class="col-bonif text-right">% Bonif</th>
+                      <th class="col-imp-bonif text-right">Imp. Bonif.</th>
+                      <th class="col-subtotal text-right">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of invoiceItems()">
+                      <td class="col-codigo">{{ item.codigo }}</td>
+                      <td class="col-producto">{{ item.descripcion }}</td>
+                      <td class="col-cantidad text-right">{{ formatNumber(item.cantidad) }}</td>
+                      <td class="col-medida">{{ item.unidadMedida }}</td>
+                      <td class="col-precio text-right">{{ formatNumber(item.precioUnitario) }}</td>
+                      <td class="col-bonif text-right">{{ formatNumber(item.bonificacionPorc) }}</td>
+                      <td class="col-imp-bonif text-right">{{ formatNumber(item.bonificacionImp) }}</td>
+                      <td class="col-subtotal text-right">{{ formatNumber(item.subtotal) }}</td>
+                    </tr>
+                    <!-- Relleno en blanco para dar altura a la factura como en los comprobantes reales -->
+                    <tr class="spacer-row">
+                      <td colspan="8">&nbsp;</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- TOTALES -->
+              <div class="totals-section">
+                <table class="totals-table">
+                  <tbody>
+                    <tr>
+                      <td class="col-totals-spacer">&nbsp;</td>
+                      <td class="total-label text-right">Subtotal: $</td>
+                      <td class="total-value text-right">{{ formatNumber(totalFinal()) }}</td>
+                    </tr>
+                    <tr>
+                      <td class="col-totals-spacer">&nbsp;</td>
+                      <td class="total-label text-right">Importe Otros Tributos: $</td>
+                      <td class="total-value text-right">0,00</td>
+                    </tr>
+                    <tr>
+                      <td class="col-totals-spacer">&nbsp;</td>
+                      <td class="total-label text-right font-bold">Importe Total: $</td>
+                      <td class="total-value text-right font-bold">{{ formatNumber(totalFinal()) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- LEYENDA CONSUMIDOR -->
+              <div class="consumer-defense-box">
+                " TELÉFONO GRATUITO 0800-222-9042 ÁREA DEFENSA Y PROTECCIÓN AL CONSUMIDOR "
+              </div>
+
+              <!-- PIE DE PÁGINA: ARCA LOGO, CAE Y QR -->
+              <div class="invoice-footer">
+                <!-- QR Code -->
+                <div class="footer-qr">
+                  <img [src]="qrCodeUrl()" alt="Código QR de verificación AFIP" *ngIf="qrCodeUrl()" class="qr-img" />
+                </div>
+
+                <!-- Logo ARCA -->
+                <div class="footer-branding">
+                  <div class="arca-logo">
+                    <span class="arca-main-text">ARCA</span>
+                    <span class="arca-sub-text">AGENCIA DE RECAUDACIÓN<br>Y CONTROL ADUANERO</span>
+                  </div>
+                  <div class="page-indicator-center">Pág. 1/1</div>
+                  <div class="comprobante-autorizado">Comprobante Autorizado</div>
+                  <div class="agencia-aviso">Esta Agencia no se responsabiliza por los datos ingresados en el detalle de la operación</div>
+                </div>
+
+                <!-- Datos CAE -->
+                <div class="footer-cae">
+                  <div class="cae-field font-bold">CAE N°: <span class="font-normal">{{ simForm.get('caeNro')?.value }}</span></div>
+                  <div class="cae-field font-bold">Fecha de Vto. de CAE: <span class="font-normal">{{ getFormattedDate(simForm.get('caeVencimiento')?.value) }}</span></div>
+                </div>
+              </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

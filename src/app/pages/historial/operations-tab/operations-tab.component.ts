@@ -12,15 +12,18 @@ import {
 } from 'ionicons/icons';
 import { OperationsListComponent } from './operations-list/operations-list.component';
 import { OperationModalComponent, OperationFormData } from './operation-modal/operation-modal.component';
+import { InvoiceModalComponent } from './invoice-modal/invoice-modal.component';
+import { Operacion } from '../../../core/models';
 
 @Component({
   selector: 'app-operations-tab',
   templateUrl: 'operations-tab.component.html',
+  styles: ['ion-fab { position: fixed; bottom: 16px; right: 16px; z-index: 1000; }'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     IonFab, IonFabButton, IonIcon,
-    OperationsListComponent, OperationModalComponent
+    OperationsListComponent, OperationModalComponent, InvoiceModalComponent
   ],
 })
 export class OperationsTabComponent {
@@ -32,6 +35,9 @@ export class OperationsTabComponent {
   isSavingOp = false;
   operationIdToEdit: string | null = null;
   initialOperationData: any = null;
+
+  isInvoiceModalOpen = false;
+  selectedOperationForInvoice: Operacion | null = null;
 
   constructor() {
     addIcons({
@@ -56,6 +62,16 @@ export class OperationsTabComponent {
     this.isModalOpen = false;
     this.operationIdToEdit = null;
     this.initialOperationData = null;
+  }
+
+  openInvoiceModal(op: Operacion) {
+    this.selectedOperationForInvoice = op;
+    this.isInvoiceModalOpen = true;
+  }
+
+  closeInvoiceModal() {
+    this.isInvoiceModalOpen = false;
+    this.selectedOperationForInvoice = null;
   }
 
   private loadOperation(id: string) {

@@ -1,8 +1,11 @@
 <app-operations-list [operations]="operationService.userOperations()" (edit)="openEditModal($event)"
-  (delete)="deleteOperation($event)" (pay)="payInstallment($event)"/>
+  (delete)="deleteOperation($event)" (pay)="payInstallment($event)" (simulateInvoice)="openInvoiceModal($event)"/>
 
 <app-operation-modal [isOpen]="isModalOpen" [isSaving]="isSavingOp" [operationIdToEdit]="operationIdToEdit"
   [initialData]="initialOperationData" (dismiss)="closeModal()" (save)="onSubmitOperation($event)"/>
+
+<app-invoice-modal [isOpen]="isInvoiceModalOpen" [operation]="selectedOperationForInvoice"
+  (dismiss)="closeInvoiceModal()"/>
 
 <!-- Botón flotante para agregar nueva operación -->
 <ion-fab slot="fixed" vertical="bottom" horizontal="end">
