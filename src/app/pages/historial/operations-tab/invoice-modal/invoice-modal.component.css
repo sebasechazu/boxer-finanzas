@@ -603,6 +603,8 @@
     min-width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
   }
 
   /* Asegurar bordes visibles en blanco y negro */
