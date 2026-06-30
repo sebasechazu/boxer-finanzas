@@ -246,4 +246,9 @@ export class ProfilePage {
         };
         return map[estado] ?? 'medium';
     }
+
+    ionViewWillLeave() {
+        const activeElement = document.activeElement as HTMLElement | null;
+        activeElement?.blur();
+    }
 }

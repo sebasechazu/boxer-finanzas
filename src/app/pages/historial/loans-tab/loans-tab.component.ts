@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonFab, IonFabButton, IonIcon} from '@ionic/angular/standalone';
@@ -27,6 +27,7 @@ import { LoanModalComponent } from './loan-modal/loan-modal.component';
 export class LoansTabComponent {
   public loanPlanService = inject(LoanPlanService);
   private uiService = inject(UiService);
+  private cdr = inject(ChangeDetectorRef);
 
   isModalOpen = false;
   isSaving = false;
@@ -74,6 +75,7 @@ export class LoansTabComponent {
   async onSaveLoan(loanFormData: Partial<PlanPrestamo>) {
     if (!this.isSaving) {
       this.isSaving = true;
+      this.cdr.detectChanges();
       try {
         const loanData = {
           ...loanFormData,
@@ -101,6 +103,7 @@ export class LoansTabComponent {
         await this.uiService.showErrorAlert('Error al guardar el plan de préstamo', error);
       } finally {
         this.isSaving = false;
+        this.cdr.detectChanges();
       }
     }
   }

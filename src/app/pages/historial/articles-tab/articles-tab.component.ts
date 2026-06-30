@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonFab, IonFabButton, IonIcon } from '@ionic/angular/standalone';
 import { ArticleService } from '../../../core/services/article.service';
@@ -23,6 +23,7 @@ import { ArticleModalComponent } from './article-modal/article-modal.component';
 export class ArticlesTabComponent {
   public articleService = inject(ArticleService);
   private uiService = inject(UiService);
+  private cdr = inject(ChangeDetectorRef);
 
   isModalOpen = false;
   isSaving = false;
@@ -70,6 +71,7 @@ export class ArticlesTabComponent {
   async onSaveArticle(articleFormData: { nombre: string; precioCompra: number; precioVentaContado: number }) {
     if (!this.isSaving) {
       this.isSaving = true;
+      this.cdr.detectChanges();
       try {
         const articleData = {
           nombre: articleFormData.nombre,
@@ -86,6 +88,7 @@ export class ArticlesTabComponent {
         await this.uiService.showErrorAlert('Error al guardar el artículo', error);
       } finally {
         this.isSaving = false;
+        this.cdr.detectChanges();
       }
     }
   }

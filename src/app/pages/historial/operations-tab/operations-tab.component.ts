@@ -134,15 +134,10 @@ export class OperationsTabComponent {
           await this.operationService.addOperation(opData as any);
         }
 
-        await this.uiService.showConfirmAlert({
-          header: 'Éxito',
-          message: this.operationIdToEdit ? 'Operación actualizada con éxito' : 'Operación guardada con éxito',
-          confirmText: 'OK',
-          cancelText: 'Cerrar',
-          onConfirm: () => {
-            this.closeModal();
-          }
-        });
+        this.closeModal();
+        await this.uiService.showToast(
+          this.operationIdToEdit ? 'Operación actualizada con éxito' : 'Operación guardada con éxito'
+        );
       } catch (error) {
         await this.uiService.showErrorAlert('Error al guardar la operación', error);
       } finally {

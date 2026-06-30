@@ -278,77 +278,143 @@ export class InvoiceModalComponent implements OnChanges, OnInit, OnDestroy {
       })
       .join('\n');
 
-    // Create a hidden iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
+    // Detect if we are on a mobile device (where iframes window.print() prints the parent top window)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    const doc = iframe.contentWindow?.document || iframe.contentDocument;
-    if (doc) {
-      doc.open();
-      doc.write(`
-        <html>
-          <head>
-            <title>Comprobante de Pago</title>
-            ${printStyles}
-            <style>
-              @page {
-                margin: 0;
-              }
-              body { 
-                margin: 0 !important; 
-                padding: 1.2cm !important; 
-                box-sizing: border-box !important;
-                background: white; 
-                font-family: 'Arial', 'Helvetica', sans-serif;
-              }
-              * {
-                box-sizing: border-box !important;
-              }
-              .invoice-box { 
-                border: none !important; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                width: 100% !important; 
-                max-width: 100% !important; 
-                min-width: 0 !important;
-                transform: none !important;
-                height: auto !important;
-              }
-              .spacer-row td { 
-                height: 380px !important; 
-              }
-              /* Force borders and colors in all print engines */
-              * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="invoice-box">
-              ${printContent}
-            </div>
-            <script>
-              window.onload = function() {
-                window.focus();
-                setTimeout(function() {
-                  window.print();
+    if (isMobile) {
+      // For mobile: open a new tab/window containing ONLY the invoice A4 layout
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Comprobante de Pago</title>
+              ${printStyles}
+              <style>
+                @page {
+                  margin: 0;
+                }
+                body { 
+                  margin: 0 !important; 
+                  padding: 1.2cm !important; 
+                  box-sizing: border-box !important;
+                  background: white; 
+                  font-family: 'Arial', 'Helvetica', sans-serif;
+                }
+                * {
+                  box-sizing: border-box !important;
+                }
+                .invoice-box { 
+                  border: none !important; 
+                  margin: 0 !important; 
+                  padding: 0 !important; 
+                  width: 100% !important; 
+                  max-width: 100% !important; 
+                  min-width: 0 !important;
+                  transform: none !important;
+                  height: auto !important;
+                }
+                .spacer-row td { 
+                  height: 380px !important; 
+                }
+                /* Force borders and colors in all print engines */
+                * {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="invoice-box">
+                ${printContent}
+              </div>
+              <script>
+                window.onload = function() {
+                  window.focus();
                   setTimeout(function() {
-                    window.parent.document.body.removeChild(window.frameElement);
-                  }, 500);
-                }, 300);
-              };
-            </script>
-          </body>
-        </html>
-      `);
-      doc.close();
+                    window.print();
+                  }, 300);
+                };
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
+    } else {
+      // For desktop: use a hidden iframe to print cleanly without opening tabs
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow?.document || iframe.contentDocument;
+      if (doc) {
+        doc.open();
+        doc.write(`
+          <html>
+            <head>
+              <title>Comprobante de Pago</title>
+              ${printStyles}
+              <style>
+                @page {
+                  margin: 0;
+                }
+                body { 
+                  margin: 0 !important; 
+                  padding: 1.2cm !important; 
+                  box-sizing: border-box !important;
+                  background: white; 
+                  font-family: 'Arial', 'Helvetica', sans-serif;
+                }
+                * {
+                  box-sizing: border-box !important;
+                }
+                .invoice-box { 
+                  border: none !important; 
+                  margin: 0 !important; 
+                  padding: 0 !important; 
+                  width: 100% !important; 
+                  max-width: 100% !important; 
+                  min-width: 0 !important;
+                  transform: none !important;
+                  height: auto !important;
+                }
+                .spacer-row td { 
+                  height: 380px !important; 
+                }
+                /* Force borders and colors in all print engines */
+                * {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="invoice-box">
+                ${printContent}
+              </div>
+              <script>
+                window.onload = function() {
+                  window.focus();
+                  setTimeout(function() {
+                    window.print();
+                    setTimeout(function() {
+                      window.parent.document.body.removeChild(window.frameElement);
+                    }, 500);
+                  }, 300);
+                };
+              </script>
+            </body>
+          </html>
+        `);
+        doc.close();
+      }
     }
   }
 

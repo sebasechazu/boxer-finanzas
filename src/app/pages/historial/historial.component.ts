@@ -28,4 +28,9 @@ export class HistorialComponent {
   onTabChange(event: any) {
     this.selectedTab.set(event.detail.value);
   }
+
+  ionViewWillLeave() {
+    const activeElement = document.activeElement as HTMLElement | null;
+    activeElement?.blur();
+  }
 }

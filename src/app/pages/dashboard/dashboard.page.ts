@@ -134,4 +134,9 @@ export class DashboardPage {
     getNombrePropietario(uid: string): string {
         return this.accountService.getNombrePropietario(uid);
     }
+
+    ionViewWillLeave() {
+        const activeElement = document.activeElement as HTMLElement | null;
+        activeElement?.blur();
+    }
 }
