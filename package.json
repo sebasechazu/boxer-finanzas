@@ -13,6 +13,9 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "emulators": "firebase emulators:start --import=./firebase_data --export-on-exit",
+    "start:all": "concurrently \"npm run emulators\" \"npm run start\"",
+    "start:emulator": "concurrently \"npm run emulators\" \"npm run start\"",
+    "start:prod-firebase": "npm run generate:env && ng serve --configuration production",
     "seed": "tsx ./scripts/seed-test-data.ts",
     "generate:env": "tsx scripts/generate-env.ts",
     "generate:env:local": "tsx --env-file=.env.local scripts/generate-env.ts",
@@ -63,6 +66,7 @@
     "firebase-tools": "^15.10.0",
     "jsdom": "^29.1.1",
     "storybook": "^10.4.5",
+    "concurrently": "^8.0.1",
     "tsx": "^4.22.4",
     "typescript": "~6.0.3",
     "vitest": "^4.1.8"

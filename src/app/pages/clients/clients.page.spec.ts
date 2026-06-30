@@ -54,7 +54,7 @@ describe('ClientsPage', () => {
     });
 
     it('debe abrir modal en modo edicion con datos', () => {
-        const client: Cliente = { id: 'c1', nombre: 'Juan', telefono: '123', usuarioId: 'u1' };
+        const client: Cliente = { id: 'c1', nombre: 'Juan', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '123', usuarioId: 'u1', saldoPendiente: 0 };
         component.editClient(client);
         expect(component.isModalOpen).toBe(true);
         expect(component.editingClientId).toBe('c1');
@@ -75,13 +75,13 @@ describe('ClientsPage', () => {
     });
 
     it('debe llamar a clientService.addClient en onSubmit si es nuevo', async () => {
-        await component.onSubmit({ nombre: 'Juan', telefono: '123' });
-        expect(mockClientService.addClient).toHaveBeenCalledWith({ nombre: 'Juan', telefono: '123' });
+        await component.onSubmit({ nombre: 'Juan', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '123' });
+        expect(mockClientService.addClient).toHaveBeenCalledWith({ nombre: 'Juan', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '123' });
     });
 
     it('debe llamar a clientService.updateClient en onSubmit si se edita', async () => {
         component.editingClientId = 'c1';
-        await component.onSubmit({ nombre: 'Juan Modificado', telefono: '123' });
-        expect(mockClientService.updateClient).toHaveBeenCalledWith('c1', { nombre: 'Juan Modificado', telefono: '123' });
+        await component.onSubmit({ nombre: 'Juan Modificado', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '123' });
+        expect(mockClientService.updateClient).toHaveBeenCalledWith('c1', { nombre: 'Juan Modificado', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '123' });
     });
 });

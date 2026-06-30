@@ -11,7 +11,8 @@
 
     <ion-item button (click)="edit.emit(client)">
       <ion-label>
-        <h2 class="m-0 text-[1.1rem] font-medium">{{ client.nombre }}</h2>
+        <h2 class="m-0 text-[1.1rem] font-medium">{{ client.nombre }} {{ client.apellido }}</h2>
+        <p class="text-sm text-gray-500 m-0">{{ client.direccion }}{{ client.ciudad ? (', ' + client.ciudad) : '' }}</p>
       </ion-label>
       <ion-note slot="end" class="text-sm text-gray-500">{{ client.saldoPendiente | currency }}</ion-note>
     </ion-item>

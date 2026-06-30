@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonModal, IonNote } from '@ionic/angular/standalone';
 import { Cliente } from '../../../../core/models';
 
-type ClienteFormData = Pick<Cliente, 'nombre' | 'telefono'>;
+type ClienteFormData = Pick<Cliente, 'nombre' | 'telefono' | 'apellido' | 'direccion' | 'codigoPostal' | 'ciudad'>;
 
 function maxWordsValidator(maxWords: number) {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -42,6 +42,23 @@ export class ClientModalComponent implements OnChanges {
       Validators.minLength(8),
       Validators.maxLength(15),
       Validators.pattern(/^\+?[\d\s\-]+$/)
+    ]],
+    apellido: ['', [
+      Validators.required,
+      Validators.minLength(2),
+      Validators.maxLength(40),
+      Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
+    ]],
+    direccion: ['', [
+      Validators.maxLength(100)
+    ]],
+    codigoPostal: ['', [
+      Validators.maxLength(10),
+      Validators.pattern(/^[A-Za-z0-9\-\s]+$/)
+    ]],
+    ciudad: ['', [
+      Validators.maxLength(60),
+      Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
     ]]
   });
 
@@ -50,7 +67,11 @@ export class ClientModalComponent implements OnChanges {
       if (this.isEditing() && this.clientData()) {
         this.clientForm.patchValue({
           nombre: this.clientData()!.nombre,
-          telefono: this.clientData()!.telefono
+          telefono: this.clientData()!.telefono,
+          apellido: this.clientData()!.apellido,
+          direccion: this.clientData()!.direccion,
+          codigoPostal: this.clientData()!.codigoPostal,
+          ciudad: this.clientData()!.ciudad
         });
       } else {
         this.clientForm.reset();

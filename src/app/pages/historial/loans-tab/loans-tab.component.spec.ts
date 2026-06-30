@@ -46,7 +46,7 @@ describe('LoansTabComponent', () => {
     });
 
     it('debe abrir modal en modo edicion con datos', () => {
-        const loan = { id: 'l1', nombrePlan: 'Plan A', montoBase: 100, porcentajeRecargo: 10, cuotasCount: 5, periodicidad: 'SEMANAL', diaSemana: 1, usuarioId: 'u1' };
+        const loan = { id: 'l1', nombre: 'Plan A', montoBase: 100, porcentajeRecargo: 10, cuotasCount: 5, periodicidad: 'SEMANAL', diaSemana: 1, usuarioId: 'u1' } as any;
         component.editLoan(loan);
         expect(component.isModalOpen).toBe(true);
         expect(component.editingLoanId).toBe('l1');
@@ -65,7 +65,7 @@ describe('LoansTabComponent', () => {
     });
 
     it('debe llamar a loanPlanService.addLoanPlan en onSaveLoan', async () => {
-        await component.onSaveLoan({ nombrePlan: 'Plan A', montoBase: '100', porcentajeRecargo: '10', cuotasCount: '5', periodicidad: 'MENSUAL', diaVencimiento: '5' });
-        expect(mockLoanPlanService.addLoanPlan).toHaveBeenCalledWith({ nombrePlan: 'Plan A', montoBase: 100, porcentajeRecargo: 10, cuotasCount: 5, periodicidad: 'MENSUAL', diaVencimiento: 5 });
+        await component.onSaveLoan({ nombre: 'Plan A', montoBase: 100, porcentajeRecargo: 10, cuotasCount: 5, periodicidad: 'MENSUAL', diaVencimiento: 5 });
+        expect(mockLoanPlanService.addLoanPlan).toHaveBeenCalledWith({ nombre: 'Plan A', montoBase: 100, porcentajeRecargo: 10, cuotasCount: 5, periodicidad: 'MENSUAL', diaVencimiento: 5 });
     });
 });

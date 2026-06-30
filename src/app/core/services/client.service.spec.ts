@@ -48,14 +48,14 @@ describe('ClientService', () => {
 
     it('debe lanzar error en addClient si no hay cuenta activa', async () => {
         mockAccountService.effectiveAccountUid.mockReturnValue(null);
-        await expect(service.addClient({ nombre: 'Test', telefono: '123' })).rejects.toThrow('No hay cuenta activa');
+        await expect(service.addClient({ nombre: 'Test', telefono: '123', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '' })).rejects.toThrow('No hay cuenta activa');
     });
 
     it('debe llamar a addDoc en addClient si el cliente no está duplicado', async () => {
         const { addDoc, getDocs } = await import('firebase/firestore');
         vi.mocked(getDocs).mockResolvedValueOnce({ empty: true } as any);
 
-        const res = await service.addClient({ nombre: 'Juan', telefono: '456' });
+        const res = await service.addClient({ nombre: 'Juan', telefono: '456', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '' });
 
         expect(getDocs).toHaveBeenCalled();
         expect(addDoc).toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe('ClientService', () => {
         const { getDocs } = await import('firebase/firestore');
         vi.mocked(getDocs).mockResolvedValueOnce({ empty: false } as any);
 
-        await expect(service.addClient({ nombre: 'Duplicado', telefono: '123' })).rejects.toThrow('Ya existe un cliente con este nombre y teléfono');
+        await expect(service.addClient({ nombre: 'Duplicado', telefono: '123', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '' })).rejects.toThrow('Ya existe un cliente con este nombre y teléfono');
     });
 
     it('debe llamar a updateDoc en updateClient', async () => {

@@ -44,6 +44,35 @@
             </ion-note>
           }
         </ion-item>
+        <ion-item lines="full" [class.ion-invalid]="clientForm.get('apellido')?.invalid && clientForm.get('apellido')?.touched" class="ion-touched">
+          <ion-label position="stacked">Apellido</ion-label>
+          <ion-input formControlName="apellido" placeholder="Apellido" type="text" maxlength="40"></ion-input>
+          @if (clientForm.get('apellido')?.invalid && clientForm.get('apellido')?.touched) {
+            <ion-note slot="error">
+              @if (clientForm.get('apellido')?.errors?.['required']) {
+                El apellido es requerido.
+              } @else if (clientForm.get('apellido')?.errors?.['minlength']) {
+                Debe tener al menos 2 caracteres.
+              } @else if (clientForm.get('apellido')?.errors?.['maxlength']) {
+                No debe superar los 40 caracteres.
+              } @else if (clientForm.get('apellido')?.errors?.['pattern']) {
+                Solo se permiten letras y espacios.
+              }
+            </ion-note>
+          }
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label position="stacked">Dirección</ion-label>
+          <ion-input formControlName="direccion" placeholder="Calle, número, piso" type="text" maxlength="100"></ion-input>
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label position="stacked">Código Postal</ion-label>
+          <ion-input formControlName="codigoPostal" placeholder="CP" type="text" maxlength="10"></ion-input>
+        </ion-item>
+        <ion-item lines="full">
+          <ion-label position="stacked">Ciudad</ion-label>
+          <ion-input formControlName="ciudad" placeholder="Ciudad" type="text" maxlength="60"></ion-input>
+        </ion-item>
         
         <ion-button expand="block" type="submit" [disabled]="clientForm.invalid || isSaving()" class="ion-margin-top">
           {{ isSaving() ? 'Guardando...' : (isEditing() ? 'Actualizar Cliente' : 'Guardar Cliente') }}

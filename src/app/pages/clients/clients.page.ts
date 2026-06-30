@@ -75,13 +75,13 @@ export class ClientsPage {
     });
   }
 
-  async onSubmit(formData: Pick<Cliente, 'nombre' | 'telefono'>) {
+  async onSubmit(formData: Pick<Cliente, 'nombre' | 'telefono' | 'apellido' | 'direccion' | 'codigoPostal' | 'ciudad'>) {
     if (!this.isSaving) {
       this.isSaving = true;
       this.cdr.detectChanges();
       try {
         if (this.editingClientId) {
-          await this.clientService.updateClient(this.editingClientId, formData);
+          await this.clientService.updateClient(this.editingClientId, formData as any);
         } else {
           await this.clientService.addClient(formData as any);
         }

@@ -67,13 +67,13 @@ describe('ArticlesTabComponent', () => {
     });
 
     it('debe llamar a articleService.addArticle en onSaveArticle si es nuevo', async () => {
-        await component.onSaveArticle({ nombre: 'Item', precioCompra: '10', precioVentaContado: '20' });
+        await component.onSaveArticle({ nombre: 'Item', precioCompra: 10, precioVentaContado: 20 });
         expect(mockArticleService.addArticle).toHaveBeenCalledWith({ nombre: 'Item', precioCompra: 10, precioVentaContado: 20 });
     });
 
     it('debe llamar a articleService.updateArticle en onSaveArticle si se edita', async () => {
         component.editingArticleId = 'art-1';
-        await component.onSaveArticle({ nombre: 'Item Editado', precioCompra: '15', precioVentaContado: '25' });
+        await component.onSaveArticle({ nombre: 'Item Editado', precioCompra: 15, precioVentaContado: 25 });
         expect(mockArticleService.updateArticle).toHaveBeenCalledWith('art-1', { nombre: 'Item Editado', precioCompra: 15, precioVentaContado: 25 });
     });
 });

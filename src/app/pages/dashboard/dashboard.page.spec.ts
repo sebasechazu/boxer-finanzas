@@ -82,7 +82,7 @@ describe('DashboardPage', () => {
     });
 
     it('debe cambiar de cuenta al llamar a switchAccount', () => {
-        const cuenta = { propietarioUid: 'user456', esPropia: false };
+        const cuenta = { propietarioUid: 'user456', esPropia: false, propietarioNombre: '', propietarioNombreNegocio: '' } as any;
         component.switchAccount(cuenta);
         expect(mockAccountService.switchAccount).toHaveBeenCalledWith('user456');
     });

@@ -72,7 +72,7 @@ describe('ArticleService', () => {
     it('debe llamar a updateDoc en updateArticle', async () => {
         const { updateDoc } = await import('firebase/firestore');
 
-        await service.updateArticle('art-1', { precioVentaContado: 120 });
+        await service.updateArticle('art-1', { nombre: 'Item', precioCompra: 0, precioVentaContado: 120 });
 
         expect(updateDoc).toHaveBeenCalled();
     });

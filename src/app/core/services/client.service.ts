@@ -77,10 +77,15 @@ export class ClientService implements OnDestroy {
 
     // VULN-03 fix: solo permite actualizar campos editables por el usuario.
     // Excluye explícitamente usuarioId y saldoPendiente para evitar manipulación.
-    async updateClient(id: string, cambios: Pick<Cliente, 'nombre' | 'telefono'>) {
+    async updateClient(id: string, cambios: Partial<Pick<Cliente, 'nombre' | 'telefono' | 'apellido' | 'direccion' | 'codigoPostal' | 'ciudad'>>) {
         const docRef = doc(db, 'clientes', id);
-        const { nombre, telefono } = cambios;
-        return await updateDoc(docRef, { nombre, telefono });
+        // Filtrar solo las propiedades permitidas y presentes para no sobrescribir con undefined
+        const allowed: Array<keyof Cliente> = ['nombre', 'telefono', 'apellido', 'direccion', 'codigoPostal', 'ciudad'];
+        const payload: any = {};
+        for (const key of allowed) {
+            if (key in cambios && (cambios as any)[key] !== undefined) payload[key] = (cambios as any)[key];
+        }
+        return await updateDoc(docRef, payload);
     }
 
     async deleteClient(id: string) {

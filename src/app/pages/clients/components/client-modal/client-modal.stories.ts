@@ -32,6 +32,10 @@ export const EditMode: Story = {
       id: '1',
       usuarioId: 'u1',
       nombre: 'Juan Pérez',
+      apellido: 'Pérez',
+      direccion: 'Calle Falsa 123',
+      codigoPostal: '1000',
+      ciudad: 'Ciudad',
       telefono: '+5491112345678',
       saldoPendiente: 1500
     },

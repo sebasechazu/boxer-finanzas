@@ -22,6 +22,10 @@ export const Default: Story = {
         id: '1',
         usuarioId: 'u1',
         nombre: 'Juan Pérez',
+        apellido: 'Pérez',
+        direccion: 'Calle Falsa 123',
+        codigoPostal: '1000',
+        ciudad: 'Ciudad',
         telefono: '+5491112345678',
         saldoPendiente: 1500
       },
@@ -29,6 +33,10 @@ export const Default: Story = {
         id: '2',
         usuarioId: 'u1',
         nombre: 'María Gómez',
+        apellido: 'Gómez',
+        direccion: 'Av. Siempreviva 742',
+        codigoPostal: '2000',
+        ciudad: 'Otra Ciudad',
         telefono: '+5491187654321',
         saldoPendiente: 0
       }

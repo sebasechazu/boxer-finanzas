@@ -24,34 +24,34 @@ describe('ClientModalComponent', () => {
     });
 
     it('debe resetear el formulario si isOpen cambia a true y no se esta editando', () => {
-        component.clientForm.setValue({ nombre: 'Juan', telefono: '12345678' });
+        component.clientForm.setValue({ nombre: 'Juan', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '12345678' });
         fixture.componentRef.setInput('isEditing', false);
         fixture.componentRef.setInput('isOpen', true);
         fixture.detectChanges();
-        expect(component.clientForm.value).toEqual({ nombre: '', telefono: '' });
+        expect(component.clientForm.value).toEqual({ nombre: '', apellido: '', direccion: '', codigoPostal: '', ciudad: '', telefono: '' });
     });
 
     it('debe cargar los datos en el formulario si isOpen cambia a true y se esta editando', () => {
         component.clientForm.reset();
         fixture.componentRef.setInput('isEditing', true);
-        fixture.componentRef.setInput('clientData', { id: 'c1', nombre: 'Juan Perez', telefono: '12345678', usuarioId: 'u1' });
+        fixture.componentRef.setInput('clientData', { id: 'c1', nombre: 'Juan Perez', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '12345678', usuarioId: 'u1', saldoPendiente: 0 });
         fixture.componentRef.setInput('isOpen', true);
         fixture.detectChanges();
-        expect(component.clientForm.value).toEqual({ nombre: 'Juan Perez', telefono: '12345678' });
+        expect(component.clientForm.value).toEqual({ nombre: 'Juan Perez', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '12345678' });
     });
 
     it('debe emitir save si el formulario es valido en onSubmit', () => {
         const spySave = vi.spyOn(component.save, 'emit');
-        component.clientForm.setValue({ nombre: 'Juan Perez', telefono: '12345678' });
+        component.clientForm.setValue({ nombre: 'Juan Perez', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '12345678' });
         fixture.componentRef.setInput('isSaving', false);
         fixture.detectChanges();
         component.onSubmit();
-        expect(spySave).toHaveBeenCalledWith({ nombre: 'Juan Perez', telefono: '12345678' });
+        expect(spySave).toHaveBeenCalledWith({ nombre: 'Juan Perez', apellido: 'Perez', direccion: '', codigoPostal: '', ciudad: '', telefono: '12345678' });
     });
 
     it('no debe emitir save si el formulario es invalido', () => {
         const spySave = vi.spyOn(component.save, 'emit');
-        component.clientForm.setValue({ nombre: 'J', telefono: '1' }); // Invalido
+        component.clientForm.setValue({ nombre: 'J', apellido: '', direccion: '', codigoPostal: '', ciudad: '', telefono: '1' }); // Invalido
         component.onSubmit();
         expect(spySave).not.toHaveBeenCalled();
     });
