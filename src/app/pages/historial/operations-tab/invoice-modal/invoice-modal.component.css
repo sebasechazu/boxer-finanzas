@@ -43,14 +43,10 @@
   font-size: 13px;
 }
 
-.input-item ion-label {
-  font-weight: 600;
-  color: var(--ion-color-step-600, #5f6368);
-  margin-bottom: 6px;
-}
-
 .input-item ion-input,
 .input-item ion-select {
+  --label-color: var(--ion-color-step-600, #5f6368);
+  --label-font-weight: 600;
   --padding-start: 8px;
   --padding-end: 8px;
   background-color: var(--ion-color-step-50, #f8f9fa);
@@ -85,13 +81,8 @@
 .invoice-box {
   width: 800px;
   min-width: 800px;
-  height: 1130px;
-  min-height: 1130px;
   padding: 40px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   font-family: 'Arial', 'Helvetica', sans-serif;
   color: #000000;
   background-color: #ffffff;
@@ -107,6 +98,7 @@
   border: 0.5px solid #7f7f7f;
   padding: 4px;
   text-transform: uppercase;
+  margin-bottom: 0;
 }
 
 /* Encabezado */
@@ -115,6 +107,7 @@
   border: 0.5px solid #7f7f7f;
   position: relative;
   min-height: 135px;
+  margin-top: 0;
 }
 
 .header-left, .header-right {
@@ -513,8 +506,52 @@
   }
 }
 
+/* Ocultar el clon de impresión en pantalla para evitar parpadeos visuales */
+#invoice-print-clone {
+  display: none !important;
+}
+
 /* ESTILOS DE IMPRESIÓN EXCLUSIVOS */
 @media print {
+  @page {
+    margin: 0 !important;
+  }
+
+  /* Ocultar el resto de la aplicación cuando se imprime mediante clonación en el body */
+  body.printing-invoice > *:not(#invoice-print-clone) {
+    display: none !important;
+  }
+
+  body.printing-invoice {
+    height: 100% !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.printing-invoice #invoice-print-clone {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 21cm !important;
+    height: 29.7cm !important;
+    padding: 1.2cm !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    border: none !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  body.printing-invoice #invoice-print-clone .spacer-row td {
+    height: 380px !important;
+  }
+
   /* Ocultar barra de navegación, botones y barra de configuración */
   ion-header, ion-toolbar, ion-buttons, ion-button, .no-print, .config-panel {
     display: none !important;
@@ -524,9 +561,7 @@
   body, html, ion-app, ion-modal, ion-content, .modal-wrapper, .ion-page, .scroll-content {
     background: #ffffff !important;
     color: #000000 !important;
-    position: static !important;
-    height: auto !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -594,3 +629,4 @@
     height: 380px; /* Suficiente espacio para llenar la página A4 */
   }
 }
+

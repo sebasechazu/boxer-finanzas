@@ -11,11 +11,9 @@
         <ion-buttons slot="end">
           <ion-button (click)="downloadPdf()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
-            Descargar PDF
           </ion-button>
           <ion-button (click)="printInvoice()">
             <ion-icon name="print-outline" slot="start"></ion-icon>
-            Imprimir
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -41,45 +39,37 @@
           <h3 class="panel-title">Datos del Comprobante</h3>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Punto de Venta</ion-label>
-            <ion-input formControlName="puntoVenta" placeholder="00003" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Punto de Venta" labelPlacement="stacked" formControlName="puntoVenta" placeholder="00003" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Comp. Nro</ion-label>
-            <ion-input formControlName="compNro" placeholder="00000104" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Comp. Nro" labelPlacement="stacked" formControlName="compNro" placeholder="00000104" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Fecha de Emisión</ion-label>
-            <ion-input type="date" formControlName="fechaEmision" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Fecha de Emisión" labelPlacement="stacked" type="date" formControlName="fechaEmision" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
 
           <h3 class="panel-title">Datos del Emisor</h3>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Nombre de Fantasía</ion-label>
-            <ion-input formControlName="emisorFantasia" placeholder="ELECTRONLINE" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Nombre de Fantasía" labelPlacement="stacked" formControlName="emisorFantasia" placeholder="ELECTRONLINE" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Razón Social</ion-label>
-            <ion-input formControlName="emisorRazonSocial" placeholder="GOMEZ BAEZ MATIAS NAHUEL" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Razón Social" labelPlacement="stacked" formControlName="emisorRazonSocial" placeholder="GOMEZ BAEZ MATIAS NAHUEL" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">CUIT Emisor</ion-label>
-            <ion-input formControlName="emisorCuit" placeholder="20-34533244-9" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="CUIT Emisor" labelPlacement="stacked" formControlName="emisorCuit" placeholder="20-34533244-9" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Domicilio Comercial</ion-label>
-            <ion-input formControlName="emisorDomicilio" placeholder="25 De Mayo 512" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Domicilio Comercial" labelPlacement="stacked" formControlName="emisorDomicilio" placeholder="25 De Mayo 512" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Condición frente al IVA</ion-label>
-            <ion-select formControlName="emisorIva" (ionChange)="onFormChange()">
+            <ion-select label="Condición frente al IVA" labelPlacement="stacked" formControlName="emisorIva" (ionChange)="onFormChange()">
               <ion-select-option value="Responsable Monotributo">Responsable Monotributo</ion-select-option>
               <ion-select-option value="IVA Responsable Inscripto">IVA Responsable Inscripto</ion-select-option>
               <ion-select-option value="IVA Exento">IVA Exento</ion-select-option>
@@ -87,35 +77,29 @@
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Ingresos Brutos</ion-label>
-            <ion-input formControlName="emisorIngresosBrutos" placeholder="80000" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Ingresos Brutos" labelPlacement="stacked" formControlName="emisorIngresosBrutos" placeholder="80000" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Inicio de Actividades</ion-label>
-            <ion-input formControlName="emisorInicioActividades" placeholder="01/12/2017" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Inicio de Actividades" labelPlacement="stacked" formControlName="emisorInicioActividades" placeholder="01/12/2017" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
 
           <h3 class="panel-title">Datos del Receptor</h3>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Razón Social Cliente</ion-label>
-            <ion-input formControlName="receptorRazonSocial" placeholder="PUERTAS LAURA ITATI" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Razón Social Cliente" labelPlacement="stacked" formControlName="receptorRazonSocial" placeholder="PUERTAS LAURA ITATI" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">DNI/CUIT Cliente</ion-label>
-            <ion-input formControlName="receptorCuitDni" placeholder="38263168" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="DNI/CUIT Cliente" labelPlacement="stacked" formControlName="receptorCuitDni" placeholder="38263168" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Domicilio Cliente</ion-label>
-            <ion-input formControlName="receptorDomicilio" placeholder="Monseñor de Andrea 417" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Domicilio Cliente" labelPlacement="stacked" formControlName="receptorDomicilio" placeholder="Monseñor de Andrea 417" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Condición frente al IVA</ion-label>
-            <ion-select formControlName="receptorIva" (ionChange)="onFormChange()">
+            <ion-select label="Condición frente al IVA" labelPlacement="stacked" formControlName="receptorIva" (ionChange)="onFormChange()">
               <ion-select-option value="Consumidor Final">Consumidor Final</ion-select-option>
               <ion-select-option value="Responsable Monotributo">Responsable Monotributo</ion-select-option>
               <ion-select-option value="IVA Responsable Inscripto">IVA Responsable Inscripto</ion-select-option>
@@ -124,8 +108,7 @@
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Condición de Venta</ion-label>
-            <ion-select formControlName="receptorCondicionVenta" (ionChange)="onFormChange()">
+            <ion-select label="Condición de Venta" labelPlacement="stacked" formControlName="receptorCondicionVenta" (ionChange)="onFormChange()">
               <ion-select-option value="Contado">Contado</ion-select-option>
               <ion-select-option value="Tarjeta de Débito">Tarjeta de Débito</ion-select-option>
               <ion-select-option value="Tarjeta de Crédito">Tarjeta de Crédito</ion-select-option>
@@ -137,13 +120,11 @@
           <h3 class="panel-title">Autorización (CAE)</h3>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">CAE N°</ion-label>
-            <ion-input formControlName="caeNro" placeholder="86030757854814" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="CAE N°" labelPlacement="stacked" formControlName="caeNro" placeholder="86030757854814" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
           
           <ion-item class="input-item">
-            <ion-label position="stacked">Fecha de Vto. CAE</ion-label>
-            <ion-input type="date" formControlName="caeVencimiento" (ionInput)="onFormChange()"></ion-input>
+            <ion-input label="Fecha de Vto. CAE" labelPlacement="stacked" type="date" formControlName="caeVencimiento" (ionInput)="onFormChange()"></ion-input>
           </ion-item>
         </div>
 

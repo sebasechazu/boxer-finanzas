@@ -509,3 +509,112 @@ app-register {
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
+
+/* --- 8. ESTILOS DE IMPRESIÓN PARA FACTURAS --- */
+@media print {
+  body.printing-invoice {
+    & > *:not(#invoice-print-clone) {
+      display: none !important;
+    }
+
+    #invoice-print-clone {
+      display: block !important;
+      position: static !important;
+      width: 800px !important;
+      min-width: 800px !important;
+      height: 1130px !important;
+      min-height: 1130px !important;
+      padding: 40px !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      background: #ffffff !important;
+      border: none !important;
+      margin: 0 auto !important;
+      box-shadow: none !important;
+
+      .spacer-row td {
+        height: 380px !important;
+      }
+    }
+
+    /* Forzar visualización de HTML nativo completo */
+    &, html, ion-app, ion-modal, ion-content, .modal-wrapper, .ion-page, .scroll-content {
+      background: #ffffff !important;
+      color: #000000 !important;
+      position: static !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+    }
+
+    ion-header, ion-toolbar, ion-buttons, ion-button, .no-print, .config-panel {
+      display: none !important;
+    }
+
+    .invoice-modal-content {
+      display: block !important;
+      background: #ffffff !important;
+    }
+
+    .editor-container {
+      display: block !important;
+      background: #ffffff !important;
+      height: auto !important;
+    }
+
+    .preview-panel {
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+
+    .invoice-container-wrapper {
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      max-width: 100% !important;
+      box-shadow: none !important;
+      background: #ffffff !important;
+    }
+
+    .invoice-box {
+      border: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Asegurar bordes visibles en blanco y negro */
+    .watermark-title,
+    .invoice-header,
+    .header-right,
+    .c-badge-box,
+    .receptor-box,
+    .items-table-container,
+    .items-table th,
+    .items-table td,
+    .totals-table,
+    .consumer-defense-box {
+      border-color: #7f7f7f !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .items-table th {
+      background-color: #e0e0e0 !important;
+    }
+
+    .spacer-row td {
+      height: 380px !important;
+    }
+  }
+}
