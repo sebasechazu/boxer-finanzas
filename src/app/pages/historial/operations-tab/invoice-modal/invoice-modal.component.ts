@@ -7,7 +7,9 @@ import {
   IonSegment, IonSegmentButton
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, printOutline } from 'ionicons/icons';
+import { closeOutline, printOutline, downloadOutline } from 'ionicons/icons';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { Operacion, Cliente, Articulo, Venta, Prestamo } from '../../../../core/models';
 import { ClientService } from '../../../../core/services/client.service';
 import { ArticleService } from '../../../../core/services/article.service';
@@ -89,7 +91,7 @@ export class InvoiceModalComponent implements OnChanges, OnInit, OnDestroy {
   });
 
   constructor() {
-    addIcons({ closeOutline, printOutline });
+    addIcons({ closeOutline, printOutline, downloadOutline });
   }
 
   ngOnInit() {
@@ -278,143 +280,237 @@ export class InvoiceModalComponent implements OnChanges, OnInit, OnDestroy {
       })
       .join('\n');
 
-    // Detect if we are on a mobile device (where iframes window.print() prints the parent top window)
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Use a hidden iframe to print cleanly without opening tabs
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
 
-    if (isMobile) {
-      // For mobile: open a new tab/window containing ONLY the invoice A4 layout
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Comprobante de Pago</title>
-              ${printStyles}
-              <style>
-                @page {
-                  margin: 0;
-                }
-                body { 
-                  margin: 0 !important; 
-                  padding: 1.2cm !important; 
-                  box-sizing: border-box !important;
-                  background: white; 
-                  font-family: 'Arial', 'Helvetica', sans-serif;
-                }
-                * {
-                  box-sizing: border-box !important;
-                }
-                .invoice-box { 
-                  border: none !important; 
-                  margin: 0 !important; 
-                  padding: 0 !important; 
-                  width: 100% !important; 
-                  max-width: 100% !important; 
-                  min-width: 0 !important;
-                  transform: none !important;
-                  height: auto !important;
-                }
-                .spacer-row td { 
-                  height: 380px !important; 
-                }
-                /* Force borders and colors in all print engines */
-                * {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
-              </style>
-            </head>
-            <body>
-              <div class="invoice-box">
-                ${printContent}
-              </div>
-              <script>
-                window.onload = function() {
-                  window.focus();
+    const doc = iframe.contentWindow?.document || iframe.contentDocument;
+    if (doc) {
+      doc.open();
+      doc.write(`
+        <html>
+          <head>
+            <title>Comprobante de Pago</title>
+            ${printStyles}
+            <style>
+              @page {
+                margin: 0;
+              }
+              body { 
+                margin: 0 !important; 
+                padding: 1.2cm !important; 
+                box-sizing: border-box !important;
+                background: white; 
+                font-family: 'Arial', 'Helvetica', sans-serif;
+              }
+              * {
+                box-sizing: border-box !important;
+              }
+              .invoice-box { 
+                border: none !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                width: 100% !important; 
+                max-width: 100% !important; 
+                min-width: 0 !important;
+                transform: none !important;
+                height: auto !important;
+              }
+              .spacer-row td { 
+                height: 380px !important; 
+              }
+              /* Force borders and colors in all print engines */
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="invoice-box">
+              ${printContent}
+            </div>
+            <script>
+              window.onload = function() {
+                window.focus();
+                setTimeout(function() {
+                  window.print();
                   setTimeout(function() {
-                    window.print();
-                  }, 300);
-                };
-              </script>
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-      }
-    } else {
-      // For desktop: use a hidden iframe to print cleanly without opening tabs
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = '0';
-      document.body.appendChild(iframe);
+                    window.parent.document.body.removeChild(window.frameElement);
+                  }, 500);
+                }, 300);
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      doc.close();
+    }
+  }
 
-      const doc = iframe.contentWindow?.document || iframe.contentDocument;
-      if (doc) {
-        doc.open();
-        doc.write(`
-          <html>
-            <head>
-              <title>Comprobante de Pago</title>
-              ${printStyles}
-              <style>
-                @page {
-                  margin: 0;
-                }
-                body { 
-                  margin: 0 !important; 
-                  padding: 1.2cm !important; 
-                  box-sizing: border-box !important;
-                  background: white; 
-                  font-family: 'Arial', 'Helvetica', sans-serif;
-                }
-                * {
-                  box-sizing: border-box !important;
-                }
-                .invoice-box { 
-                  border: none !important; 
-                  margin: 0 !important; 
-                  padding: 0 !important; 
-                  width: 100% !important; 
-                  max-width: 100% !important; 
-                  min-width: 0 !important;
-                  transform: none !important;
-                  height: auto !important;
-                }
-                .spacer-row td { 
-                  height: 380px !important; 
-                }
-                /* Force borders and colors in all print engines */
-                * {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
-              </style>
-            </head>
-            <body>
-              <div class="invoice-box">
-                ${printContent}
-              </div>
-              <script>
-                window.onload = function() {
-                  window.focus();
-                  setTimeout(function() {
-                    window.print();
-                    setTimeout(function() {
-                      window.parent.document.body.removeChild(window.frameElement);
-                    }, 500);
-                  }, 300);
-                };
-              </script>
-            </body>
-          </html>
-        `);
-        doc.close();
-      }
+  async downloadPdf() {
+    const element = document.getElementById('invoiceFrame');
+    if (!element) return;
+
+    // Create temporary off-screen container for isolated rendering
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'fixed';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '-9999px';
+    tempContainer.style.width = '800px';
+    tempContainer.style.height = '1130px';
+    tempContainer.style.background = '#ffffff';
+    tempContainer.style.zIndex = '-9999';
+
+    // Inject invoice contents and custom styles to isolate from mobile parents
+    const tempStyle = `
+      <style>
+        .capturing-pdf {
+          width: 800px !important;
+          min-width: 800px !important;
+          height: 1130px !important;
+          min-height: 1130px !important;
+          padding: 40px !important;
+          box-sizing: border-box !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: space-between !important;
+          background: #ffffff !important;
+          color: #000000 !important;
+          font-family: 'Arial', 'Helvetica', sans-serif !important;
+        }
+        .capturing-pdf .spacer-row td {
+          height: 380px !important;
+        }
+        .capturing-pdf .invoice-header {
+          display: flex !important;
+          border: 0.5px solid #7f7f7f !important;
+          min-height: 135px !important;
+          position: relative !important;
+        }
+        .capturing-pdf .header-left {
+          flex: 1 !important;
+          padding: 12px 15px !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: space-between !important;
+        }
+        .capturing-pdf .header-right {
+          flex: 1 !important;
+          padding: 12px 15px !important;
+          padding-left: 50px !important;
+          border-left: 0.5px solid #7f7f7f !important;
+        }
+        .capturing-pdf .header-center {
+          position: absolute !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          top: -1px !important;
+          height: 100% !important;
+          width: 80px !important;
+          display: flex !important;
+          justify-content: center !important;
+          align-items: flex-start !important;
+        }
+        .capturing-pdf .c-badge-box {
+          width: 60px !important;
+          height: 60px !important;
+          border: 0.5px solid #7f7f7f !important;
+          background-color: #ffffff !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        .capturing-pdf .receptor-box {
+          border: 0.5px solid #7f7f7f !important;
+          padding: 10px 15px !important;
+          margin-top: 4px !important;
+          margin-bottom: 0 !important;
+        }
+        .capturing-pdf .items-table-container {
+          margin-top: 4px !important;
+        }
+        .capturing-pdf .items-table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+          font-size: 11px !important;
+        }
+        .capturing-pdf .items-table th {
+          background-color: #e0e0e0 !important;
+          border-top: 0.5px solid #7f7f7f !important;
+          border-bottom: 0.5px solid #7f7f7f !important;
+          border-right: 0.5px solid #7f7f7f !important;
+          padding: 8px 6px !important;
+          font-weight: bold !important;
+          text-align: left !important;
+        }
+        .capturing-pdf .items-table th:first-child {
+          border-left: 0.5px solid #7f7f7f !important;
+        }
+        .capturing-pdf .items-table td {
+          padding: 6px !important;
+        }
+        .capturing-pdf .totals-table {
+          width: 100% !important;
+          border: 0.5px solid #7f7f7f !important;
+          border-collapse: collapse !important;
+          font-size: 11px !important;
+        }
+        .capturing-pdf .totals-table td {
+          padding: 6px 12px !important;
+        }
+        .capturing-pdf .consumer-defense-box {
+          border: 0.5px solid #7f7f7f !important;
+          text-align: center !important;
+          padding: 6px !important;
+          font-size: 10px !important;
+        }
+        .capturing-pdf .footer-section {
+          margin-top: 10px !important;
+        }
+      </style>
+    `;
+
+    tempContainer.className = 'capturing-pdf';
+    tempContainer.innerHTML = tempStyle + element.innerHTML;
+    
+    // Append to body to render in background
+    document.body.appendChild(tempContainer);
+
+    try {
+      const canvas = await html2canvas(tempContainer, {
+        scale: 2, // High resolution (renders crisp text and QR code)
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Create A4 PDF (210mm x 297mm)
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = 297; // Force full A4 page height (matches capturing aspect ratio)
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`factura-${this.simForm.get('compNro')?.value || 'simulada'}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      // Remove temporary container
+      document.body.removeChild(tempContainer);
     }
   }
 
@@ -436,5 +532,9 @@ export class InvoiceModalComponent implements OnChanges, OnInit, OnDestroy {
       return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
     return dateStr;
+  }
+
+  isMobileDevice(): boolean {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   }
 }

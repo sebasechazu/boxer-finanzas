@@ -9,6 +9,10 @@
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="end">
+          <ion-button (click)="downloadPdf()">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Descargar PDF
+          </ion-button>
           <ion-button (click)="printInvoice()">
             <ion-icon name="print-outline" slot="start"></ion-icon>
             Imprimir
